@@ -1,0 +1,17 @@
+.vs
+.svn
+bin
+obj
+node_modules
+/public/*
+/x64/*
+
+packages
+projects
+
+.VSCodeCounter
+
+TestResults
+/VpnServer
+
+*.fpk
