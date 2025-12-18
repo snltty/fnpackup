@@ -1,0 +1,8 @@
+{
+    "defaults":
+    {
+        "run-as": "package"
+    },
+    "username": "fnpackup-docker",
+    "groupname": "fnpackup-docker"
+}

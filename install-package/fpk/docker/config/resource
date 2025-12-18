@@ -1,0 +1,28 @@
+{
+    "docker-project":
+    {
+        "projects":
+        [
+            {
+                "name": "fnpackup",
+                "path": "docker"
+            }
+        ]
+    },
+    "data-share":
+    {
+        "shares":
+        [
+            {
+                "name": "fnpackup-docker",
+                "permission":
+                {
+                    "rw":
+                    [
+                        "fnpackup-docker"
+                    ]
+                }
+            }
+        ]
+    }
+}

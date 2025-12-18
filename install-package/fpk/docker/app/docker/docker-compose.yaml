@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  linker:
+    image: snltty/fnpackup
+    container_name: fnpackup
+    privileged: true
+    network_mode: host
+    restart: always
+    tty: true
+    stdin_open: true
+    volumes:
+      - "/$TRIM_APPDEST_VOL/@appshare/fnpackup-docker/projects:/app/projects"

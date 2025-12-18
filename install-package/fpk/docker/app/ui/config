@@ -1,0 +1,13 @@
+{
+    ".url": {
+        "fnpackup.docker.Application": {
+            "title": "Fnpackup",
+            "icon": "images/icon_{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "{port}",
+            "url": "/",
+            "allUsers": false
+        }
+    }
+}
