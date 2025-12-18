@@ -1,6 +1,0 @@
-@fnpackup_HostAddress = http://localhost:5083
-
-GET {{fnpackup_HostAddress}}/files/get
-Accept: application/json
-
-###

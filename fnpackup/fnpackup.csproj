@@ -4,8 +4,6 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>disable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<PublishAot>false</PublishAot>
-		<PublishTrimmed>true</PublishTrimmed>
 		<Title>fnpackup</Title>
 		<Authors>snltty</Authors>
 		<Company>snltty</Company>
@@ -15,14 +13,34 @@
 		<FileVersion>0.0.1</FileVersion>
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 		<ApplicationIcon>ico.ico</ApplicationIcon>
+		<IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+
+		<PublishAot>false</PublishAot>
+		<PublishTrimmed>true</PublishTrimmed>
+		<PublishSingleFile>true</PublishSingleFile>
+		<TieredPGO>true</TieredPGO>
+		<TrimMode>partial</TrimMode>
+		<EventSourceSupport>false</EventSourceSupport>
+		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+		<DebuggerSupport>false</DebuggerSupport>
+		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+		<HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+		<InvariantGlobalization>false</InvariantGlobalization>
+		<MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+		<UseSystemResourceKeys>true</UseSystemResourceKeys>
+		<MetricsSupport>false</MetricsSupport>
+		<StackTraceSupport>false</StackTraceSupport>
+		<XmlResolverIsNetworkingEnabledByDefault>false</XmlResolverIsNetworkingEnabledByDefault>
+
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DebugType>full</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DebugType>full</DebugType>
-		<DebugSymbols>true</DebugSymbols>
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
 		<Optimize>True</Optimize>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
@@ -34,5 +52,4 @@
 	<ItemGroup>
 	  <Content Include="ico.ico" />
 	</ItemGroup>
-
 </Project>
