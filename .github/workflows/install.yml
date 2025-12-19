@@ -45,6 +45,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./public/publish-fpk/docker/x64/linker-docker-x64.fpk
-          asset_name: linker-docker-x64.fpk
+          asset_path: ./public/publish-fpk/docker/x64/fnpackup-docker-x64.fpk
+          asset_name: fnpackup-docker-x64.fpk
           asset_content_type: application/fpk
