@@ -1,11 +1,5 @@
 target=$(cd $(dirname $0)/..; pwd)
 
-
-cd fnpackup.web 
-npm install &&
-npm run build &&
-cd ../
-
 rs=('x64')
 for r in ${rs[@]} 
 do

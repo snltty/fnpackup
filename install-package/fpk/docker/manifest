@@ -11,5 +11,5 @@ distributor_url=https://github.com/snltty/fnpackup
 desktop_uidir=ui
 desktop_applaunchname=fnpackup.docker.Application
 
-service_port={port}
+service_port=1069
 checkport=true
