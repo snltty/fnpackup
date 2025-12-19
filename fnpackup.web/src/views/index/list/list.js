@@ -1,7 +1,11 @@
 import { inject, provide, ref, watch } from "vue";
+import { useLogger } from "../logger";
+import { fetchApi } from "@/api/api";
 
 const projectsSymbol = Symbol();
 export const provideProjects = () => {
+
+    const logger = useLogger();
     const projects = ref({
         page:{
             path:localStorage.getItem('projects_path') || './',
@@ -15,6 +19,18 @@ export const provideProjects = () => {
             content:''
         },
 
+        showCreate:false,
+        showUpload:false,
+
+        contextMenu:{
+            show:false,
+            x:0,
+            y:0,
+            row:null,
+            cell:null
+        },
+
+        building:false,
         loading:false,
         remarks:{
             'app':'应用目录，放你的程序和程序UI/入口',
@@ -53,7 +69,15 @@ export const provideProjects = () => {
         load(){
             this.loading = true;
             localStorage.setItem('projects_path', this.page.path);
-            fetch(`http://localhost:5083/files/get?path=${this.page.path}&p=${this.page.p}&ps=${this.page.ps}`)
+            fetchApi(`/files/get`,{
+                params:{
+                    path:this.page.path,
+                    p:this.page.p,
+                    ps:this.page.ps
+                },
+                method:'GET',
+                headers:{'Content-Type':'application/json'}
+            })
             .then(res=>res.json())
             .then(json=>{
                 this.loading = false;
@@ -66,7 +90,9 @@ export const provideProjects = () => {
                     c.remark = projects.value.remarks[c.remark] || c.remark;
                 })
                 this.page.list = json.list;
-            }).catch(()=>{
+                logger.value.success(`文件列表加载成功，${this.page.list.length}/${this.page.count}`);
+            }).catch((e)=>{
+                logger.value.error(`文件列表加载失败：${e}`);
                 this.loading = false;
             });
         }

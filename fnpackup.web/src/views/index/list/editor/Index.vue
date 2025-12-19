@@ -12,13 +12,16 @@
 </template>
 
 <script>
-import { onMounted, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 import Source from './Source.vue';
 import { useProjects } from '../list';
+import { useLogger } from '../../logger';
+import { fetchApi } from '@/api/api';
 export default {
     components:{Source},
     setup () {
         
+        const logger = useLogger();
         const projects = useProjects();
         const state = reactive({
             show:false
@@ -37,12 +40,14 @@ export default {
         });
 
         const getContent = ()=>{
-            fetch(`http://localhost:5083/files/read?path=${projects.value.current.path}`,{
+            fetchApi(`/files/read`,{
+                params:{path:projects.value.current.path},
                 method:'GET',
                 headers:{'Content-Type':'application/json'},
             }).then(res => res.text()).then(res => {
                 projects.value.current.content = res;
-            }).catch(()=>{
+            }).catch((e)=>{
+                logger.value.error(`${e}`);
             })
         }
 

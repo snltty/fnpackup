@@ -4,13 +4,13 @@
             <el-button type="primary" plain size="small" @click="handleCreate"><el-icon><Plus /></el-icon>新增项目</el-button>
         </template>
         <template v-if="paths.length >= 1">
-            <el-button type="success" plain size="small"><el-icon><Coin /></el-icon>打包FPK</el-button>
-            <el-button plain size="small" @click="handleUpload"><el-icon><Upload /></el-icon>上传文件</el-button>
-            <el-button plain size="small" @click="handleCreateFile(true)"><el-icon><DocumentAdd /></el-icon>新建文件</el-button>
-            <el-button plain size="small" @click="handleCreateFile(false)"><el-icon><FolderAdd /></el-icon>新建文件夹</el-button>
+            <el-button type="success" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Coin /></el-icon>打包FPK</el-button>
+            <el-button plain size="small" @click="handleUpload" :loading="projects.building"><el-icon><Upload /></el-icon>上传文件</el-button>
+            <el-button plain size="small" @click="handleCreateFile(true)" :loading="projects.building"><el-icon><DocumentAdd /></el-icon>新建文件</el-button>
+            <el-button plain size="small" @click="handleCreateFile(false)" :loading="projects.building"><el-icon><FolderAdd /></el-icon>新建文件夹</el-button>
         </template>
-        <Create v-model="state.showCreate" v-if="state.showCreate"></Create>
-        <UploadFile v-model="state.showUpload" v-if="state.showUpload"></UploadFile>
+        <Create v-model="projects.showCreate" v-if="projects.showCreate"></Create>
+        <UploadFile v-model="projects.showUpload" v-if="projects.showUpload"></UploadFile>
     </div>
 </template>
 
@@ -22,6 +22,7 @@ import Create from './Create.vue';
 import { useLogger } from '../logger';
 import { ElMessageBox } from 'element-plus';
 import UploadFile from './Upload.vue';
+import { fetchApi } from '@/api/api';
 export default {
     components: {
         Upload,Coin,DocumentAdd,FolderAdd,Plus,Create,UploadFile
@@ -30,15 +31,11 @@ export default {
         const logger = useLogger();
         const projects = useProjects();
         const paths = computed(()=>projects.value.page.path.split('/').filter(item=>item && item!='.'));
-        const state = reactive({
-            showCreate:false,
-            showUpload:false
-        });
         const handleCreate = ()=>{
-            state.showCreate = true;
+            projects.value.showCreate = true;
         }
         const handleUpload = ()=>{
-            state.showUpload = true;
+            projects.value.showUpload = true;
         }
         const handleCreateFile = (isFile)=>{
             ElMessageBox.prompt('输入名称', `新建${isFile?'文件':'文件夹'}`, {
@@ -52,7 +49,8 @@ export default {
                 if(!value) {
                     return;
                 }
-                fetch(`http://localhost:5083/files/createfile?path=${projects.value.page.path}/${value}&f=${isFile}`,{
+                fetchApi(`/files/createfile`,{
+                    params:{path:`${projects.value.page.path}/${value}`,f:isFile},
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
                 }).then(res=>res.text()).then((res)=>{
@@ -63,11 +61,32 @@ export default {
                         projects.value.load(); 
                     }
                 });
-            }).catch(() => {
+            }).catch((e) => {
+                logger.value.error(`${e}`);
             })
         }
 
-        return {paths,state,handleCreate,handleUpload,handleCreateFile}
+        const handleBuild = ()=>{
+            projects.value.building = true;
+            logger.value.debug('开始打包...');
+            fetchApi(`/files/build`,{
+                params:{name:projects.value.page.path.split('/').filter(item=>item && item!='.')[0]},
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+            }).then(res=>res.text()).then((res)=>{
+                if(res.indexOf('Packing successfully')){
+                    logger.value.success(res);
+                }else{
+                    logger.value.error(res);
+                }
+            }).catch((e)=>{
+                logger.value.error(`${e}`);
+            }).finally(()=>{
+                projects.value.building = false;
+            });
+        }
+
+        return {paths,projects,handleCreate,handleUpload,handleCreateFile,handleBuild}
     }
 }
 </script>

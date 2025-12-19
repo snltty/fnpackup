@@ -27,6 +27,7 @@ import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import {Plus,Refresh,Document,Folder} from '@element-plus/icons-vue'
 import { useLogger } from '../logger';
 import { useProjects } from './list';
+import {fetchApi} from '@/api/api'
 export default {
     props: ['modelValue'],
     emits: ['update:modelValue'],
@@ -66,7 +67,8 @@ export default {
                 }
                 const formData = new FormData();
                 formData.append('files', files[index].file);
-                fetch(`http://localhost:5083/files/upload?path=${ files[index].path}`,{
+                fetchApi(`/files/upload`,{
+                    params:{path:files[index].path},
                     method:'POST',
                     body:formData,
                 }).then(res=>res.json()).then((res)=>{
@@ -75,10 +77,11 @@ export default {
                             logger.value.error(item);
                         });
                     }else{
-                        logger.value.success('上传成功');
+                        logger.value.success(`已上传:${files[index].file.name}`);
                     }
                     fn(index+1);
-                }).catch(()=>{
+                }).catch((e)=>{
+                    logger.value.error(`${e}`);
                     fn(index+1);
                 });
             }

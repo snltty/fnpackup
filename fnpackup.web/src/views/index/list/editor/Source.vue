@@ -1,6 +1,6 @@
 <template>
     <Codemirror 
-    :style="{ height: height,fontSize:'1.6rem' }"
+    :style="{ height: state.height,fontSize:'1.6rem' }"
     v-model="state.code" 
     :autofocus="state.options.autofocus"
     :indent-with-tab="state.options.indentWithTab"
@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
@@ -21,11 +21,9 @@ export default {
     setup () {
         
         const projects = useProjects();
-        const height = computed(() => {
-            return `${window.innerHeight*0.7}px`
-        });
         const state = reactive({
             code:projects.value.current.content,
+            height:`${window.innerHeight*0.7}px`,
             options: {
                 tabSize: 4,
                 autofocus: true,
@@ -38,7 +36,17 @@ export default {
         })
         const myEditor = ref(null);
 
-        return {state,myEditor,height}
+        const resize = () => {
+            state.height = `${window.innerHeight*0.7}px`;
+        }
+        onMounted(()=>{
+            window.addEventListener('resize', resize);
+        });
+        onUnmounted(()=>{
+            window.removeEventListener('resize', resize);
+        });
+
+        return {state,myEditor}
     }
 }
 </script>

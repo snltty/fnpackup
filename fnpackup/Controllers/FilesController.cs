@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Mvc;
+using System.IO.Compression;
 using System.Text;
 
 namespace fnpackup.Controllers
@@ -33,10 +34,10 @@ namespace fnpackup.Controllers
             }
             if (result.Contains("Success! Created"))
             {
-                if (info.WizardInstall) System.IO.File.Create(Path.Join(root, info.Name, "wizard", "install"));
-                if (info.WizardUninstall) System.IO.File.Create(Path.Join(root, info.Name, "wizard", "uninstall"));
-                if (info.WizardUpgrade) System.IO.File.Create(Path.Join(root, info.Name, "wizard", "upgrade"));
-                if (info.WizardConfig) System.IO.File.Create(Path.Join(root, info.Name, "wizard", "config"));
+                if (info.WizardInstall) System.IO.File.WriteAllText(Path.Join(root, info.Name, "wizard", "install"),"{}");
+                if (info.WizardUninstall) System.IO.File.WriteAllText(Path.Join(root, info.Name, "wizard", "uninstall"), "{}");
+                if (info.WizardUpgrade) System.IO.File.WriteAllText(Path.Join(root, info.Name, "wizard", "upgrade"), "{}");
+                if (info.WizardConfig) System.IO.File.WriteAllText(Path.Join(root, info.Name, "wizard", "config"), "{}");
             }
 
             return result;
@@ -82,7 +83,6 @@ namespace fnpackup.Controllers
                 }).ToList()
             };
         }
-
 
         [HttpPost]
         public async Task<string> CreateFile(string path, bool f = true)
@@ -176,7 +176,7 @@ namespace fnpackup.Controllers
                 if (Directory.Exists(Path.GetDirectoryName(filePath)) == false)
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                } 
+                }
 
                 if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
 
@@ -185,6 +185,70 @@ namespace fnpackup.Controllers
             }
 
             return [];
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Download(string path)
+        {
+            path = Path.Join(root, path);
+            if (System.IO.File.Exists(path))
+            {
+                var stream = new FileStream(path, FileMode.Open);
+                return File(stream, "application/octet-stream", Path.GetFileName(path));
+            }
+
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                {
+                    var files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+
+                    foreach (var file in files)
+                    {
+                        var relativePath = Path.GetRelativePath(path, file);
+                        var entry = archive.CreateEntry(relativePath, CompressionLevel.Fastest);
+                        using (var entryStream = entry.Open())
+                        {
+                            using (var fileStream = System.IO.File.OpenRead(file))
+                            {
+                                await fileStream.CopyToAsync(entryStream);
+                            }
+                        }
+                    }
+                }
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                return File(memoryStream.ToArray(),
+                    "application/zip",
+                    $"{Path.GetFileName(path)}.zip");
+            }
+        }
+
+        [HttpPost]
+        public async Task<string> Build(string name)
+        {
+            Crlf2lf(name);
+
+            string result = CommandHelper.Execute($"fnpack", $" build", Path.Join(root, name), out string error);
+            if (string.IsNullOrWhiteSpace(error) == false)
+            {
+                return error;
+            }
+
+            return result;
+        }
+
+        private void Crlf2lf(string name)
+        {
+            string path = Path.Join(root, name, "cmd");
+            var files = Directory.GetFiles(path).ToList();
+            files.Add(Path.Join(root, name, "manifest"));
+            foreach (var item in files)
+            {
+                string text = System.IO.File.ReadAllText(item);
+                System.IO.File.WriteAllText(item, text.Replace("\r\n", "\n"));
+            }
+
         }
     }
 

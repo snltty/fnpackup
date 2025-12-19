@@ -1,6 +1,7 @@
 <template>
-    <div class="table-wrap flex-1 flex flex-column flex-nowrap">
-         <el-table :data="projects.page.list" stripe border size="small" class="flex-1" v-loading="projects.loading" @cell-dblclick="handleOpen">
+    <div class="table-wrap flex-1 flex flex-column flex-nowrap" @contextmenu="handleContextMenu1">
+        <el-table :data="projects.page.list" stripe border size="small" class="flex-1"
+         v-loading="projects.loading" @cell-dblclick="handleOpen" @row-contextmenu="handleContextMenu">
             <el-table-column prop="if" width="35">
                 <template #default="scope">
                     <div class="type">
@@ -38,6 +39,7 @@
                 :page-size="projects.page.ps" @current-change="handlePageChange"/>
             </div>
         </div>
+        <ContextMenu v-if="projects.contextMenu.show"></ContextMenu>
     </div>
 </template>
 
@@ -45,8 +47,9 @@
 import { onMounted} from 'vue';
 import {EditPen,Document,Folder} from '@element-plus/icons-vue'
 import { useProjects } from './list';
+import ContextMenu from './ContextMenu.vue';
 export default {
-    components:{EditPen,Document,Folder},
+    components:{EditPen,Document,Folder,ContextMenu},
     setup () {
         
         const projects = useProjects();
@@ -61,11 +64,30 @@ export default {
                 projects.value.current.path =`${projects.value.page.path}/${row.name}`;
             }
         }
+        const handleContextMenu = (row,cell,event)=>{
+            event.preventDefault()
+            event.stopPropagation();
+            projects.value.contextMenu.row = row;
+            projects.value.contextMenu.cell = cell;
+            projects.value.contextMenu.x = event.clientX;
+            projects.value.contextMenu.y = event.clientY;
+            projects.value.contextMenu.show = true;
+        }
+        const handleContextMenu1 = (event)=>{
+            event.preventDefault()
+            event.stopPropagation();
+            projects.value.contextMenu.row = null;
+            projects.value.contextMenu.cell= null;
+            projects.value.contextMenu.x = event.clientX;
+            projects.value.contextMenu.y = event.clientY;
+            projects.value.contextMenu.show = true;
+        }
+
         onMounted(()=>{
            projects.value.load();
         });
 
-        return {projects,handlePageChange,handleOpen}
+        return {projects,handlePageChange,handleOpen,handleContextMenu1,handleContextMenu}
     }
 }
 </script>

@@ -29,6 +29,7 @@ import { reactive, ref, watch } from 'vue';
 import {Plus,Refresh} from '@element-plus/icons-vue'
 import { useLogger } from '../logger';
 import { useProjects } from './list';
+import { fetchApi } from '@/api/api';
 export default {
     props: ['modelValue'],
     emits: ['update:modelValue'],
@@ -68,7 +69,7 @@ export default {
             ruleFormRef.value.validate(valid => {
                 if (valid) {
                     state.loading = true;
-                    fetch(`http://localhost:5083/files/create`,{
+                    fetchApi(`/files/create`,{
                         method:'POST',
                         headers:{'Content-Type':'application/json'},
                         body:JSON.stringify(state.createForm)
@@ -81,8 +82,9 @@ export default {
                             logger.value.success(res);
                             projects.value.load();
                         }
-                    }).catch(()=>{
+                    }).catch((e)=>{
                         state.loading = false;
+                        logger.value.error(`${e}`);
                     })
                 }
             })
