@@ -16,7 +16,7 @@ do
     sed -i "s|{version}|{{version}}|g" public/publish-fpk/docker/${r}/manifest
     sed -i 's/\r$//' public/publish-fpk/docker/${r}/manifest
     sed -i 's/\r$//' public/publish-fpk/docker/${r}/cmd/main
-    sed -i 's/\r$//' public/publish-fpk//${r}/cmd/uninstall_callback
+    sed -i 's/\r$//' public/publish-fpk/docker/${r}/cmd/uninstall_callback
 
     cd public/publish-fpk/docker/${r}
 
