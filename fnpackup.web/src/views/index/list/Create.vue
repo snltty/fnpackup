@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="state.show" title="创建项目" width="340" >
+    <el-dialog v-model="state.show" title="创建项目" width="260" >
         <div>
             <el-form :model="state.createForm" :rules="state.createRules" ref="ruleFormRef"  label-width="50">
                 <el-form-item label="名称" prop="name">
@@ -7,13 +7,9 @@
                 </el-form-item>
                 <el-form-item label="">
                     <el-checkbox v-model="state.createForm.docker" label="Docker应用"/>
-                    <el-checkbox v-model="state.createForm.ui" label="UI访问入口"/>
                 </el-form-item>
                 <el-form-item label="">
-                    <el-checkbox v-model="state.createForm.wizardInstall" label="安装向导"/>
-                    <el-checkbox v-model="state.createForm.wizardUninstall" label="卸载向导"/>
-                    <el-checkbox v-model="state.createForm.wizardUpgrade" label="更新向导"/>
-                    <el-checkbox v-model="state.createForm.wizardConfig" label="配置向导"/>
+                    <el-checkbox v-model="state.createForm.ui" label="UI访问入口"/>
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="state.show = false">取消</el-button>
@@ -44,11 +40,7 @@ export default {
             createForm:{
                 name:'',
                 docker:true,
-                ui:true,
-                wizardInstall:false,
-                wizardUninstall:false,
-                wizardUpgrade:false,
-                wizardConfig:false,
+                ui:true
             },
             createRules:{
                 name:[

@@ -32,13 +32,6 @@ namespace fnpackup.Controllers
             {
                 return error;
             }
-            if (result.Contains("Success! Created"))
-            {
-                if (info.WizardInstall) System.IO.File.WriteAllText(Path.Join(root, info.Name, "wizard", "install"),"{}");
-                if (info.WizardUninstall) System.IO.File.WriteAllText(Path.Join(root, info.Name, "wizard", "uninstall"), "{}");
-                if (info.WizardUpgrade) System.IO.File.WriteAllText(Path.Join(root, info.Name, "wizard", "upgrade"), "{}");
-                if (info.WizardConfig) System.IO.File.WriteAllText(Path.Join(root, info.Name, "wizard", "config"), "{}");
-            }
 
             return result;
         }
@@ -147,12 +140,23 @@ namespace fnpackup.Controllers
         public async Task<string> Read(string path)
         {
             path = Path.Join(root, path);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false || System.IO.File.Exists(path) == false)
             {
                 return string.Empty;
             }
 
             return await System.IO.File.ReadAllTextAsync(path).ConfigureAwait(false);
+        }
+        [HttpPost]
+        public async Task<string> Write([FromQuery]string path,[FromBody]string content)
+        {
+            path = Path.Join(root, path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
+            }
+            await System.IO.File.WriteAllTextAsync(path, content.Replace("\r\n", "\n")).ConfigureAwait(false);
+            return string.Empty;
         }
 
         [HttpPost]
@@ -258,10 +262,6 @@ namespace fnpackup.Controllers
         public string Name { get; set; }
         public bool Docker { get; set; }
         public bool Ui { get; set; }
-        public bool WizardInstall { get; set; }
-        public bool WizardUninstall { get; set; }
-        public bool WizardUpgrade { get; set; }
-        public bool WizardConfig { get; set; }
     }
 
     public sealed class FilePageInfo

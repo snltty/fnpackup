@@ -16,7 +16,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { useProjects } from '../list';
 export default {
-
+    match:/.*/,
     components: { Codemirror },
     setup () {
         

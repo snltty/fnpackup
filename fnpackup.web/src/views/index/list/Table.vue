@@ -62,6 +62,7 @@ export default {
                 projects.value.page.path = `${projects.value.page.path}/${row.name}`;
             }else{
                 projects.value.current.path =`${projects.value.page.path}/${row.name}`;
+                projects.value.current.remark = row.remark;
             }
         }
         const handleContextMenu = (row,cell,event)=>{
