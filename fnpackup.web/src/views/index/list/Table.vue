@@ -28,8 +28,8 @@
                 </template>
             </el-table-column>
             <el-table-column prop="remark" label="描述"></el-table-column>
-            <el-table-column prop="ct" label="创建时间" width="140" />
             <el-table-column prop="lwt" label="修改时间" width="140" />
+            <el-table-column prop="ct" label="创建时间" width="140" />
         </el-table>
         <div class="pages">
             <div>
@@ -48,21 +48,36 @@ import { onMounted} from 'vue';
 import {EditPen,Document,Folder} from '@element-plus/icons-vue'
 import { useProjects } from './list';
 import ContextMenu from './ContextMenu.vue';
+import { ElMessage } from 'element-plus';
+import { useLogger } from '../logger';
 export default {
     components:{EditPen,Document,Folder,ContextMenu},
     setup () {
         
+        const logger = useLogger();
         const projects = useProjects();
         const handlePageChange = (p)=>{
             projects.value.page.p = p;
             projects.value.load();
         }
+
+        const excludeEditor = [
+            /\.DS_Store$/,
+            /\.fpk$/,
+            /\/app\/server\//,
+            /\/app\/www\//,
+        ]
         const handleOpen = (row,cell)=>{
+            if(excludeEditor.some(e=>e.test(`${projects.value.page.path}/${row.name}`))){
+                logger.value.error(`${`${projects.value.page.path}/${row.name}`} 不可编辑`)
+                return;
+            }
             if(row.if==false){
                 projects.value.page.path = `${projects.value.page.path}/${row.name}`;
             }else{
                 projects.value.current.path =`${projects.value.page.path}/${row.name}`;
                 projects.value.current.remark = row.remark;
+                projects.value.current.show = true;
             }
         }
         const handleContextMenu = (row,cell,event)=>{

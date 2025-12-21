@@ -90,7 +90,7 @@ export const provideProjects = () => {
                     c.remark = projects.value.remarks[c.remark] || c.remark;
                 })
                 this.page.list = json.list;
-                logger.value.success(`文件列表加载成功，${this.page.list.length}/${this.page.count}`);
+                logger.value.success(`[${this.page.path}]文件列表加载成功，${this.page.list.length}/${this.page.count}`);
             }).catch((e)=>{
                 logger.value.error(`文件列表加载失败：${e}`);
                 this.loading = false;

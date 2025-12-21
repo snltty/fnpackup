@@ -1,21 +1,26 @@
 <template>
     <div class="manifset-wrap">
         <el-form ref="ruleFormRef"  :model="state.ruleForm" :rules="state.rules" label-width="140">
-            <template v-for="(item,index) in fieldsArray">
-                <el-form-item :label="item.type == 'checkbox'?'':item.label" :prop="item.name">
-                    <template v-if="item.type == 'input'">
-                        <el-input v-model="state.ruleForm[item.name]" />
-                    </template>
-                    <template v-else-if="item.type == 'checkbox'">
-                        <el-checkbox v-model="state.ruleForm[item.name]">{{ item.label }}</el-checkbox>
-                    </template>
-                    <template v-else-if="item.type == 'select'">
-                        <el-select v-model="state.ruleForm[item.name]">
-                            <el-option v-for="(option,index) in item.options" :key="index" :label="option" :value="option"></el-option>
-                        </el-select>
-                    </template>
-                </el-form-item>
-            </template>
+            <div class="inner scrollbar">
+                <template v-for="(item,index) in fieldsArray">
+                    <el-form-item :label="item.type == 'checkbox'?'':item.label" :prop="item.name">
+                        <template v-if="item.type == 'input'">
+                            <el-input v-model="state.ruleForm[item.name]" />
+                        </template>
+                        <template v-else-if="item.type == 'textarea'">
+                            <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6}" resize="none" v-model="state.ruleForm[item.name]" />
+                        </template>
+                        <template v-else-if="item.type == 'checkbox'">
+                            <el-checkbox v-model="state.ruleForm[item.name]">{{ item.label }}</el-checkbox>
+                        </template>
+                        <template v-else-if="item.type == 'select'">
+                            <el-select v-model="state.ruleForm[item.name]">
+                                <el-option v-for="(option,index) in item.options" :key="index" :label="option" :value="option"></el-option>
+                            </el-select>
+                        </template>
+                    </el-form-item>
+                </template>
+            </div>
             <el-form-item>
                 <el-button @click="handleCancel" :loading="state.loading">取消</el-button>
                 <el-button type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
@@ -27,6 +32,8 @@
 <script>
 import { reactive, ref } from 'vue';
 import { useProjects } from '../list';
+import { fetchApi } from '@/api/api';
+import { useLogger } from '../../logger';
 
 export default {
     match:/^manifest$/,
@@ -37,7 +44,7 @@ export default {
             {name: 'appname', label: '应用的唯一标识符', type: 'input',default:'',rules:[{required: true, message: '请填写唯一标识符', trigger: 'blur'}]},
             {name: 'version', label: '应用版本号', type: 'input',default:'0.0.1',rules:[{required: true, message: '请填写版本号', trigger: 'blur'}]},
             {name: 'display_name', label: '应用显示名', type: 'input',default:'',rules:[{required: true, message: '请填写显示名', trigger: 'blur'}]},
-            {name: 'desc', label: '详细介绍支持HTML', type: 'input',default:'',rules:[{required: true, message: '请填写描述', trigger: 'blur'}]},
+            {name: 'desc', label: '详细介绍支持HTML', type: 'textarea',default:'',rules:[{required: true, message: '请填写描述', trigger: 'blur'}]},
             {name: 'arch', label: '架构类型', type: 'select', options: ['x86_64'],default:'x86_64'},
             {name: 'source', label: '应用来源', type: 'select', options: ['thirdparty'],default:'thirdparty'},
             {name: 'maintainer', label: '开发者名', type: 'input',default:'',rules:[{required: true, message: '请填写开发者名', trigger: 'blur'}]},
@@ -56,6 +63,7 @@ export default {
             {name: 'disable_authorization_path', label: '是否禁用授权目录功能', type: 'checkbox',default:false},
         ];
         
+        const logger = useLogger();
         const projects = useProjects();
 
         const labels = fieldsArray.reduce((json,item)=>{
@@ -71,7 +79,7 @@ export default {
             json[item.name] = item.default;
             return json;
         },{});
-        const json = projects.value.current.content.split('\n').reduce((json,item)=>{
+        const contentJson = projects.value.current.content.split('\n').reduce((json,item)=>{
             const index = item.indexOf('=');
             if(index>0){
                 const key = item.substring(0,index).trim();
@@ -83,9 +91,10 @@ export default {
             }
             return json;
         },{});
-        
+        const json = Object.assign(defaultJosn,contentJson);
+        json.desc = json.desc.replace(/^"""|"""$/g,'');
         const state = reactive({
-            ruleForm: Object.assign(defaultJosn,json),
+            ruleForm: json,
             labels:labels,
             rules: rules,
             loading: false,
@@ -99,26 +108,33 @@ export default {
             ruleFormRef.value.validate(valid => {
                 if (valid) {
                     
-                    const content = Object.keys(state.ruleForm).reduce((arr,item)=>{
-                        arr.push(`${item}=${state.ruleForm[item]}`);
+                    const keys = Object.keys(state.ruleForm);
+                    const maxlength = keys.map(c=>c.length).sort((a,b)=>b-a)[0];
+                    const content = keys.reduce((arr,item)=>{
+                        let value = state.ruleForm[item];
+                        if(value){
+                            if(item == 'desc'){
+                                value  = `"""${value}"""`
+                            }
+                            arr.push(`${item.padEnd(maxlength,' ')} = ${value}`);
+                        }
                         return arr;
                     },[]).join('\n');
-                    console.log(state.ruleForm);
-                    console.log(content);
-                    return;
                     state.loading = true;
                     fetchApi(`/files/write`,{
-                        params:{path:projects.value.current.path},
                         method:'POST',
                         headers:{'Content-Type':'application/json'},
-                        body:content
+                        body:JSON.stringify({
+                            path:projects.value.current.path,
+                            content:content
+                        })
                     }).then(res => res.text()).then(res => {
                         state.loading = false;
                         if(res){
                             logger.value.error(res);
                         }else{
                             state.show = false;
-                            logger.value.success(res);
+                            logger.value.success(`保存成功`);
                             projects.value.load();
                         }
                     }).catch((e)=>{
@@ -135,5 +151,10 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.manifset-wrap{}
+.manifset-wrap{
+    .inner{
+        max-height: 70vh;
+        padding:2rem 1rem;
+    }
+}
 </style>

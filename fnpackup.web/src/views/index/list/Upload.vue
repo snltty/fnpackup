@@ -1,6 +1,6 @@
 <template>
     <el-dialog v-model="state.show" title="上传文件到当前目录" width="340" >
-        <div class="upload-wrap"  v-loading="" ref="drag">
+        <div class="upload-wrap" ref="drag">
             <div class="inner"> 
                 <template v-if="state.loading">
                     <div>{{state.process.current}} / {{state.process.total}}</div>

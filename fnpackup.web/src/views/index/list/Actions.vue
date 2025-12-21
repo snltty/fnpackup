@@ -76,6 +76,7 @@ export default {
             }).then(res=>res.text()).then((res)=>{
                 if(res.indexOf('Packing successfully')){
                     logger.value.success(res);
+                    projects.value.load(); 
                 }else{
                     logger.value.error(res);
                 }

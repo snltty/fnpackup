@@ -147,15 +147,27 @@ namespace fnpackup.Controllers
 
             return await System.IO.File.ReadAllTextAsync(path).ConfigureAwait(false);
         }
-        [HttpPost]
-        public async Task<string> Write([FromQuery]string path,[FromBody]string content)
+        [HttpGet]
+        public async Task<IActionResult> Img(string path)
         {
             path = Path.Join(root, path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false || System.IO.File.Exists(path) == false)
+            {
+                return null;
+            }
+
+            return File(await System.IO.File.ReadAllBytesAsync(path).ConfigureAwait(false), "image/png");
+        }
+
+        [HttpPost]
+        public async Task<string> Write(FileWriteInfo info)
+        {
+            string path = Path.Join(root, info.Path);
             if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
             {
                 return $"Access to the path [{Path.GetFullPath(path)}] is denied";
             }
-            await System.IO.File.WriteAllTextAsync(path, content.Replace("\r\n", "\n")).ConfigureAwait(false);
+            await System.IO.File.WriteAllTextAsync(path, info.Content.Replace("\r\n", "\n")).ConfigureAwait(false);
             return string.Empty;
         }
 
@@ -176,7 +188,7 @@ namespace fnpackup.Controllers
 
             foreach (var file in files)
             {
-                var filePath = Path.Combine(path, file.FileName);
+                var filePath = System.IO.File.Exists(path)? path : Path.Combine(path, file.FileName);
                 if (Directory.Exists(Path.GetDirectoryName(filePath)) == false)
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath));
@@ -256,7 +268,11 @@ namespace fnpackup.Controllers
         }
     }
 
-
+    public sealed class FileWriteInfo
+    {
+        public string Path { get; set; }
+        public string Content { get; set; }
+    }
     public sealed class ProjectCreateInfo
     {
         public string Name { get; set; }
