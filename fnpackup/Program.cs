@@ -32,12 +32,12 @@ namespace fnpackup
             app.UseStaticFiles(new StaticFileOptions
             {
                 
-                FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "web")),
+                FileProvider = new PhysicalFileProvider(dir),
                 RequestPath = "/web"
             }); ;
             app.UseDefaultFiles();
 
-            Console.WriteLine(Path.Combine(builder.Environment.ContentRootPath, "web"));
+            Console.WriteLine(dir);
             
 
             app.UseRouting();
