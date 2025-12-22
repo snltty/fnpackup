@@ -27,7 +27,7 @@ namespace fnpackup.Controllers
                 sb.Append($" --without-ui true");
             }
 
-            string result = CommandHelper.Execute($"fnpack", $" {sb.ToString()}", root, out string error);
+            string result = CommandHelper.Execute($"fnpack", $" {sb.ToString()}", [], root, out string error);
             if (string.IsNullOrWhiteSpace(error) == false)
             {
                 return error;
