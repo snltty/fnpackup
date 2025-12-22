@@ -1,10 +1,8 @@
-FROM alpine:latest
+FROM debian:latest
 
-ENV TZ=Asia/Shanghai DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
-RUN echo "https://mirrors.ustc.edu.cn/alpine/latest-stable/main/" > /etc/apk/repositories \
-    && apk add --no-cache libstdc++ libintl tzdata bash \
-    && ln -snf /usr/share/zoneinfo/$clTZ /etc/localtime \
-    && echo $TZ > /etc/timezone
+RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
+
+EXPOSE 1069/tcp
 
 WORKDIR /app
 COPY . .

@@ -46,16 +46,16 @@ jobs:
 
     - name: create docker image manifest
       run: |
-        docker pull --platform linux/arm/v7 snltty/fnpackup-musl-arm:latest &&  \
-        docker tag snltty/fnpackup-musl-arm:latest snltty/fnpackup-musl:arm &&  \
-        docker push snltty/fnpackup-musl:arm &&  \
-        docker pull --platform linux/arm64 snltty/fnpackup-musl-arm64:latest &&  \
-        docker tag snltty/fnpackup-musl-arm64:latest snltty/fnpackup-musl:arm64 &&  \
-        docker push snltty/fnpackup-musl:arm64 &&  \
-        docker pull --platform linux/amd64 snltty/fnpackup-musl-x64:latest &&  \
-        docker tag snltty/fnpackup-musl-x64:latest snltty/fnpackup-musl:amd64 &&  \
-        docker push snltty/fnpackup-musl:amd64 &&  \
-        docker manifest create snltty/fnpackup-musl:latest snltty/fnpackup-musl:amd64 snltty/fnpackup-musl:arm64 snltty/fnpackup-musl:arm && \
-        docker manifest create snltty/fnpackup-musl:v{{version}} snltty/fnpackup-musl:amd64 snltty/fnpackup-musl:arm64 snltty/fnpackup-musl:arm && \
-        docker manifest push snltty/fnpackup-musl:latest && \
-        docker manifest push snltty/fnpackup-musl:v{{version}}
+        docker pull --platform linux/arm/v7 snltty/fnpackup-arm:latest &&  \
+        docker tag snltty/fnpackup-arm:latest snltty/fnpackup:arm &&  \
+        docker push snltty/fnpackup:arm &&  \
+        docker pull --platform linux/arm64 snltty/fnpackup-arm64:latest &&  \
+        docker tag snltty/fnpackup-arm64:latest snltty/fnpackup:arm64 &&  \
+        docker push snltty/fnpackup:arm64 &&  \
+        docker pull --platform linux/amd64 snltty/fnpackup-x64:latest &&  \
+        docker tag snltty/fnpackup-x64:latest snltty/fnpackup:amd64 &&  \
+        docker push snltty/fnpackup:amd64 &&  \
+        docker manifest create snltty/fnpackup:latest snltty/fnpackup:amd64 snltty/fnpackup:arm64 snltty/fnpackup:arm && \
+        docker manifest create snltty/fnpackup:v{{version}} snltty/fnpackup:amd64 snltty/fnpackup:arm64 snltty/fnpackup:arm && \
+        docker manifest push snltty/fnpackup:latest && \
+        docker manifest push snltty/fnpackup:v{{version}}

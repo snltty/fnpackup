@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   fnpackup:
-    image: snltty/fnpackup-musl
+    image: snltty/fnpackup
     container_name: fnpackup
     privileged: true
     network_mode: host
