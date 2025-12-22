@@ -8,7 +8,7 @@
                 <span><el-icon size="14"><Refresh /></el-icon></span>
             </li>
             <li @click="handleFolder(0)">
-                <span>项目列表</span>
+                <span>应用列表</span>
             </li>
             <template v-for="(value,index) in paths">
                 <li @click="handleFolder(index+1)">

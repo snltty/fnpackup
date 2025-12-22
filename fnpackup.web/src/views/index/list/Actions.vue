@@ -1,7 +1,7 @@
 <template>
     <div class="actions-wrap">
         <template v-if="paths.length == 0">
-            <el-button type="primary" plain size="small" @click="handleCreate"><el-icon><Plus /></el-icon>新增项目</el-button>
+            <el-button type="primary" plain size="small" @click="handleCreate"><el-icon><Plus /></el-icon>新增应用</el-button>
         </template>
         <template v-if="paths.length >= 1">
             <el-button type="success" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Coin /></el-icon>打包FPK</el-button>

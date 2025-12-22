@@ -27,7 +27,16 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column prop="remark" label="描述"></el-table-column>
+            <el-table-column prop="remark" label="描述">
+                <template #default="scope">
+                    <template v-if="scope.row.doc">
+                        <a :href="scope.row.doc" target="_blank" class="a-doc">{{ scope.row.remark }}</a>
+                    </template>
+                    <template v-else>
+                        <span>{{ scope.row.remark }}</span>
+                    </template>
+                </template>
+            </el-table-column>
             <el-table-column prop="lwt" label="修改时间" width="140" />
             <el-table-column prop="ct" label="创建时间" width="140" />
         </el-table>
@@ -126,5 +135,10 @@ export default {
 .name{
     display: flex;
     align-items: center;
+}
+
+a.a-doc{
+    color:blue;
+    text-decoration: underline;
 }
 </style>

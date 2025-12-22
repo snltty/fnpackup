@@ -1,15 +1,21 @@
 <template>
-    <el-dialog v-model="state.show" title="创建项目" width="260" >
+    <el-dialog v-model="state.show" title="创建应用" width="280" >
         <div>
             <el-form :model="state.createForm" :rules="state.createRules" ref="ruleFormRef"  label-width="50">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="state.createForm.name"></el-input>
                 </el-form-item>
                 <el-form-item label="">
-                    <el-checkbox v-model="state.createForm.docker" label="Docker应用"/>
+                    <el-radio-group v-model="state.createForm.docker">
+                        <el-radio :value="true" class="mgr-1">Docker应用</el-radio>
+                        <el-radio :value="false">原生应用</el-radio>
+                    </el-radio-group>
                 </el-form-item>
                 <el-form-item label="">
-                    <el-checkbox v-model="state.createForm.ui" label="UI访问入口"/>
+                    <el-radio-group v-model="state.createForm.ui">
+                        <el-radio :value="true" class="mgr-1">有ui入口</el-radio>
+                        <el-radio :value="false">无入口</el-radio>
+                    </el-radio-group>
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="state.show = false">取消</el-button>
@@ -44,7 +50,7 @@ export default {
             },
             createRules:{
                 name:[
-                    {required: true, message: '请输入项目名', trigger: 'blur'}
+                    {required: true, message: '请输入应用名', trigger: 'blur'}
                 ]
             }
         });

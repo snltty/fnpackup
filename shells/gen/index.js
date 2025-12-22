@@ -46,7 +46,7 @@ function writeText(path, data) {
     }
 }
 function writeUploadIpk(data, tagName) {
-    const platforms1 = ['x64'];
+    const platforms1 = ['x86_64','arm64','arm'];
     for (let i = 0; i < platforms1.length; i++) {
         let arch = platforms1[i];
 

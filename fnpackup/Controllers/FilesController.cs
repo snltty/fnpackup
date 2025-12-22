@@ -33,6 +33,16 @@ namespace fnpackup.Controllers
                 return error;
             }
 
+            try
+            {
+                System.IO.Directory.CreateDirectory(Path.Join(root, info.Name, "building"));
+                System.IO.Directory.CreateDirectory(Path.Join(root, info.Name, "building", "dist"));
+                using var fs = System.IO.File.Create(Path.Join(root, info.Name, "building", "building"));
+            }
+            catch (Exception)
+            {
+            }
+
             return result;
         }
 

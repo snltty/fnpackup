@@ -5,18 +5,28 @@
                 <template v-for="(item,index) in fieldsArray">
                     <el-form-item :label="item.type == 'checkbox'?'':item.label" :prop="item.name">
                         <template v-if="item.type == 'input'">
-                            <el-input v-model="state.ruleForm[item.name]" />
+                            <el-input v-model="state.ruleForm[item.name]" @change="handleChange(item.name)" />
                         </template>
                         <template v-else-if="item.type == 'textarea'">
-                            <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6}" resize="none" v-model="state.ruleForm[item.name]" />
+                            <el-input type="textarea" 
+                            :autosize="{ minRows: 2, maxRows: 6}" resize="none" 
+                            v-model="state.ruleForm[item.name]" @change="handleChange(item.name)"/>
                         </template>
                         <template v-else-if="item.type == 'checkbox'">
-                            <el-checkbox v-model="state.ruleForm[item.name]">{{ item.label }}</el-checkbox>
+                            <el-checkbox v-model="state.ruleForm[item.name]" @change="handleChange(item.name)">{{ item.label }}</el-checkbox>
                         </template>
                         <template v-else-if="item.type == 'select'">
-                            <el-select v-model="state.ruleForm[item.name]">
-                                <el-option v-for="(option,index) in item.options" :key="index" :label="option" :value="option"></el-option>
-                            </el-select>
+                            <template v-if="item.create">
+                                <el-select v-model="state.ruleForm[item.name]" filterable clearable allow-create 
+                                multiple collapse-tags collapse-tags-tooltip :max-collapse-tags="19" @change="handleChange(item.name)">
+                                    <el-option v-for="(option,index) in item.options" :key="index" :label="option.label" :value="option.value"></el-option>
+                                </el-select>
+                            </template>
+                            <template v-else> 
+                                <el-select v-model="state.ruleForm[item.name]" @change="handleChange(item.name)">
+                                    <el-option v-for="(option,index) in item.options" :key="index" :label="option.label" :value="option.value"></el-option>
+                                </el-select>
+                            </template>
                         </template>
                     </el-form-item>
                 </template>
@@ -30,7 +40,7 @@
 </template>
 
 <script>
-import { reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useProjects } from '../list';
 import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
@@ -45,8 +55,8 @@ export default {
             {name: 'version', label: '应用版本号', type: 'input',default:'0.0.1',rules:[{required: true, message: '请填写版本号', trigger: 'blur'}]},
             {name: 'display_name', label: '应用显示名', type: 'input',default:'',rules:[{required: true, message: '请填写显示名', trigger: 'blur'}]},
             {name: 'desc', label: '详细介绍支持HTML', type: 'textarea',default:'',rules:[{required: true, message: '请填写描述', trigger: 'blur'}]},
-            {name: 'arch', label: '架构类型', type: 'select', options: ['x86_64'],default:'x86_64'},
-            {name: 'source', label: '应用来源', type: 'select', options: ['thirdparty'],default:'thirdparty'},
+            {name: 'arch', label: '架构类型', type: 'select', options: [{label: 'x86_64', value: 'x86_64'}],default:'x86_64'},
+            {name: 'source', label: '应用来源', type: 'select', options: [{label: '第三方应用', value: 'thirdparty'}],default:'thirdparty'},
             {name: 'maintainer', label: '开发者名', type: 'input',default:'',rules:[{required: true, message: '请填写开发者名', trigger: 'blur'}]},
             {name: 'maintainer_url', label: '开发者网站/联系方式', type: 'input',default:''},
             {name: 'distributor', label: '发布者名', type: 'input',default:'',rules:[{required: true, message: '请填写发布者名', trigger: 'blur'}]},
@@ -54,10 +64,10 @@ export default {
             {name: 'os_min_version', label: '支持最低系统版本', type: 'input',default:''},
             {name: 'os_max_version', label: '支持最高系统版本', type: 'input',default:''},
             {name: 'ctl_stop', label: '显示启动/停止功能', type: 'checkbox',default:true},
-            {name: 'install_type', label: '安装类型', type: 'select',options:['','root'],default:''},
-            {name: 'install_dep_apps', label: '依赖应用列表', type: 'input',default:''},
+            {name: 'install_type', label: '安装类型', type: 'select',options:[{label: '应用用户', value: ' '},{label: 'root用户', value: 'root'}],default:' '},
+            {name: 'install_dep_apps', label: '依赖应用列表', type: 'select',options:[],create:true,default:''},
             {name: 'desktop_uidir', label: 'UI组件目录路径', type: 'input',default:'ui',rules:[{required: true, message: '请填写UI组件目录路径', trigger: 'blur'}]},
-            {name: 'desktop_applaunchname', label: '应用中心启动入口',  type: 'input',default:'',rules:[{required: true, message: '请填写应用中心启动入口', trigger: 'blur'}]},
+            {name: 'desktop_applaunchname', label: '应用中心启动入口',  type: 'select',options:[],default:''},
             {name: 'service_port', label: '占用端口', type: 'input',default:''},
             {name: 'checkport', label: '检查端口占用', type: 'checkbox',default:true},
             {name: 'disable_authorization_path', label: '是否禁用授权目录功能', type: 'checkbox',default:false},
@@ -66,17 +76,17 @@ export default {
         const logger = useLogger();
         const projects = useProjects();
 
-        const labels = fieldsArray.reduce((json,item)=>{
-            json[item.name] = item.label;
-            return json;
-        },{});
         const rules = fieldsArray.reduce((json,item)=>{
             if(item.rules)
                 json[item.name] = item.rules;
             return json;
         },{});
         const defaultJosn = fieldsArray.reduce((json,item)=>{
-            json[item.name] = item.default;
+            if(item.name == 'install_dep_apps'){
+                json[item.name] = item.default.split(':').filter(c=>c);
+            }else{
+                json[item.name] = item.default;
+            }
             return json;
         },{});
         const contentJson = projects.value.current.content.split('\n').reduce((json,item)=>{
@@ -84,9 +94,11 @@ export default {
             if(index>0){
                 const key = item.substring(0,index).trim();
                 const value = item.substring(index+1).trim();
-                json[key] = value;
-                if(!labels[key]){
-                    labels[key] = key;
+
+                if(key == 'install_dep_apps'){
+                    json[key] = value.split(':').filter(c=>c);
+                }else{
+                    json[key] = value;
                 }
             }
             return json;
@@ -95,10 +107,30 @@ export default {
         json.desc = json.desc.replace(/^"""|"""$/g,'');
         const state = reactive({
             ruleForm: json,
-            labels:labels,
             rules: rules,
             loading: false,
         });
+
+        const handleChange = (name)=>{
+            if(name == 'desktop_uidir'){
+                readUiEndpoint();
+            }
+        }
+
+        const readUiEndpoint = ()=>{
+            fetchApi('/files/read',{
+                params:{path:`${projects.value.page.path}/app/${state.ruleForm.desktop_uidir}/config`},
+                method:'GET',
+                headers:{'Content-Type':'application/json'},
+            }).then(res => res.json()).then(res => { 
+                fieldsArray.filter(c=>c.name == 'desktop_applaunchname')[0].options = Object.keys(res['.url']).map(c=>{
+                    return {label:c,value:c}
+                });
+            }).catch((e)=>{
+                fieldsArray.filter(c=>c.name == 'desktop_applaunchname')[0].options = [];
+                logger.value.error(`${e}`);
+            })
+        }
 
         const ruleFormRef = ref(null);
         const handleCancel = ()=>{
@@ -108,10 +140,13 @@ export default {
             ruleFormRef.value.validate(valid => {
                 if (valid) {
                     
-                    const keys = Object.keys(state.ruleForm);
+                    const json = JSON.parse(JSON.stringify(state.ruleForm));
+                    json.install_dep_apps = json.install_dep_apps.join(':');
+
+                    const keys = Object.keys(json);
                     const maxlength = keys.map(c=>c.length).sort((a,b)=>b-a)[0];
                     const content = keys.reduce((arr,item)=>{
-                        let value = state.ruleForm[item];
+                        let value = json[item].trim();
                         if(value){
                             if(item == 'desc'){
                                 value  = `"""${value}"""`
@@ -144,8 +179,12 @@ export default {
                 }
             })
         }
+
+        onMounted(()=>{
+            readUiEndpoint();
+        })
     
-        return {state,fieldsArray,ruleFormRef,handleCancel,handleSubmit}
+        return {state,fieldsArray,ruleFormRef,handleChange,handleCancel,handleSubmit}
     }
 }
 </script>
