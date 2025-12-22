@@ -6,6 +6,11 @@
                 <span>在线打包FPK</span>
             </div>
             <span class="flex-1"></span>
+            <span class="github">
+                <a href="https://github.com/snltty/fnpackup" target="_blank">
+                    <img src="../assets/github.svg" alt="" height="20">
+                </a>
+            </span>
         </div>
     </div>
 </template>
@@ -38,6 +43,12 @@ export default {
             border-radius: 10px;
         }
         span{font-size:2rem;vertical-align: middle;color:#45627b;}
+    }
+    .github{
+        padding-right:1rem;
+        img{
+            vertical-align: middle;
+        }
     }
 }
 </style>
