@@ -36,6 +36,8 @@ namespace fnpackup
                 RequestPath = "/web"
             }); ;
             app.UseDefaultFiles();
+
+            Console.WriteLine(Path.Combine(builder.Environment.ContentRootPath, "web"));
             
 
             app.UseRouting();

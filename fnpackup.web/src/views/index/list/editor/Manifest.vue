@@ -103,7 +103,11 @@ export default {
             }
             return json;
         },{});
+
         const json = Object.assign(defaultJosn,contentJson);
+        json.ctl_stop = json.ctl_stop == 'true';
+        json.checkport = json.checkport == 'true';
+        json.disable_authorization_path = json.disable_authorization_path == 'true';
         json.desc = json.desc.replace(/^"""|"""$/g,'');
         const state = reactive({
             ruleForm: json,
@@ -144,14 +148,16 @@ export default {
                     json.install_dep_apps = json.install_dep_apps.join(':');
 
                     const keys = Object.keys(json);
-                    const maxlength = keys.map(c=>c.length).sort((a,b)=>b-a)[0];
                     const content = keys.reduce((arr,item)=>{
-                        let value = json[item].trim();
+                        let value = json[item];
+                        if(typeof value == 'string'){
+                            value = value.trim();
+                        }
                         if(value){
                             if(item == 'desc'){
                                 value  = `"""${value}"""`
                             }
-                            arr.push(`${item.padEnd(maxlength,' ')} = ${value}`);
+                            arr.push(`${item}=${value}`);
                         }
                         return arr;
                     },[]).join('\n');
