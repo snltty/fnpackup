@@ -253,28 +253,7 @@ namespace fnpackup.Controllers
         [HttpPost]
         public async Task<string> Build(string name)
         {
-            string result = string.Empty, error = string.Empty;
-            if (OperatingSystem.IsWindows())
-            {
-                result = CommandHelper.Execute($"fnpack", $" build", [], Path.Join(root, name), out error);
-            }
-            else
-            {
-                StringBuilder sb = new StringBuilder("app/ui config");
-                if (Directory.Exists(Path.Join(root, name, "app", "docker")))
-                {
-                    sb.Append(" app/docker");
-                }
-                else
-                {
-                    sb.Append(" app/server app/www");
-                }
-
-                result = CommandHelper.Execute($"/bin/bash", string.Empty, [
-                    $"tar -czf app.tgz --transform='s,app/,,g' {sb}",
-                    $"tar -czf {name}.fpk --exclude='app' --exclude='building' *",
-                    ], Path.Join(root, name), out error);
-            }
+            string result = CommandHelper.Execute($"fnpack", $" build", [], Path.Join(root, name), out string error);
             if (string.IsNullOrWhiteSpace(error) == false)
             {
                 return error;

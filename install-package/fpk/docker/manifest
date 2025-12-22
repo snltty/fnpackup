@@ -1,8 +1,8 @@
 appname=fnpackup
-version={version}
-display_name=Fnpackup
-desc=fnpack二次包装UI，在线编辑和打包fpk
-arch={arch}
+version=0.0.1
+display_name=在线打包FPK
+desc="""fnpack二次包装UI，在线编辑和打包fpk"""
+arch=x86_64
 source=thirdparty
 maintainer=snltty
 maintainer_url=https://github.com/snltty/fnpackup
@@ -10,6 +10,5 @@ distributor=snltty
 distributor_url=https://github.com/snltty/fnpackup
 desktop_uidir=ui
 desktop_applaunchname=fnpackup.docker.Application
-
 service_port=1069
 checkport=true
