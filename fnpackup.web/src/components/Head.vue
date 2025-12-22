@@ -3,7 +3,7 @@
         <div class="flex">
             <div class="logo">
                 <img src="../assets/logo.png" alt="">
-                <span>在线打包FPK</span>
+                <span>在线打包fpk</span>
             </div>
             <span class="flex-1"></span>
             <span class="github">
@@ -39,10 +39,9 @@ export default {
             height:4rem;
             vertical-align: middle;
             margin-right: .5rem;
-            border:1px solid #45627b;
             border-radius: 10px;
         }
-        span{font-size:2rem;vertical-align: middle;color:#45627b;}
+        span{font-size:2rem;vertical-align: middle;color:#2c6dee;font-family: fangsong;}
     }
     .github{
         padding-right:1rem;

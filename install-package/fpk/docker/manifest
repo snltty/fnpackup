@@ -1,6 +1,6 @@
 appname=fnpackup
 version=0.0.1
-display_name=在线打包FPK
+display_name=在线打包fpk
 desc="""fnpack二次包装UI，在线编辑和打包fpk"""
 arch=x86_64
 source=thirdparty

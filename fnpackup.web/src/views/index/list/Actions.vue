@@ -4,7 +4,7 @@
             <el-button type="primary" plain size="small" @click="handleCreate"><el-icon><Plus /></el-icon>新增应用</el-button>
         </template>
         <template v-if="paths.length >= 1">
-            <el-button type="success" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Coin /></el-icon>打包FPK</el-button>
+            <el-button type="primary" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Coin /></el-icon>打包FPK</el-button>
             <el-button plain size="small" @click="handleUpload" :loading="projects.building"><el-icon><Upload /></el-icon>上传文件</el-button>
             <el-button plain size="small" @click="handleCreateFile(true)" :loading="projects.building"><el-icon><DocumentAdd /></el-icon>新建文件</el-button>
             <el-button plain size="small" @click="handleCreateFile(false)" :loading="projects.building"><el-icon><FolderAdd /></el-icon>新建文件夹</el-button>

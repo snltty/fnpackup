@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-column flex-nowrap h-100 absolute">
-        <div class="head">
+        <div class="head" v-if="showHead">
             <Head></Head>
         </div>
         <div class="body flex-1 relative">
@@ -16,12 +16,15 @@
 import Head from './components/Head.vue';
 import Body from './components/Body.vue';
 import Foot from './components/Foot.vue';
+import { computed } from 'vue';
 export default {
     name: 'App',
     components: {Head,Body,Foot},
     setup() {
 
-        return {}
+        const showHead = computed(()=>window.self === window.top);
+
+        return {showHead}
     },
 }
 </script>

@@ -39,6 +39,7 @@ li{
         &.router-link-active,&:hover{
             background-color:#f6f8fa;
             box-shadow: 0 0 5px rgba(0,0,0,0.05) inset;
+            color:#2568ed
         }
         .el-icon,span{
             vertical-align: middle;

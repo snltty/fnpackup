@@ -1,7 +1,7 @@
 {
     ".url": {
         "fnpackup.docker.Application": {
-            "title": "在线打包FPK",
+            "title": "在线打包fpk",
             "icon": "images/icon_{0}.png",
             "type": "iframe",
             "protocol": "http",
