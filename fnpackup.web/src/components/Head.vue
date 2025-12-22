@@ -3,7 +3,7 @@
         <div class="flex">
             <div class="logo">
                 <img src="../assets/logo.png" alt="">
-                <span>Fnpackup</span>
+                <span>在线打包FPK</span>
             </div>
             <span class="flex-1"></span>
         </div>
