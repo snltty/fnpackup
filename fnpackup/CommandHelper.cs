@@ -4,7 +4,7 @@ namespace fnpackup
 {
     public sealed class CommandHelper
     {
-        public static string Execute(string fileName, string arg, string root, out string error)
+        public static string Execute(string fileName, string arg,string[] commands, string root, out string error)
         {
             using Process proc = new Process();
             proc.StartInfo.WorkingDirectory = Path.GetFullPath(root);
@@ -20,6 +20,15 @@ namespace fnpackup
             proc.StartInfo.StandardOutputEncoding = Encoding.UTF8; 
             proc.StartInfo.StandardErrorEncoding = Encoding.UTF8;
             proc.Start();
+
+            if (commands.Length > 0)
+            {
+                for (int i = 0; i < commands.Length; i++)
+                {
+                    proc.StandardInput.WriteLine(commands[i]);
+                }
+            }
+
             proc.StandardInput.AutoFlush = true;
             proc.StandardInput.WriteLine("exit");
             proc.StandardInput.Close();

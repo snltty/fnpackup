@@ -2,7 +2,7 @@ FROM alpine:latest
 
 ENV TZ=Asia/Shanghai DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 RUN echo "https://mirrors.ustc.edu.cn/alpine/latest-stable/main/" > /etc/apk/repositories \
-    && apk add --no-cache libstdc++ libintl tzdata \
+    && apk add --no-cache libstdc++ libintl tzdata bash \
     && ln -snf /usr/share/zoneinfo/$clTZ /etc/localtime \
     && echo $TZ > /etc/timezone
 

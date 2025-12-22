@@ -198,7 +198,7 @@ namespace fnpackup.Controllers
 
             foreach (var file in files)
             {
-                var filePath = System.IO.File.Exists(path)? path : Path.Combine(path, file.FileName);
+                var filePath = System.IO.File.Exists(path) ? path : Path.Combine(path, file.FileName);
                 if (Directory.Exists(Path.GetDirectoryName(filePath)) == false)
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath));
@@ -253,28 +253,34 @@ namespace fnpackup.Controllers
         [HttpPost]
         public async Task<string> Build(string name)
         {
-            Crlf2lf(name);
+            string result = string.Empty, error = string.Empty;
+            if (OperatingSystem.IsWindows())
+            {
+                result = CommandHelper.Execute($"fnpack", $" build", [], Path.Join(root, name), out error);
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("app/ui config");
+                if (Directory.Exists(Path.Join(root, name, "app", "docker")))
+                {
+                    sb.Append(" app/docker");
+                }
+                else
+                {
+                    sb.Append(" app/server app/www");
+                }
 
-            string result = CommandHelper.Execute($"fnpack", $" build", Path.Join(root, name), out string error);
+                result = CommandHelper.Execute($"/bin/bash", string.Empty, [
+                    $"tar -czf app.tgz --transform='s,app/,,g' {sb}",
+                    $"tar -czf {name}.fpk --exclude='app' --exclude='building' *",
+                    ], Path.Join(root, name), out error);
+            }
             if (string.IsNullOrWhiteSpace(error) == false)
             {
                 return error;
             }
 
             return result;
-        }
-
-        private void Crlf2lf(string name)
-        {
-            string path = Path.Join(root, name, "cmd");
-            var files = Directory.GetFiles(path).ToList();
-            files.Add(Path.Join(root, name, "manifest"));
-            foreach (var item in files)
-            {
-                string text = System.IO.File.ReadAllText(item);
-                System.IO.File.WriteAllText(item, text.Replace("\r\n", "\n"));
-            }
-
         }
     }
 
