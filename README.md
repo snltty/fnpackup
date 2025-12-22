@@ -7,7 +7,7 @@
 
 [![Stars](https://img.shields.io/github/stars/snltty/fnpackup?style=for-the-badge)](https://github.com/snltty/fnpackup)
 [![Forks](https://img.shields.io/github/forks/snltty/fnpackup?style=for-the-badge)](https://github.com/snltty/fnpackup)
-[![Docker Pulls](https://img.shields.io/docker/pulls/snltty/fnpackup-musl?style=for-the-badge)](https://hub.docker.com/r/snltty/fnpackup-musl)
+[![Docker Pulls](https://img.shields.io/docker/pulls/snltty/fnpackup?style=for-the-badge)](https://hub.docker.com/r/snltty/fnpackup)
 
 [![Release](https://img.shields.io/github/v/release/snltty/fnpackup?sort=semver&style=for-the-badge)](https://github.com/snltty/fnpackup/releases)
 [![License](https://img.shields.io/github/license/snltty/fnpackup?style=for-the-badge)](https://mit-license.org/)
@@ -26,7 +26,7 @@ fnpack二次包装UI，在线编辑和打包fpk
 
 1. 在飞牛系统`应用中心`找到应用安装，所有创建的项目文件都在`应用文件夹->fnpackup-docker->projects`下
 2. 下载`fnpackup-docker-x64.fpk`到飞牛系统安装，目录与应用中心安装的一样
-3. 或使用`snltty/fnpackup-musl`Dcker镜像运行
+3. 或使用`snltty/fnpackup`Dcker镜像运行
 
 ```
 docker run -it -d --name fnpackup \
@@ -34,7 +34,7 @@ docker run -it -d --name fnpackup \
 -v /usr/local/fnpackup-docker/projects:/app/projects \
 --restart=always \
 --privileged=true \
-snltty/fnpackup-musl
+snltty/fnpackup
 ```
 ```
 docker run -it -d --name fnpackup \
@@ -42,7 +42,7 @@ docker run -it -d --name fnpackup \
 -v /usr/local/fnpackup-docker/projects:/app/projects \
 --restart=always \
 --privileged=true \
-snltty/fnpackup-musl
+snltty/fnpackup
 ```
 
 ## [🎁]为爱发电
