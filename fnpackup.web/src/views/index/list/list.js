@@ -43,14 +43,14 @@ const remarks = {
 }
 const documents = [
     {match:/^manifest$/,url:'https://developer.fnnas.com/docs/core-concepts/manifest'},
-    {match:/app\/docker/,url:'https://developer.fnnas.com/docs/advancies/docker'},
+    {match:/app\/docker/,url:'https://developer.fnnas.com/docs/core-concepts/docker'},
     {match:/app\/ui/,url:'https://developer.fnnas.com/docs/core-concepts/app-entry'},
-    {match:/cmd/,url:'https://developer.fnnas.com/docs/core-concepts/framework#%E5%BA%94%E7%94%A8%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86'},
+    {match:/cmd/,url:'https://developer.fnnas.com/docs/core-concepts/native#%E7%BC%96%E8%BE%91%E5%BA%94%E7%94%A8%E5%90%AF%E5%81%9C%E8%84%9A%E6%9C%AC'},
     {match:/config\/privilege/,url:'https://developer.fnnas.com/docs/core-concepts/privilege'},
     {match:/config\/resource/,url:'https://developer.fnnas.com/docs/core-concepts/resource'},
     {match:/config/,url:'https://developer.fnnas.com/docs/core-concepts/resource'},
     {match:/wizard/,url:'https://developer.fnnas.com/docs/core-concepts/wizard'},
-    {match:/(ICON|icon).*(PNG|png)$/,url:'https://developer.fnnas.com/docs/ui/icon'},
+    {match:/(ICON|icon).*(PNG|png)$/,url:'https://developer.fnnas.com/docs/core-concepts/icon'},
 ]
 
 const projectsSymbol = Symbol();
@@ -67,7 +67,11 @@ export const provideProjects = () => {
         },
         current:{
             path:'',
-            content:''
+            content:'',
+            remark:'',
+            load:true,
+            show:false,
+            loading:false
         },
 
         showCreate:false,

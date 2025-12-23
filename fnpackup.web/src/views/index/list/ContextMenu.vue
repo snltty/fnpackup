@@ -3,6 +3,7 @@
         <a href="javascript:;" @click="handleRefresh"><el-icon><Refresh/></el-icon> 刷新</a>
         <a href="javascript:;" @click="handleUpload"><el-icon><Upload/></el-icon>上传</a>
         <a href="javascript:;" @click="handleDownload"><el-icon><Download/></el-icon>下载</a>
+        <a href="javascript:;" @click="handleWizard" v-if="canWizard"><el-icon><DocumentAdd/></el-icon>编辑用户向导</a>
         <a href="javascript:;" @click="handleCreateFile(true)"><el-icon><DocumentAdd/></el-icon>新建文件</a>
         <a href="javascript:;" @click="handleCreateFile(false)"><el-icon><FolderAdd/></el-icon>新建文件夹</a>
         <template v-if="projects.contextMenu.row">
@@ -14,7 +15,7 @@
 <script>
 import {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete} from '@element-plus/icons-vue'
 import { useProjects } from './list';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { useLogger } from '../logger';
 import { fetchApi } from '@/api/api';
@@ -24,7 +25,21 @@ export default {
 
         const logger = useLogger();
         const projects = useProjects();
-        
+
+        const canWizard = computed(()=>{
+            return /\/wizard/.test(projects.value.page.path)
+            || (projects.value.contextMenu.row && projects.value.contextMenu.row.name == 'wizard');
+        });
+        const handleWizard = ()=>{
+            projects.value.current.load = false;
+            if(projects.value.contextMenu.row){
+                projects.value.current.path = `${projects.value.page.path}/${projects.value.contextMenu.row.name}`;
+            }else{
+                projects.value.current.path = projects.value.page.path;
+            }
+            projects.value.current.remark = '用户向导';
+            projects.value.current.show = true;
+        }
         const handleRefresh = ()=>{
             projects.value.load();
         }
@@ -109,7 +124,7 @@ export default {
             });
         });
 
-        return {projects,handleRefresh,handleUpload,handleDownload,handleCreateFile,handleDel}
+        return {projects,canWizard,handleWizard,handleRefresh,handleUpload,handleDownload,handleCreateFile,handleDel}
     }
 }
 </script>

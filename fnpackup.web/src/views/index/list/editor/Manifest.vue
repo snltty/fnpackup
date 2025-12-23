@@ -46,7 +46,7 @@ import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
 
 export default {
-    match:/^manifest$/,
+    match:/manifest$/,
     width:500,
     setup () {
 
@@ -71,6 +71,8 @@ export default {
             {name: 'service_port', label: '占用端口', type: 'input',default:''},
             {name: 'checkport', label: '检查端口占用', type: 'checkbox',default:true},
             {name: 'disable_authorization_path', label: '是否禁用授权目录功能', type: 'checkbox',default:false},
+            {name: 'changelog', label: '应用更新日志', type: 'input',default:''},
+            
         ];
         
         const logger = useLogger();
