@@ -29,6 +29,7 @@
 
 <script>
 export default {
+    allowTypes:['switch'],
     props: ['item','types'],
     setup (props) {
 

@@ -199,7 +199,7 @@ export default {
         }
 
         const handleAdd = ()=>{
-            ElMessageBox.prompt(`输入名称,必须已{appname}.开头`, '添加入口', {
+            ElMessageBox.prompt(`输入名称,必须以{appname}.开头`, '添加入口', {
                 confirmButtonText: '确认',
                 cancelButtonText: '取消',
                 draggable:true,
@@ -221,7 +221,7 @@ export default {
             })
         }
         const handleEdit = ()=>{
-            ElMessageBox.prompt(`输入名称,必须已{appname}.开头`, `修改[${state.key}]`, {
+            ElMessageBox.prompt(`输入名称,必须以{appname}.开头`, `修改[${state.key}]`, {
                 confirmButtonText: '确认',
                 cancelButtonText: '取消',
                 draggable:true,

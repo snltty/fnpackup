@@ -29,6 +29,7 @@
 
 <script>
 export default {
+    allowTypes:['text','password'],
     props: ['item','types'],
     setup (props) {
 

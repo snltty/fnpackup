@@ -31,7 +31,7 @@
                     </el-form-item>
                 </template>
             </div>
-            <el-form-item>
+            <el-form-item class="mgt-1">
                 <el-button @click="handleCancel" :loading="state.loading">取消</el-button>
                 <el-button type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
             </el-form-item>
@@ -202,6 +202,7 @@ export default {
     .inner{
         max-height: 70vh;
         padding:2rem 1rem;
+        border:1px solid #ddd;
     }
 }
 </style>

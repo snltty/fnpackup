@@ -19,6 +19,8 @@
 <script>
 import {  onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror'
+import { json } from '@codemirror/lang-json'
+import { yaml } from '@codemirror/lang-yaml'
 import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { useProjects } from '../list';
@@ -29,16 +31,26 @@ export default {
     components: { Codemirror },
     setup () {
         
+
         const logger = useLogger();
         const projects = useProjects();
+
+        const extensions = [oneDark];
+        if(projects.value.current.path.endsWith('.yaml')){
+            extensions.splice(0,0,yaml());
+        }else if(projects.value.current.content.startsWith('#!/bin/bash')){
+            extensions.splice(0,0,javascript());
+        }else{
+            extensions.splice(0,0,json());
+        }
         const state = reactive({
             code:projects.value.current.content,
             height:`${window.innerHeight*0.7}px`,
             options: {
-                tabSize: 4,
+                tabSize: 2,
                 autofocus: true,
                 indentWithTab:true,
-                extensions:[javascript(), oneDark]
+                extensions:extensions
             },
             loading:false
         });

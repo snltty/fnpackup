@@ -21,6 +21,7 @@
 
 <script>
 export default {
+    allowTypes:['tips'],
     props: ['item','types'],
     setup (props) {
         return {}
