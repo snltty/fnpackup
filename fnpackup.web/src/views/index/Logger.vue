@@ -1,5 +1,5 @@
 <template>
-    <div class="logger-wrap scrollbar-4 h-100" ref="wrap">
+    <div class="logger-wrap scrollbar h-100" ref="wrap">
         <ul class="ul" ref="ul">
             <template v-for="item in logger.list">
                 <li :class="`color-${item.type}`">

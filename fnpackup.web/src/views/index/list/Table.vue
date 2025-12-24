@@ -1,45 +1,47 @@
 <template>
     <div class="table-wrap flex-1 flex flex-column flex-nowrap" @contextmenu="handleContextMenu1">
-        <el-table :data="projects.page.list" stripe border size="small" class="flex-1"
-         v-loading="projects.loading" @cell-dblclick="handleOpen" @row-contextmenu="handleContextMenu">
-            <el-table-column prop="if" width="35">
-                <template #default="scope">
-                    <div class="type">
-                        <template v-if="scope.row.docker">
-                            <img src="docker.svg" alt="docker" width="20">
+        <div class="flex-1 scrollbar">
+            <el-table :data="projects.page.list" border size="small" height="100%" v-loading="projects.loading"
+            @cell-dblclick="handleOpen" @row-contextmenu="handleContextMenu" ref="table" style="--el-table-header-bg-color: #fafafa">
+                <el-table-column prop="if" width="35">
+                    <template #default="scope">
+                        <div class="type">
+                            <template v-if="scope.row.docker">
+                                <img src="docker.svg" alt="docker" width="20">
+                            </template>
+                            <template v-else>
+                                <img src="binary.svg" alt="binary" width="20">
+                            </template>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="名称">
+                    <template #default="scope">
+                        <div class="name">
+                            <template v-if="scope.row.if">
+                                <el-icon size="16"><Document /></el-icon>
+                            </template>
+                            <template v-else>
+                                <el-icon size="16"><Folder /></el-icon>
+                            </template>
+                            <span class="mgl-1">{{ scope.row.name }}</span>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="remark" label="描述">
+                    <template #default="scope">
+                        <template v-if="scope.row.doc">
+                            <a :href="scope.row.doc" target="_blank" class="a-doc">{{ scope.row.remark }}</a>
                         </template>
                         <template v-else>
-                            <img src="binary.svg" alt="binary" width="20">
+                            <span>{{ scope.row.remark }}</span>
                         </template>
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column prop="name" label="名称">
-                <template #default="scope">
-                    <div class="name">
-                        <template v-if="scope.row.if">
-                            <el-icon size="16"><Document /></el-icon>
-                        </template>
-                        <template v-else>
-                            <el-icon size="16"><Folder /></el-icon>
-                        </template>
-                        <span class="mgl-1">{{ scope.row.name }}</span>
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column prop="remark" label="描述">
-                <template #default="scope">
-                    <template v-if="scope.row.doc">
-                        <a :href="scope.row.doc" target="_blank" class="a-doc">{{ scope.row.remark }}</a>
                     </template>
-                    <template v-else>
-                        <span>{{ scope.row.remark }}</span>
-                    </template>
-                </template>
-            </el-table-column>
-            <el-table-column prop="lwt" label="修改时间" width="140" />
-            <el-table-column prop="ct" label="创建时间" width="140" />
-        </el-table>
+                </el-table-column>
+                <el-table-column prop="lwt" label="修改时间" width="140" />
+                <el-table-column prop="ct" label="创建时间" width="140" />
+            </el-table>
+        </div>
         <div class="pages">
             <div>
                 <el-pagination small background layout="prev, pager, next" 
@@ -53,11 +55,10 @@
 </template>
 
 <script>
-import { onMounted} from 'vue';
+import { onMounted, ref} from 'vue';
 import {EditPen,Document,Folder} from '@element-plus/icons-vue'
 import { useProjects } from './list';
 import ContextMenu from './ContextMenu.vue';
-import { ElMessage } from 'element-plus';
 import { useLogger } from '../logger';
 export default {
     components:{EditPen,Document,Folder,ContextMenu},
@@ -107,17 +108,21 @@ export default {
             projects.value.contextMenu.y = event.clientY;
             projects.value.contextMenu.show = true;
         }
-
         onMounted(()=>{
-           projects.value.load();
+            projects.value.load();
         });
 
         return {projects,handlePageChange,handleOpen,handleContextMenu1,handleContextMenu}
     }
 }
 </script>
-
+<style lang="stylus">
+</style>
 <style lang="stylus" scoped>
+
+.table-wrap{
+    overflow hidden;
+}
 .pages{
     text-align: center;
     padding:1rem 0;

@@ -251,51 +251,9 @@ span.split-pad10 {
   -webkit-backdrop-filter: blur(2px);z-index: 99;} */
 
 
-.scrollbar,
-.scrollbar-1,
-.scrollbar-4,
-.scrollbar-10 {
+.scrollbar{
     overflow: auto;
-}
-
-.scrollbar-1::-webkit-scrollbar {
-    width: 0px;
-    height: 1px;
-}
-
-.scrollbar-1::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
-
-.scrollbar::-webkit-scrollbar {
-    width: 1px;
-    height: 1px;
-}
-
-.scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
-
-.scrollbar-4::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-}
-
-.scrollbar-4::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-}
-
-.scrollbar-10::-webkit-scrollbar {
-    width: 10px;
-    height: 1px;
-}
-
-.scrollbar-10::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    scrollbar-width: thin;
 }
 
 

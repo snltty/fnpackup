@@ -5,7 +5,7 @@
                 <el-form-item label="步骤标题" class="mgb-0">
                     <el-input v-model="step.stepTitle" ></el-input>
                 </el-form-item>
-                <div class="fields flex-1 scrollbar-4">
+                <div class="fields flex-1 scrollbar">
                     <template v-if="step.items.length > 0">
                         <el-form-item v-for="(item,index) in step.items" label-width="0" class="field-item mgb-0">
                             <a href="javascript:;" class="action del" @click="handleDelField(step,index)"><el-icon><CircleCloseFilled></CircleCloseFilled></el-icon></a>

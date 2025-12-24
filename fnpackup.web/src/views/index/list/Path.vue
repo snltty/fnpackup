@@ -49,10 +49,8 @@ export default {
 
 <style lang="stylus" scoped>
 .path-wrap{
-    background-color: #fafafa;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.05);
     li{
-        padding:0.5rem 1rem;
+        padding:.8rem 1rem;
         font-size:0;
         border-right:1px solid #ddd;
         color:#333;
@@ -63,7 +61,7 @@ export default {
         }
        
         span{
-            font-size:1.2rem;
+            font-size:1.3rem;
             display: inline-flex;
             align-items: center;
             vertical-align: bottom;
