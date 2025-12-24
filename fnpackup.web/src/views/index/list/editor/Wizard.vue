@@ -1,6 +1,6 @@
 <template>
     <el-tabs v-model="state.step" type="border-card" class="wizard-tab"  editable @edit="handleStepEdit">
-        <el-tab-pane :label="step.stepTitle" :name="step.id" :key="index" v-for="(step,index) in state.steps" class="h-100">
+        <el-tab-pane :label="step.stepTitle" :name="step._id" :key="index" v-for="(step,index) in state.steps" class="h-100">
             <el-form ref="ruleFormRef" :model="step.items" label-width="80" class="wizard-form h-100 flex flex-column flex-nowrap">
                 <el-form-item label="步骤标题" class="mgb-0">
                     <el-input v-model="step.stepTitle" ></el-input>
@@ -8,9 +8,12 @@
                 <div class="fields flex-1 scrollbar-4">
                     <template v-if="step.items.length > 0">
                         <el-form-item v-for="(item,index) in step.items" label-width="0" class="field-item mgb-0">
-                            <a href="javasceipt:;" class="action del" @click="handleDelField(step,index)"><el-icon><CircleCloseFilled></CircleCloseFilled></el-icon></a>
-                            <a href="javasceipt:;" class="action add" @click="handleAddField(step,index)"><el-icon><CirclePlusFilled></CirclePlusFilled></el-icon></a>
+                            <a href="javascript:;" class="action del" @click="handleDelField(step,index)"><el-icon><CircleCloseFilled></CircleCloseFilled></el-icon></a>
+                            <a href="javascript:;" class="action add" @click="handleAddField(step,index)"><el-icon><CirclePlusFilled></CirclePlusFilled></el-icon></a>
                             <component :is="choiceComponent(item.type)" :item="item" :types="state.types"></component>
+                            <template v-if="item.type != 'tips'">
+                                <WizardValidate :item="item" :types="state.types" :vtypes="state.vtypes"></WizardValidate>
+                            </template>
                         </el-form-item>
                     </template>
                     <template v-else>
@@ -21,7 +24,7 @@
                         </el-form-item>
                     </template>
                 </div>
-                <el-form-item label-width="0" v-if="step.items.length > 0">
+                <el-form-item label-width="0">
                     <div class="t-c w-100">
                         <el-button type="primary" @click="handleSubmit" :loading="state.loading">保存修改</el-button>
                     </div>
@@ -36,19 +39,26 @@ import {reactive } from 'vue';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
 import {Edit,CircleCloseFilled,CirclePlusFilled} from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import WizardText from './WizardText.vue';
 import WizardOptions from './WizardOptions.vue';
 import WizardSwitch from './WizardSwitch.vue';
 import WizardTips from './WizardTips.vue';
+import WizardValidate from './WizardValidate.vue';
 export default {
     props: ['type'],
-    components: { Edit,CircleCloseFilled,CirclePlusFilled },
+    components: { Edit,CircleCloseFilled,CirclePlusFilled,WizardValidate },
     setup (props,{emit}) {
 
         const logger = useLogger();
         const projects = useProjects();
 
+        const validateTypes = [
+            {label: '必填',value: 'required',default:{_required:true}},
+            {label: '范围',value: 'min',default:{_min:0,_max:0}},
+            {label: '长度',value: 'len',default:{_len:0}},
+            {label: '正则',value: 'pattern',default:{_pattern:''}},
+        ];
         const types = [
             {label:'文本框',value:'text',default:''},
             {label:'密码框',value:'password',default:''},
@@ -63,29 +73,30 @@ export default {
             field:'wizard_default',
             label:'示例项',
             initValue:'',
-            rules:[{required:true,message:'请输入内容'}],
+            rules:[],
             options:[]
         }, types.reduce((json,item)=>{
             json[`_${item.value}`] = item.default;
             return json;
         },{}));
 
-        const _default = JSON.parse(projects.value.current.content);
+        const _default = JSON.parse(projects.value.current.content == '[]' ? JSON.stringify([{'stepTitle':'欢迎使用','items':[]}]) : projects.value.current.content);
         _default.forEach((item,index)=>{
-            item.id = index;
+            item._id = index;
         });
         const state = reactive({
-            step:_default.length > 0 ? _default[0].id : '',
+            step:_default.length > 0 ? _default[0]._id : '',
             steps:_default,
             types:types,
-            loading:false
+            loading:false,
+            vtypes:validateTypes
         });
 
         const choiceComponent = (type) =>{
             return [WizardText,WizardOptions,WizardSwitch,WizardTips].filter(c=>c.allowTypes.indexOf(type) >= 0)[0];
         };
 
-        const handleStepEdit = (id,action) => {
+        const handleStepEdit = (_id,action) => {
             if(action == 'add'){
                 ElMessageBox.prompt('请输入步骤标题','添加步骤',{
                     confirmButtonText: '确定',
@@ -96,13 +107,13 @@ export default {
                     },
                 }).then(({ value }) => {
                     if(!value) return;
-                    const id = Date.now().toString();
+                    const _id = Date.now().toString();
                     state.steps.push({
-                        'id':id,
+                        '_id':_id,
                         'stepTitle':value,
                         'items':[]
                     });
-                    state.step = id;
+                    state.step = _id;
                 }).catch((e) => {
                     logger.value.error(`${e}`);
                 });
@@ -116,9 +127,9 @@ export default {
                         'vertical-align':'unset'
                     },
                 }).then(() => {
-                    state.steps = state.steps.filter(item=>item.id != id);
-                    if(state.step == id && state.steps.length > 0){
-                        state.step = state.steps[0].id;
+                    state.steps = state.steps.filter(item=>item._id != _id);
+                    if(state.step == _id && state.steps.length > 0){
+                        state.step = state.steps[0]._id;
                     }
                 }).catch((e) => {
                     logger.value.error(`${e}`);
@@ -149,23 +160,35 @@ export default {
             step.items.splice(index+1,0,JSON.parse(JSON.stringify(defaultItem)));
         }
 
+        const deleteField = (item)=>{
+            Object.keys(item).filter(c=>c.startsWith('_')).forEach(c=>{
+                delete item[c];
+            });
+        }
         const handleSubmit = () => {
             const arr = JSON.parse(JSON.stringify(state.steps.filter(c=>{
                 return c.items.filter(item=>item.field != 'wizard_default').length > 0;
             })));
-            arr.forEach(c=>{
-                delete c['id'];
-                c.items.forEach(item=>{
+            arr.forEach(step=>{
+                //删除步骤的辅助字段
+                deleteField(step);
+                step.items.forEach(item=>{
+                    //删除字段的辅助字段，每个字段类型有一个单独的初始值辅助字段
                     item.initValue = item[`_${item.type}`];
-                    types.forEach(type=>{
-                        delete item[`_${type.value}`];
-                    });
+                    deleteField(item);
+
+                    //删除验证的辅助字段，并将对应不同类型的辅助字段的值还原到真正字段
+                    //比如{required:true,_requred:true,message:'',_required_message:'111'}->{required:true,message:'11'}
+                    item.rules = item.rules.reduce((arr,rule)=>{
+                        const keys = Object.keys(validateTypes.filter(c=>c.value == rule._type)[0].default);
+                        arr.push(Object.assign(keys.reduce((json,value)=>{
+                            json[value.replace(/_/g,'')] = rule[value];
+                            return json;
+                        },{}),{'message':rule[`_${rule._type}_message`]}));
+                        return arr;
+                    },[]);
                 });
             });
-            if(arr.length == 0) {
-                ElMessage.error('未配置表单字段');
-                return;
-            }
             emit('save',JSON.stringify(arr,null,2));
         }
 

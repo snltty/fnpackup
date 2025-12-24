@@ -26,7 +26,7 @@ fnpack二次包装UI，在线编辑和打包fpk
 
 1. 在飞牛系统`应用中心`找到应用安装，所有创建的项目文件都在`应用文件夹->fnpackup-docker->projects`下
 2. 下载`fnpackup-docker-x64.fpk`到飞牛系统安装，目录与应用中心安装的一样
-3. 或使用`snltty/fnpackup`Dcker镜像运行，依赖fnpack，所以只能在飞牛系统中使用
+3. 或使用`snltty/fnpackup`Dcker镜像运行，依赖fnpack
 
 ```
 docker run -it -d --name fnpackup \

@@ -1,5 +1,3 @@
-using fnpackup.Controllers;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.FileProviders;
 
 namespace fnpackup
@@ -16,9 +14,9 @@ namespace fnpackup
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyOrigin()       // 允许任何源
-                          .AllowAnyMethod()       // 允许任何HTTP方法
-                          .AllowAnyHeader();       // 允许任何请求头
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
                 });
             });
 
@@ -36,9 +34,6 @@ namespace fnpackup
                 RequestPath = "/web"
             }); ;
             app.UseDefaultFiles();
-
-            Console.WriteLine(dir);
-            
 
             app.UseRouting();
             app.Run();

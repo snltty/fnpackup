@@ -1,6 +1,6 @@
 <template>
     <div class="wizard-wrap">
-        <el-tabs v-model="current" type="border-card" class="wizard-tab">
+        <el-tabs v-model="current" type="border-card" class="wizard-tab" @tab-change="handleChange">
             <el-tab-pane label="安装向导" name="install" v-loading="projects.current.loading" class="h-100">
                 <Wizard v-if="projects.current.content && current=='install'" :type="current" @save="saveContent"></Wizard>
             </el-tab-pane>
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted,  ref } from 'vue';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
 import Wizard from './Wizard.vue';
@@ -33,8 +33,10 @@ export default {
         const logger = useLogger();
         const projects = useProjects();
 
-        const path = /\/wizard$/.test(projects.value.current.path)?`${projects.value.current.path}/install`:projects.value.current.path;
-        const current = ref(path.split('/').pop());
+        const paths = (/\/wizard$/.test(projects.value.current.path) 
+        ?`${projects.value.current.path}/install`
+        :projects.value.current.path).split('/');
+        const current = ref(paths[paths.length-1]);
         const handleChange = (type) => {
             current.value = type;
             projects.value.current.remark = {
@@ -43,21 +45,20 @@ export default {
                 'upgrade':'用户更新向导',
                 'config':'用户配置向导'
             }[type];
+            paths[paths.length-1] = type;
             getContent();
         };
 
         const getContent = ()=>{
             return new Promise((resolve,reject)=>{ 
-
                 projects.value.current.loading = true;
                 projects.value.current.content = '';
                 fetchApi(`/files/read`,{
-                    params:{path:path},
+                    params:{path:paths.join('/')},
                     method:'GET',
                     headers:{'Content-Type':'application/json'},
                 }).then(res => res.text()).then(res => {
                     projects.value.current.loading = false;
-                    console.log(res);
                     projects.value.current.content = res || '[]';
                     resolve();
                 }).catch((e)=>{
@@ -69,11 +70,32 @@ export default {
         }
         const saveContent = (content)=>{
             projects.value.current.loading = true;
+            if(content == '[]'){
+                fetchApi(`/files/delfile`,{
+                    params:{ path:paths.join('/'), f:true},
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                })
+                .then(res=>res.text()).then((res)=>{
+                    projects.value.current.loading = false;
+                    if(res){
+                        logger.value.error(res);
+                    }else{
+                        ElMessage.success('操作成功!');
+                        logger.value.success(`未配置字段，[${paths.join('/')}]删除成功`);
+                        projects.value.load(); 
+                    }
+                }).catch((e)=>{
+                    projects.value.current.loading = false;
+                    logger.value.error(`${e}`);
+                });
+                return;
+            }
             fetchApi(`/files/write`,{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({
-                    path:path,
+                    path:paths.join('/'),
                     content:content
                 })
             }).then(res => res.text()).then(res => {
