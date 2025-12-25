@@ -46,29 +46,24 @@ function writeText(path, data) {
     }
 }
 function writeUploadIpk(data, tagName) {
-    const platforms1 = ['x86_64','arm64','arm'];
-    for (let i = 0; i < platforms1.length; i++) {
-        let arch = platforms1[i];
-
-        const types = ['docker'];
-        for (let j = 0; j < types.length; j++) { 
-            const type = types[j];
-            data.jobs.build.steps.push({
-                name: `upload-${type}-fpk-${arch}`,
-                id: `upload-${type}-fpk-${arch}`,
-                uses: 'actions/upload-release-asset@master',
-                env: {
-                    'GITHUB_TOKEN': '${{ secrets.ACTIONS_TOKEN }}'
-                },
-                with: {
-                    'upload_url': '${{ steps.create_release.outputs.upload_url }}',
-                    'asset_path': `./public/publish-fpk/${type}/${arch}/fnpackup-${type}-${arch}.fpk`,
-                    'asset_name': `fnpackup-${type}-${arch}.fpk`,
-                    'asset_content_type': 'application/fpk'
-                }
-            });
-        }
-    };
+    const types = ['docker'];
+    for (let j = 0; j < types.length; j++) { 
+        const type = types[j];
+        data.jobs.build.steps.push({
+            name: `upload-${type}-fpk`,
+            id: `upload-${type}-fpk`,
+            uses: 'actions/upload-release-asset@master',
+            env: {
+                'GITHUB_TOKEN': '${{ secrets.ACTIONS_TOKEN }}'
+            },
+            with: {
+                'upload_url': '${{ steps.create_release.outputs.upload_url }}',
+                'asset_path': `./public/publish-fpk/${type}/fnpackup-${type}.fpk`,
+                'asset_name': `fnpackup-${type}.fpk`,
+                'asset_content_type': 'application/fpk'
+            }
+        });
+    }
 }
 
 

@@ -38,33 +38,13 @@ jobs:
         run: chmod +x shells/publish-fpk.sh
       - name: publish projects
         run: ./shells/publish-fpk.sh
-      - name: upload-docker-fpk-x86_64
-        id: upload-docker-fpk-x86_64
+      - name: upload-docker-fpk
+        id: upload-docker-fpk
         uses: actions/upload-release-asset@master
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./public/publish-fpk/docker/x86_64/fnpackup-docker-x86_64.fpk
-          asset_name: fnpackup-docker-x86_64.fpk
-          asset_content_type: application/fpk
-      - name: upload-docker-fpk-arm64
-        id: upload-docker-fpk-arm64
-        uses: actions/upload-release-asset@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./public/publish-fpk/docker/arm64/fnpackup-docker-arm64.fpk
-          asset_name: fnpackup-docker-arm64.fpk
-          asset_content_type: application/fpk
-      - name: upload-docker-fpk-arm
-        id: upload-docker-fpk-arm
-        uses: actions/upload-release-asset@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./public/publish-fpk/docker/arm/fnpackup-docker-arm.fpk
-          asset_name: fnpackup-docker-arm.fpk
+          asset_path: ./public/publish-fpk/docker/fnpackup-docker.fpk
+          asset_name: fnpackup-docker.fpk
           asset_content_type: application/fpk
