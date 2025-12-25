@@ -16,16 +16,38 @@
                             <el-checkbox v-model="state.ruleForm[item.name]" @change="handleChange(item.name)">{{ item.label }}</el-checkbox>
                         </template>
                         <template v-else-if="item.type == 'select'">
-                            <template v-if="item.create">
-                                <el-select v-model="state.ruleForm[item.name]" filterable clearable allow-create 
-                                multiple collapse-tags collapse-tags-tooltip :max-collapse-tags="19" @change="handleChange(item.name)">
-                                    <el-option v-for="(option,index) in item.options" :key="index" :label="option.label" :value="option.value"></el-option>
-                                </el-select>
+                            <template v-if="item.to">
+                                <el-row class="w-100">
+                                    <el-col :span="12">
+                                        <template v-if="item.create">
+                                            <el-select v-model="state.ruleForm[item.name]" filterable clearable allow-create 
+                                            multiple collapse-tags collapse-tags-tooltip :max-collapse-tags="19" @change="handleChange(item.name)">
+                                                <el-option v-for="(option,index) in item.options" :label="option.label" :value="option.value"></el-option>
+                                            </el-select>
+                                        </template>
+                                        <template v-else> 
+                                            <el-select v-model="state.ruleForm[item.name]" @change="handleChange(item.name)">
+                                                <el-option v-for="(option,index) in item.options" :key="index" :label="option.label" :value="option.value"></el-option>
+                                            </el-select>
+                                        </template>
+                                    </el-col>
+                                    <el-col :span="12" class="t-r"> 
+                                        <el-button @click="handleTransform(index)">转为{{item.to.label}}</el-button>
+                                    </el-col>
+                                </el-row>
                             </template>
-                            <template v-else> 
-                                <el-select v-model="state.ruleForm[item.name]" @change="handleChange(item.name)">
-                                    <el-option v-for="(option,index) in item.options" :key="index" :label="option.label" :value="option.value"></el-option>
-                                </el-select>
+                            <template v-else>
+                                <template v-if="item.create">
+                                    <el-select v-model="state.ruleForm[item.name]" filterable clearable allow-create 
+                                    multiple collapse-tags collapse-tags-tooltip :max-collapse-tags="19" @change="handleChange(item.name)">
+                                        <el-option v-for="(option,index) in item.options" :key="index" :label="option.label" :value="option.value"></el-option>
+                                    </el-select>
+                                </template>
+                                <template v-else> 
+                                    <el-select v-model="state.ruleForm[item.name]" @change="handleChange(item.name)">
+                                        <el-option v-for="(option,index) in item.options" :key="index" :label="option.label" :value="option.value"></el-option>
+                                    </el-select>
+                                </template>
                             </template>
                         </template>
                     </el-form-item>
@@ -51,12 +73,40 @@ export default {
     width:500,
     setup () {
 
-        const fieldsArray = [
+        const logger = useLogger();
+        const projects = useProjects();
+        const contentJson = projects.value.current.content.split('\n').reduce((json,item)=>{
+            const index = item.indexOf('=');
+            if(index>0){
+                const key = item.substring(0,index).trim();
+                const value = item.substring(index+1).trim();
+
+                if(key == 'install_dep_apps'){
+                    json[key] = value.split(':').filter(c=>c);
+                }else{
+                    json[key] = value;
+                }
+            }
+            return json;
+        },{});
+
+        const archJson = {
+            arch:{
+                name: 'arch', label: '架构类型', type: 'select', options: [{label: 'x86_64', value: 'x86_64'}],default:'x86_64',
+                to:{label:'新版',value:'platform'}
+            },
+            platform:{
+                name: 'platform', label: '架构类型', type: 'select', options: [{label: 'all', value: 'all'},{label: 'x86', value: 'x86'},{label: 'arm', value: 'arm'}],default:'x86',
+                to:{label:'旧版',value:'arch'}
+            }
+        }
+
+        const fieldsArray = ref([
             {name: 'appname', label: '应用的唯一标识符', type: 'input',default:'',rules:[{required: true, message: '请填写唯一标识符', trigger: 'blur'}]},
             {name: 'version', label: '应用版本号', type: 'input',default:'0.0.1',rules:[{required: true, message: '请填写版本号', trigger: 'blur'}]},
             {name: 'display_name', label: '应用显示名', type: 'input',default:'',rules:[{required: true, message: '请填写显示名', trigger: 'blur'}]},
             {name: 'desc', label: '详细介绍支持HTML', type: 'textarea',default:'',rules:[{required: true, message: '请填写描述', trigger: 'blur'}]},
-            {name: 'arch', label: '架构类型', type: 'select', options: [{label: 'x86_64', value: 'x86_64'}],default:'x86_64'},
+            contentJson['arch'] !== undefined ? archJson['arch'] : archJson['platform'],
             {name: 'source', label: '应用来源', type: 'select', options: [{label: '第三方应用', value: 'thirdparty'}],default:'thirdparty'},
             {name: 'maintainer', label: '开发者名', type: 'input',default:'',rules:[{required: true, message: '请填写开发者名', trigger: 'blur'}]},
             {name: 'maintainer_url', label: '开发者网站/联系方式', type: 'input',default:''},
@@ -74,35 +124,17 @@ export default {
             {name: 'disable_authorization_path', label: '是否禁用授权目录功能', type: 'checkbox',default:false},
             {name: 'changelog', label: '应用更新日志', type: 'input',default:''},
             
-        ];
-        
-        const logger = useLogger();
-        const projects = useProjects();
-
-        const rules = fieldsArray.reduce((json,item)=>{
+        ]);
+        const rules = fieldsArray.value.reduce((json,item)=>{
             if(item.rules)
                 json[item.name] = item.rules;
             return json;
         },{});
-        const defaultJosn = fieldsArray.reduce((json,item)=>{
+        const defaultJosn = fieldsArray.value.reduce((json,item)=>{
             if(item.name == 'install_dep_apps'){
                 json[item.name] = item.default.split(':').filter(c=>c);
             }else{
                 json[item.name] = item.default;
-            }
-            return json;
-        },{});
-        const contentJson = projects.value.current.content.split('\n').reduce((json,item)=>{
-            const index = item.indexOf('=');
-            if(index>0){
-                const key = item.substring(0,index).trim();
-                const value = item.substring(index+1).trim();
-
-                if(key == 'install_dep_apps'){
-                    json[key] = value.split(':').filter(c=>c);
-                }else{
-                    json[key] = value;
-                }
             }
             return json;
         },{});
@@ -130,13 +162,22 @@ export default {
                 method:'GET',
                 headers:{'Content-Type':'application/json'},
             }).then(res => res.json()).then(res => { 
-                fieldsArray.filter(c=>c.name == 'desktop_applaunchname')[0].options = Object.keys(res['.url']).map(c=>{
+                fieldsArray.value.filter(c=>c.name == 'desktop_applaunchname')[0].options = Object.keys(res['.url']).map(c=>{
                     return {label:c,value:c}
                 });
             }).catch((e)=>{
-                fieldsArray.filter(c=>c.name == 'desktop_applaunchname')[0].options = [];
+                fieldsArray.value.filter(c=>c.name == 'desktop_applaunchname')[0].options = [];
                 logger.value.error(`${e}`);
             })
+        }
+
+        const handleTransform = (index)=>{
+            const from = fieldsArray.value[index];
+            const to = archJson[from.to.value];
+
+            fieldsArray.value[index] = to;
+            delete state.ruleForm[from.name];
+            state.ruleForm[to.name] = to.default;
         }
 
         const ruleFormRef = ref(null);
@@ -193,7 +234,7 @@ export default {
             readUiEndpoint();
         })
     
-        return {state,fieldsArray,ruleFormRef,handleChange,handleCancel,handleSubmit}
+        return {state,fieldsArray,ruleFormRef,handleChange,handleCancel,handleSubmit,handleTransform}
     }
 }
 </script>
