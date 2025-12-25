@@ -249,9 +249,7 @@ span.split-pad10 {
 }
 /* .device-remark{position: absolute;left:0;top:0;right:0;bottom:0; backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);z-index: 99;} */
-.el-overlay-dialog{
-    overflow: hidden !important;
-}
+
 
 .scrollbar{
     overflow: auto;

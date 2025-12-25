@@ -45,7 +45,7 @@ export default {
         }
         const state = reactive({
             code:projects.value.current.content,
-            height:`${window.innerHeight-300}px`,
+            height:`${window.innerHeight-window.innerHeight*0.1-200}px`,
             options: {
                 tabSize: 2,
                 autofocus: true,
@@ -86,7 +86,7 @@ export default {
         }
 
         const resize = () => {
-            state.height = `${window.innerHeight-300}px`;
+            state.height = `${window.innerHeight-window.innerHeight*0.1-200}px`;
         }
         onMounted(()=>{
             window.addEventListener('resize', resize);
