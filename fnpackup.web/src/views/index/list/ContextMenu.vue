@@ -1,11 +1,11 @@
 <template>
     <div class="context-menu-wrap" :style="{left:`${projects.contextMenu.x+4}px`,top:`${projects.contextMenu.y+4}px`}">
         <a href="javascript:;" @click="handleRefresh"><el-icon><Refresh/></el-icon> 刷新</a>
-        <a href="javascript:;" @click="handleUpload"><el-icon><Upload/></el-icon>上传</a>
-        <a href="javascript:;" @click="handleDownload"><el-icon><Download/></el-icon>下载</a>
+        <a href="javascript:;" @click="handleUpload" v-if="hasInProject"><el-icon><Upload/></el-icon>上传</a>
+        <a href="javascript:;" @click="handleDownload" v-if="hasInProject"><el-icon><Download/></el-icon>下载</a>
         <a href="javascript:;" @click="handleWizard" v-if="canWizard"><el-icon><DocumentAdd/></el-icon>编辑用户向导</a>
-        <a href="javascript:;" @click="handleCreateFile(true)"><el-icon><DocumentAdd/></el-icon>新建文件</a>
-        <a href="javascript:;" @click="handleCreateFile(false)"><el-icon><FolderAdd/></el-icon>新建文件夹</a>
+        <a href="javascript:;" @click="handleCreateFile(true)" v-if="hasInProject"><el-icon><DocumentAdd/></el-icon>新建文件</a>
+        <a href="javascript:;" @click="handleCreateFile(false)" v-if="hasInProject"><el-icon><FolderAdd/></el-icon>新建文件夹</a>
         <template v-if="projects.contextMenu.row">
             <a href="javascript:;" class="red" @click="handleDel"><el-icon><Delete/></el-icon>删除</a>
         </template>
@@ -26,12 +26,12 @@ export default {
         const logger = useLogger();
         const projects = useProjects();
 
+        const hasInProject = computed(()=>projects.value.page.path != '.');
         const canWizard = computed(()=>{
             return /\/wizard/.test(projects.value.page.path)
             || (projects.value.contextMenu.row && projects.value.contextMenu.row.name == 'wizard');
         });
         const handleWizard = ()=>{
-            projects.value.current.load = false;
             if(projects.value.contextMenu.row){
                 projects.value.current.path = `${projects.value.page.path}/${projects.value.contextMenu.row.name}`;
             }else{
@@ -124,7 +124,7 @@ export default {
             });
         });
 
-        return {projects,canWizard,handleWizard,handleRefresh,handleUpload,handleDownload,handleCreateFile,handleDel}
+        return {projects,hasInProject,canWizard,handleWizard,handleRefresh,handleUpload,handleDownload,handleCreateFile,handleDel}
     }
 }
 </script>

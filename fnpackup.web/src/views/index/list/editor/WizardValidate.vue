@@ -75,9 +75,9 @@ export default {
             if(!item['_type']){
                 item['_type'] = props.vtypes.filter(c=>item[c.value] !== undefined)[0].value;
             }
-            Object.assign(item,props.vtypes.reduce((json,item)=>{
-                Object.assign(json,item.default,{
-                    [`_${item.value}_message`]:''
+            Object.assign(item,props.vtypes.reduce((json,value)=>{
+                Object.assign(json,value.default,{
+                    [`_${value.value}_message`]: item[value.value] !== undefined ?  item.message : ''
                 });
                 return json;
             },{}));

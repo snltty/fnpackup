@@ -5,21 +5,23 @@
         <Table></Table>
     </div>
     <Editor></Editor>
+    <Guide v-if="projects.current.guide"></Guide>
 </template>
 
 <script>
 import Path from './Path.vue';
-import Actions from './Actions.vue';
+import Actions from './action/Index.vue';
 import Table from './Table.vue';
 import { provideProjects } from './list';
 import Editor from './editor/Index.vue';
+import Guide from './editor/Guide.vue';
 export default {
-    components: { Path, Actions,Table,Editor },
+    components: { Path, Actions,Table,Editor,Guide },
     setup () {
         
         const {projects} = provideProjects();
 
-        return {}
+        return {projects}
     }
 }
 </script>

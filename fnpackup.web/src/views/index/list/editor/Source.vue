@@ -1,23 +1,22 @@
 <template>
-    <div>
+    <div class="source-wrap">
         <Codemirror 
-            :style="{ height: state.height,fontSize:'1.6rem' }"
-            v-model="state.code" 
-            :autofocus="state.options.autofocus"
-            :indent-with-tab="state.options.indentWithTab"
-            :tab-size="state.options.tabSize"
-            :extensions="state.options.extensions"
-            class="theme" ref="myEditor"></Codemirror>
-        
-            <div class="btns t-c mgt-1">
-                <el-button @click="handleCancel" :loading="state.loading">取消</el-button>
-                <el-button type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
-            </div>
+        :style="{height:state.height, fontSize:'1.6rem' }"
+        v-model="state.code" 
+        :autofocus="state.options.autofocus"
+        :indent-with-tab="state.options.indentWithTab"
+        :tab-size="state.options.tabSize"
+        :extensions="state.options.extensions"
+        class="theme" ref="myEditor"></Codemirror>
+        <div style="height:6px;"></div>
+        <div class="btns t-c">
+            <el-button type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
+        </div>
     </div>
 </template>
 
 <script>
-import {  onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import {  nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror'
 import { json } from '@codemirror/lang-json'
 import { yaml } from '@codemirror/lang-yaml'
@@ -28,6 +27,7 @@ import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
 export default {
     match:/.*/,
+    width:600,
     components: { Codemirror },
     setup () {
         
@@ -45,7 +45,7 @@ export default {
         }
         const state = reactive({
             code:projects.value.current.content,
-            height:`${window.innerHeight*0.7}px`,
+            height:`${window.innerHeight-300}px`,
             options: {
                 tabSize: 2,
                 autofocus: true,
@@ -86,10 +86,13 @@ export default {
         }
 
         const resize = () => {
-            state.height = `${window.innerHeight*0.7}px`;
+            state.height = `${window.innerHeight-300}px`;
         }
         onMounted(()=>{
             window.addEventListener('resize', resize);
+            nextTick(()=>{
+                resize();
+            })
         });
         onUnmounted(()=>{
             window.removeEventListener('resize', resize);
@@ -99,7 +102,12 @@ export default {
     }
 }
 </script>
-
+<style lang="stylus">
+.v-codemirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+</style>
 <style lang="stylus" scoped>
-
+.source-wrap{height:50%}
 </style>

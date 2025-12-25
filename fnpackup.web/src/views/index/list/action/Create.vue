@@ -29,8 +29,8 @@
 <script>
 import { reactive, ref, watch } from 'vue';
 import {Plus,Refresh} from '@element-plus/icons-vue'
-import { useLogger } from '../logger';
-import { useProjects } from './list';
+import { useLogger } from '../../logger';
+import { useProjects } from '../list';
 import { fetchApi } from '@/api/api';
 export default {
     props: ['modelValue'],

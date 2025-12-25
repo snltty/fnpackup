@@ -1,18 +1,11 @@
 <template>
     <div class="wizard-wrap">
         <el-tabs v-model="current" type="border-card" class="wizard-tab" @tab-change="handleChange">
-            <el-tab-pane label="安装向导" name="install" v-loading="projects.current.loading" class="h-100">
-                <Wizard v-if="projects.current.content && current=='install'" :type="current" @save="saveContent"></Wizard>
-            </el-tab-pane>
-            <el-tab-pane label="卸载向导" name="uninstall" v-loading="projects.current.loading" class="h-100">
-                <Wizard v-if="projects.current.content && current=='uninstall'" :type="current" @save="saveContent"></Wizard>
-            </el-tab-pane>
-            <el-tab-pane label="更新向导" name="upgrade" v-loading="projects.current.loading" class="h-100">
-                <Wizard v-if="projects.current.content && current=='upgrade'" :type="current" @save="saveContent"></Wizard>
-            </el-tab-pane>
-            <el-tab-pane label="配置向导" name="config" v-loading="projects.current.loading" class="h-100">
-                <Wizard v-if="projects.current.content && current=='config'" :type="current" @save="saveContent"></Wizard>
-            </el-tab-pane>
+            <template v-for="item in options">
+                <el-tab-pane :label="item.label" :name="item.value" v-loading="projects.current.loading" class="h-100">
+                    <Wizard v-if="projects.current.content && current==item.value" :type="current" @save="saveContent"></Wizard>
+                </el-tab-pane>
+            </template>
         </el-tabs>
     </div>
 </template>
@@ -36,16 +29,19 @@ export default {
         const paths = (/\/wizard$/.test(projects.value.current.path) 
         ?`${projects.value.current.path}/install`
         :projects.value.current.path).split('/');
-        const current = ref(paths[paths.length-1]);
+        const current = ref('');
+
+        const options = [
+            {label:'用户安装向导',value:'install'},
+            {label:'用户卸载向导',value:'uninstall'},
+            {label:'用户更新向导',value:'upgrade'},
+            {label:'用户配置向导',value:'config'}
+        ];
         const handleChange = (type) => {
             current.value = type;
-            projects.value.current.remark = {
-                'install':'用户安装向导',
-                'uninstall':'用户卸载向导',
-                'upgrade':'用户更新向导',
-                'config':'用户配置向导'
-            }[type];
+            projects.value.current.remark = options.reduce((json,item)=>{ json[item.value]=item.label; return json;  },{})[type];
             paths[paths.length-1] = type;
+            projects.value.current.path = paths.join('/');
             getContent();
         };
 
@@ -114,10 +110,10 @@ export default {
         }
 
         onMounted(()=>{ 
-            getContent();
+            handleChange(paths[paths.length-1])
         });
 
-        return {projects,current,handleChange,saveContent}
+        return {projects,current,options,handleChange,saveContent}
     }
 }
 </script>

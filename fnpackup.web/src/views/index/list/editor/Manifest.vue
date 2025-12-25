@@ -31,16 +31,17 @@
                     </el-form-item>
                 </template>
             </div>
-            <el-form-item class="mgt-1">
-                <el-button @click="handleCancel" :loading="state.loading">取消</el-button>
-                <el-button type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
+            <el-form-item class="mgt-1" label-width="0">
+                <div class="t-c w-100"> 
+                    <el-button type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
+                </div>
             </el-form-item>
         </el-form>
     </div>
 </template>
 
 <script>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useProjects } from '../list';
 import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
@@ -125,7 +126,7 @@ export default {
 
         const readUiEndpoint = ()=>{
             fetchApi('/files/read',{
-                params:{path:`${projects.value.page.path}/app/${state.ruleForm.desktop_uidir}/config`},
+                params:{path:`${projects.value.page.path.split('/')[1]}/app/${state.ruleForm.desktop_uidir}/config`},
                 method:'GET',
                 headers:{'Content-Type':'application/json'},
             }).then(res => res.json()).then(res => { 

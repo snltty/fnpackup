@@ -261,6 +261,17 @@ namespace fnpackup.Controllers
 
             return result;
         }
+
+
+        [HttpGet]
+        public async Task<FileExistsInfo> Exists(string name)
+        {
+            return new FileExistsInfo
+            {
+                Docker = System.IO.Directory.Exists(Path.Join(root,name,"app","docker")),
+                UI = System.IO.Directory.Exists(Path.Join(root,name,"app","ui")),
+            };
+        }
     }
 
     public sealed class FileWriteInfo
@@ -289,5 +300,11 @@ namespace fnpackup.Controllers
         public string Ct { get; set; }
         public string Lwt { get; set; }
         public bool Docker { get; set; }
+    }
+
+    public sealed class FileExistsInfo
+    {
+        public bool Docker { get; set; }
+        public bool UI { get; set; }
     }
 }

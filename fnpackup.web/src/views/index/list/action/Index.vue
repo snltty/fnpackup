@@ -5,6 +5,8 @@
         </template>
         <template v-if="paths.length >= 1">
             <el-button type="primary" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Coin /></el-icon>打包fpk</el-button>
+            <el-button type="success" plain size="small" @click="handleGuide" :loading="projects.building"><el-icon><Files /></el-icon>快速编辑</el-button>
+            
             <el-button plain size="small" @click="handleUpload" :loading="projects.building"><el-icon><Upload /></el-icon>上传文件</el-button>
             <el-button plain size="small" @click="handleCreateFile(true)" :loading="projects.building"><el-icon><DocumentAdd /></el-icon>新建文件</el-button>
             <el-button plain size="small" @click="handleCreateFile(false)" :loading="projects.building"><el-icon><FolderAdd /></el-icon>新建文件夹</el-button>
@@ -15,17 +17,17 @@
 </template>
 
 <script>
-import { Coin, Upload,DocumentAdd,FolderAdd,Plus } from '@element-plus/icons-vue'
-import { computed, reactive } from 'vue';
-import { useProjects } from './list';
+import { Coin, Upload,DocumentAdd,FolderAdd,Plus,Files } from '@element-plus/icons-vue'
+import { computed } from 'vue';
+import { useProjects } from '../list';
 import Create from './Create.vue';
-import { useLogger } from '../logger';
+import { useLogger } from '../../logger';
 import { ElMessageBox } from 'element-plus';
 import UploadFile from './Upload.vue';
 import { fetchApi } from '@/api/api';
 export default {
     components: {
-        Upload,Coin,DocumentAdd,FolderAdd,Plus,Create,UploadFile
+        Upload,Coin,DocumentAdd,FolderAdd,Plus,Files,Create,UploadFile
     },
     setup () {
         const logger = useLogger();
@@ -67,27 +69,16 @@ export default {
         }
 
         const handleBuild = ()=>{
-            projects.value.building = true;
-            logger.value.debug('开始打包...');
-            fetchApi(`/files/build`,{
-                params:{name:projects.value.page.path.split('/').filter(item=>item && item!='.')[0]},
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-            }).then(res=>res.text()).then((res)=>{
-                if(res.indexOf('Packing successfully')){
-                    logger.value.success(res);
-                    projects.value.load(); 
-                }else{
-                    logger.value.error(res);
-                }
-            }).catch((e)=>{
-                logger.value.error(`${e}`);
-            }).finally(()=>{
-                projects.value.building = false;
-            });
+            const name = projects.value.page.path.split('/').filter(item=>item && item!='.')[0];
+            projects.value.current.path =`./${name}/fnpack`;
+            projects.value.current.remark = '打包下载';
+            projects.value.current.show = true;
+        }
+        const handleGuide = ()=>{
+            projects.value.current.guide = true;
         }
 
-        return {paths,projects,handleCreate,handleUpload,handleCreateFile,handleBuild}
+        return {paths,projects,handleCreate,handleUpload,handleCreateFile,handleBuild,handleGuide}
     }
 }
 </script>

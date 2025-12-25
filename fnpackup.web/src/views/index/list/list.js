@@ -69,9 +69,10 @@ export const provideProjects = () => {
             path:'',
             content:'',
             remark:'',
-            load:true,
             show:false,
-            loading:false
+            loading:false,
+            width:600,
+            guide:false,
         },
 
         showCreate:false,
