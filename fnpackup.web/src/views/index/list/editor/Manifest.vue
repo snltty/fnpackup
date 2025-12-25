@@ -1,7 +1,7 @@
 <template>
-    <div class="manifset-wrap">
-        <el-form ref="ruleFormRef"  :model="state.ruleForm" :rules="state.rules" label-width="140">
-            <div class="inner scrollbar">
+    <div class="manifset-wrap h-100">
+        <el-form ref="ruleFormRef"  :model="state.ruleForm" :rules="state.rules" label-width="140" class="h-100 flex flex-column flex-nowrap">
+            <div class="flex-1 inner scrollbar">
                 <template v-for="(item,index) in fieldsArray">
                     <el-form-item :label="item.type == 'checkbox'?'':item.label" :prop="item.name">
                         <template v-if="item.type == 'input'">
@@ -67,6 +67,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { useProjects } from '../list';
 import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
+import { ElMessage } from 'element-plus';
 
 export default {
     match:/manifest$/,
@@ -219,6 +220,7 @@ export default {
                             logger.value.error(res);
                         }else{
                             state.show = false;
+                            ElMessage.success('保存成功');
                             logger.value.success(`保存成功`);
                             projects.value.load();
                         }
@@ -242,7 +244,6 @@ export default {
 <style lang="stylus" scoped>
 .manifset-wrap{
     .inner{
-        max-height: 70vh;
         padding:2rem 1rem;
         border:1px solid #ddd;
     }

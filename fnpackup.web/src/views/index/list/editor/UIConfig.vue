@@ -1,5 +1,5 @@
 <template>
-    <el-tabs v-model="state.key" type="border-card" class="ui-tab"  editable @edit="handleEdit">
+    <el-tabs v-model="state.key" type="border-card" class="h-100 ui-tab"  editable @edit="handleEdit">
         <el-tab-pane :label="value._key" :name="value._id" :key="index" v-for="(value,index) in state.values" class="h-100">
             <el-form ref="ruleFormRef" label-width="80" class="ui-form h-100 flex flex-column flex-nowrap">
                 <div class="fields flex-1 scrollbar mgb-1">
@@ -20,8 +20,9 @@ import {reactive } from 'vue';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
 import {Edit,CircleCloseFilled,CirclePlusFilled} from '@element-plus/icons-vue'
-import { ElMessageBox } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import UIConfigItem from './UIConfigItem.vue';
+import { fetchApi } from '@/api/api';
 export default {
     match:/\/ui\/config$/,
     width:550,
@@ -82,6 +83,7 @@ export default {
                     logger.value.error(res);
                 }else{
                     state.show = false;
+                    ElMessage.success('保存成功');
                     logger.value.success(`保存成功`);
                     projects.value.load();
                 }
@@ -146,6 +148,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.ui-tab{
+.fields{
+    padding:1rem;
+    border:1px solid #eee;
 }
 </style>

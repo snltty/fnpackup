@@ -1,8 +1,11 @@
 <template>
-    <el-dialog v-model="projects.current.show" :title="`编辑器[${projects.current.remark}]`" :width="`${projects.current.width}px`" top="1vh" height="90%" style="max-width: 80rem;" 
-    :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
+    <el-dialog v-model="projects.current.show" :title="`编辑器[${projects.current.remark}]`" 
+    :width="`${projects.current.width}px`" top="1vh" 
+    :close-on-click-modal="false" :close-on-press-escape="false"  draggable class="editor-dialog">
         <template v-if="projects.current.show">
-            <Editor></Editor>
+            <div style="height:calc(100% - 4rem)">
+                <Editor></Editor>
+            </div>
         </template>
     </el-dialog>
 </template>
@@ -31,6 +34,11 @@ export default {
 }
 </script>
 
-<style lang="stylus" scoped>
-
+<style lang="stylus">
+.editor-dialog{
+    max-width: 80%;height:90%
+    .el-dialog__body{
+        height:100%;
+    }
+}
 </style>

@@ -125,8 +125,5 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.item{
-    padding:1rem;
-    border:1px solid #eee;
-}
+
 </style>

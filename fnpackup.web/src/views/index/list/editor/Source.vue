@@ -25,6 +25,7 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { useProjects } from '../list';
 import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
+import { ElMessage } from 'element-plus';
 export default {
     match:/.*/,
     width:600,
@@ -76,6 +77,7 @@ export default {
                     logger.value.error(res);
                 }else{
                     state.show = false;
+                    ElMessage.success('保存成功');
                     logger.value.success(`保存成功`);
                     projects.value.load();
                 }

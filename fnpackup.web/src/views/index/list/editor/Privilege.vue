@@ -26,6 +26,7 @@ import { reactive, ref } from 'vue';
 import { useProjects } from '../list';
 import { useLogger } from '../../logger';
 import { fetchApi } from '@/api/api';
+import { ElMessage } from 'element-plus';
 
 export default {
     match:/privilege$/,
@@ -63,6 +64,7 @@ export default {
                             logger.value.error(res);
                         }else{
                             state.show = false;
+                            ElMessage.success('保存成功');
                             logger.value.success(`保存成功`);
                             projects.value.load();
                         }
