@@ -2,9 +2,6 @@
     <el-tabs v-model="state.step" type="border-card" class="wizard-tab"  editable @edit="handleStepEdit">
         <el-tab-pane :label="step.stepTitle" :name="step._id" :key="index" v-for="(step,index) in state.steps" class="h-100">
             <el-form ref="ruleFormRef" :model="step.items" label-width="80" class="wizard-form h-100 flex flex-column flex-nowrap">
-                <el-form-item label="步骤标题" class="mgb-1">
-                    <el-input v-model="step.stepTitle" ></el-input>
-                </el-form-item>
                 <WizardPlusField :step="step"></WizardPlusField>
                 <div class="fields flex-1 scrollbar">
                     <template v-if="step.items.length > 0">
