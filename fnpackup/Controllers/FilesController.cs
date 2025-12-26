@@ -10,8 +10,11 @@ namespace fnpackup.Controllers
     public class FilesController : BaseController
     {
         private readonly string root = "./projects";
-        public FilesController()
+
+        private readonly IHttpClientFactory httpClientFactory;
+        public FilesController(IHttpClientFactory httpClientFactory)
         {
+            this.httpClientFactory = httpClientFactory;
         }
 
         [HttpPost]
@@ -268,9 +271,20 @@ namespace fnpackup.Controllers
         {
             return new FileExistsInfo
             {
-                Docker = System.IO.Directory.Exists(Path.Join(root,name,"app","docker")),
-                UI = System.IO.Directory.Exists(Path.Join(root,name,"app","ui")),
+                Docker = System.IO.Directory.Exists(Path.Join(root, name, "app", "docker")),
+                UI = System.IO.Directory.Exists(Path.Join(root, name, "app", "ui")),
             };
+        }
+
+        private List<AppCenterInfo> apps = [];
+        [HttpGet]
+        public async Task<List<AppCenterInfo>> AppCnter(string host, string name)
+        {
+            using var client = httpClientFactory.CreateClient();
+
+            //client.GetAsync($"http://{host}/")
+
+            return apps.Where(c => c.Name.Contains(name) || c.Label.Contains(name)).Take(10).ToList();
         }
     }
 
@@ -306,5 +320,12 @@ namespace fnpackup.Controllers
     {
         public bool Docker { get; set; }
         public bool UI { get; set; }
+    }
+
+    public sealed class AppCenterInfo
+    {
+        public string Name { get; set; }
+        public string Label { get; set; }
+        public string Icon { get; set; }
     }
 }
