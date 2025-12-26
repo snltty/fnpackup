@@ -20,7 +20,8 @@
                                 <el-row class="w-100">
                                     <el-col :span="12">
                                         <template v-if="item.create">
-                                            <el-select v-model="state.ruleForm[item.name]" filterable clearable allow-create 
+                                            <el-select v-model="state.ruleForm[item.name]" :remote="item.remote" :filter-method="item.remoteFn || remoteFn"
+                                            filterable clearable allow-create 
                                             multiple collapse-tags collapse-tags-tooltip :max-collapse-tags="19" @change="handleChange(item.name)">
                                                 <el-option v-for="(option,index) in item.options" :label="option.label" :value="option.value"></el-option>
                                             </el-select>
@@ -38,7 +39,8 @@
                             </template>
                             <template v-else>
                                 <template v-if="item.create">
-                                    <el-select v-model="state.ruleForm[item.name]" filterable clearable allow-create 
+                                    <el-select v-model="state.ruleForm[item.name]" :remote="item.remote" :filter-method="item.remoteFn || remoteFn"
+                                    filterable clearable allow-create 
                                     multiple collapse-tags collapse-tags-tooltip :max-collapse-tags="19" @change="handleChange(item.name)">
                                         <el-option v-for="(option,index) in item.options" :key="index" :label="option.label" :value="option.value"></el-option>
                                     </el-select>
@@ -73,22 +75,6 @@ export default {
     match:/manifest$/,
     width:500,
     setup () {
-
-        try{
-            console.log(document.cookie);
-        }catch(e){
-            console.log(e);
-        }
-        try{
-            console.log(window.top.document.cookie);
-        }catch(e){
-            console.log(e);
-        }
-        try{
-            console.log(window.parent.document.cookie);
-        }catch(e){
-            console.log(e);
-        }
 
         const logger = useLogger();
         const projects = useProjects();
@@ -133,7 +119,21 @@ export default {
             {name: 'os_max_version', label: '支持最高系统版本', type: 'input',default:''},
             {name: 'ctl_stop', label: '显示启动/停止功能', type: 'checkbox',default:true},
             {name: 'install_type', label: '安装类型', type: 'select',options:[{label: '应用用户', value: ' '},{label: 'root用户', value: 'root'}],default:' '},
-            {name: 'install_dep_apps', label: '依赖应用列表', type: 'select',options:[],create:true,default:''},
+            {name: 'install_dep_apps', label: '依赖应用列表', type: 'select',options:[],create:true,remote:true,remoteFn:(query)=>{
+                fetchApi('/files/appcenter',{
+                    params:{name:query || ''},
+                    method:'GET',
+                    headers:{'Content-Type':'application/json'},
+                }).then(res => res.json()).then(res => {
+                    if(res.code == 0){
+                        fieldsArray.value[fieldsArray.value.findIndex(c=>c.name == 'install_dep_apps')].options = res.data.list.map(c=>{
+                            return {label:c.name,value:c.appName};
+                        });
+                        return;
+                    }
+                    logger.value.error(res.msg);
+                });
+            },default:''},
             {name: 'desktop_uidir', label: 'UI组件目录路径', type: 'input',default:'ui',rules:[{required: true, message: '请填写UI组件目录路径', trigger: 'blur'}]},
             {name: 'desktop_applaunchname', label: '应用中心启动入口',  type: 'select',options:[],default:''},
             {name: 'service_port', label: '占用端口', type: 'input',default:''},
@@ -165,6 +165,7 @@ export default {
             ruleForm: json,
             rules: rules,
             loading: false,
+            apps:[]
         });
 
         const handleChange = (name)=>{
@@ -186,6 +187,8 @@ export default {
                 fieldsArray.value.filter(c=>c.name == 'desktop_applaunchname')[0].options = [];
                 logger.value.error(`${e}`);
             })
+        }
+        const remoteFn = ()=>{ 
         }
 
         const handleTransform = (index)=>{
@@ -250,9 +253,22 @@ export default {
 
         onMounted(()=>{
             readUiEndpoint();
+
+            fetchApi('/files/appcenter',{
+                method:'GET',
+                headers:{'Content-Type':'application/json'},
+            }).then(res => res.json()).then(res => {
+                if(res.code == 0){
+                    fieldsArray.value[fieldsArray.value.findIndex(c=>c.name == 'install_dep_apps')].options = res.data.list.map(c=>{
+                        return {label:c.name,value:c.appName};
+                    });
+                    return;
+                }
+                logger.value.error(res.msg);
+            });
         })
     
-        return {state,fieldsArray,ruleFormRef,handleChange,handleCancel,handleSubmit,handleTransform}
+        return {state,fieldsArray,ruleFormRef,handleChange,handleCancel,handleSubmit,handleTransform,remoteFn}
     }
 }
 </script>

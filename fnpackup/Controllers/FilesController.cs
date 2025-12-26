@@ -280,10 +280,13 @@ namespace fnpackup.Controllers
         }
 
         [HttpGet]
-        public async Task<AppCenterRespInfo> AppCenter(string host, string token, string name)
+        public async Task<AppCenterRespInfo> AppCenter(string name)
         {
             try
             {
+                string host =  $"{(Request.Host.Host=="localhost"? "172.23.212.86":Request.Host.Host)}:5666";
+                string token = $"trim {(string.IsNullOrWhiteSpace(Request.Cookies["fnos-token"]) ? "T+S+Oy4tTmk0VuIgCaMtAn4jtfREO4FkYDQ17kuTsX0=" : Request.Cookies["fnos-token"])}";
+
                 using var client = httpClientFactory.CreateClient();
 
                 string url = $"http://{host}/app-center/v1/app/list?language=zh";
