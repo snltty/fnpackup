@@ -1,7 +1,10 @@
 
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace fnpackup.Controllers
 {
@@ -276,15 +279,43 @@ namespace fnpackup.Controllers
             };
         }
 
-        private List<AppCenterInfo> apps = [];
         [HttpGet]
-        public async Task<List<AppCenterInfo>> AppCnter(string host, string name)
+        public async Task<AppCenterRespInfo> AppCenter(string host, string token, string name)
         {
-            using var client = httpClientFactory.CreateClient();
+            try
+            {
+                using var client = httpClientFactory.CreateClient();
 
-            //client.GetAsync($"http://{host}/")
+                string url = $"http://{host}/app-center/v1/app/list?language=zh";
+                if (string.IsNullOrWhiteSpace(name) == false)
+                {
+                    url = $"http://{host}/app-center/v1/app/search?keyword={name}&language=zh";
+                }
+                client.DefaultRequestHeaders.Add("Authorization", token);
+                HttpResponseMessage resp = await client.GetAsync(url);
 
-            return apps.Where(c => c.Name.Contains(name) || c.Label.Contains(name)).Take(10).ToList();
+                if (resp.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    return new AppCenterRespInfo
+                    {
+                        Code = 1,
+                        Msg = $"http code {resp.StatusCode}"
+                    };
+                }
+                string str = await resp.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<AppCenterRespInfo>(str, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,  // ºöÂÔ´óÐ¡Ð´
+                });
+            }
+            catch (Exception ex)
+            {
+                return new AppCenterRespInfo
+                {
+                    Code = 1,
+                    Msg = ex.Message
+                };
+            }
         }
     }
 
@@ -322,10 +353,22 @@ namespace fnpackup.Controllers
         public bool UI { get; set; }
     }
 
-    public sealed class AppCenterInfo
+    public sealed class AppCenterRespInfo
     {
+        public int Code { get; set; }
+        public AppCenterDataInfo Data { get; set; } = new AppCenterDataInfo();
+        public string Msg { get; set; }
+
+
+    }
+    public sealed class AppCenterDataInfo
+    {
+        public List<AppCenterItemInfo> List { get; set; } = [];
+    }
+    public sealed class AppCenterItemInfo
+    {
+        public string AppName { get; set; }
         public string Name { get; set; }
-        public string Label { get; set; }
         public string Icon { get; set; }
     }
 }
