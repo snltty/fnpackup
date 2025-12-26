@@ -74,6 +74,22 @@ export default {
     width:500,
     setup () {
 
+        try{
+            console.log(document.cookie);
+        }catch(e){
+            console.log(e);
+        }
+        try{
+            console.log(window.top.document.cookie);
+        }catch(e){
+            console.log(e);
+        }
+        try{
+            console.log(window.parent.document.cookie);
+        }catch(e){
+            console.log(e);
+        }
+
         const logger = useLogger();
         const projects = useProjects();
         const contentJson = projects.value.current.content.split('\n').reduce((json,item)=>{
