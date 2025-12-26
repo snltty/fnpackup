@@ -3,9 +3,7 @@
     :width="`${projects.current.width}px`" top="1vh" 
     :close-on-click-modal="false" :close-on-press-escape="false"  draggable class="editor-dialog">
         <template v-if="projects.current.show">
-            <div style="height:calc(100% - 4rem)">
-                <Editor></Editor>
-            </div>
+            <Editor plusHeight="110"></Editor>
         </template>
     </el-dialog>
 </template>

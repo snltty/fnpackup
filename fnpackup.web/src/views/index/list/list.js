@@ -73,6 +73,7 @@ export const provideProjects = () => {
             loading:false,
             width:600,
             guide:false,
+            source:false
         },
 
         showCreate:false,

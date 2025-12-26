@@ -30,8 +30,9 @@ export default {
     match:/.*/,
     width:600,
     components: { Codemirror },
-    setup () {
-        
+    props:['plusHeight'],
+    setup (props) {
+        const plusHeight = +(props.plusHeight || 200);
 
         const logger = useLogger();
         const projects = useProjects();
@@ -46,7 +47,7 @@ export default {
         }
         const state = reactive({
             code:projects.value.current.content,
-            height:`${window.innerHeight-window.innerHeight*0.1-200}px`,
+            height:`${window.innerHeight-window.innerHeight*0.1-plusHeight}px`,
             options: {
                 tabSize: 2,
                 autofocus: true,
@@ -88,7 +89,7 @@ export default {
         }
 
         const resize = () => {
-            state.height = `${window.innerHeight-window.innerHeight*0.1-200}px`;
+            state.height = `${window.innerHeight-window.innerHeight*0.1-plusHeight}px`;
         }
         onMounted(()=>{
             window.addEventListener('resize', resize);

@@ -1,6 +1,6 @@
 <template>
     <template v-if="state.component">
-        <component :is="state.component"></component>
+        <component :is="state.component" :plusHeight="plusHeight"></component>
     </template>
 </template>
 
@@ -19,6 +19,7 @@ import CommandWrap from './CommandWrap.vue';
 import Fnpack from './Fnpack.vue';
 export default {
     components:{Privilege,UiConfig},
+    props:['plusHeight'],
     setup () {
 
         const components = [

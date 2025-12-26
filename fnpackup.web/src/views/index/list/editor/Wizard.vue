@@ -2,9 +2,10 @@
     <el-tabs v-model="state.step" type="border-card" class="wizard-tab"  editable @edit="handleStepEdit">
         <el-tab-pane :label="step.stepTitle" :name="step._id" :key="index" v-for="(step,index) in state.steps" class="h-100">
             <el-form ref="ruleFormRef" :model="step.items" label-width="80" class="wizard-form h-100 flex flex-column flex-nowrap">
-                <el-form-item label="步骤标题" class="mgb-0">
+                <el-form-item label="步骤标题" class="mgb-1">
                     <el-input v-model="step.stepTitle" ></el-input>
                 </el-form-item>
+                <WizardPlusField :step="step"></WizardPlusField>
                 <div class="fields flex-1 scrollbar">
                     <template v-if="step.items.length > 0">
                         <el-form-item v-for="(item,index) in step.items" label-width="0" class="field-item mgb-0">
@@ -45,9 +46,10 @@ import WizardOptions from './WizardOptions.vue';
 import WizardSwitch from './WizardSwitch.vue';
 import WizardTips from './WizardTips.vue';
 import WizardValidate from './WizardValidate.vue';
+import WizardPlusField from './WizardPlusField.vue';
 export default {
     props: ['type'],
-    components: { Edit,CircleCloseFilled,CirclePlusFilled,WizardValidate },
+    components: { Edit,CircleCloseFilled,CirclePlusFilled,WizardValidate,WizardPlusField },
     setup (props,{emit}) {
 
         const logger = useLogger();
@@ -81,8 +83,19 @@ export default {
         },{}));
 
         const _default = JSON.parse(projects.value.current.content == '[]' ? JSON.stringify([{'stepTitle':'欢迎使用','items':[]}]) : projects.value.current.content);
-        _default.forEach((item,index)=>{
-            item._id = index;
+        _default.forEach((step,index)=>{
+            step._id = index;
+            step.items.forEach((item,index)=>{
+                Object.assign(defaultItem,item);
+            });
+            step['_plus_field'] = Object.keys(step).filter(c=>['stepTitle','items','_id'].indexOf(c) < 0).map(c=>{
+                const value = step[c];
+                delete step[c];
+                return {
+                    field:c,
+                    value:value
+                }
+            });
         });
         const state = reactive({
             step:_default.length > 0 ? _default[0]._id : '',
@@ -170,8 +183,17 @@ export default {
                 return c.items.filter(item=>item.field != 'wizard_default').length > 0;
             })));
             arr.forEach(step=>{
+
+                step._plus_field.forEach(item=>{
+                    step[item.field] = item.value;
+                });
+
                 //删除步骤的辅助字段
                 deleteField(step);
+
+                const items = step.items;
+                delete step.items;
+                step.items = items;
                 step.items.forEach(item=>{
                     //删除字段的辅助字段，每个字段类型有一个单独的初始值辅助字段
                     item.initValue = item[`_${item.type}`];

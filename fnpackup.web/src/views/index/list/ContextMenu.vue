@@ -3,6 +3,7 @@
         <a href="javascript:;" @click="handleRefresh"><el-icon><Refresh/></el-icon> 刷新</a>
         <a href="javascript:;" @click="handleUpload" v-if="hasInProject"><el-icon><Upload/></el-icon>上传</a>
         <a href="javascript:;" @click="handleDownload" v-if="hasInProject"><el-icon><Download/></el-icon>下载</a>
+        <a href="javascript:;" @click="handleSource" v-if="canSource"><el-icon><EditPen/></el-icon>源码编辑</a>
         <a href="javascript:;" @click="handleWizard" v-if="canWizard"><el-icon><DocumentAdd/></el-icon>编辑用户向导</a>
         <a href="javascript:;" @click="handleCreateFile(true)" v-if="hasInProject"><el-icon><DocumentAdd/></el-icon>新建文件</a>
         <a href="javascript:;" @click="handleCreateFile(false)" v-if="hasInProject"><el-icon><FolderAdd/></el-icon>新建文件夹</a>
@@ -13,19 +14,20 @@
 </template>
 
 <script>
-import {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete} from '@element-plus/icons-vue'
+import {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen} from '@element-plus/icons-vue'
 import { useProjects } from './list';
 import { computed, onMounted } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { useLogger } from '../logger';
 import { fetchApi } from '@/api/api';
 export default {
-    components: {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete},
+    components: {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen},
     setup () {
 
         const logger = useLogger();
         const projects = useProjects();
 
+        const canSource = computed(()=>projects.value.contextMenu.row && projects.value.contextMenu.row.if);
         const hasInProject = computed(()=>projects.value.page.path != '.');
         const canWizard = computed(()=>{
             return /\/wizard/.test(projects.value.page.path)
@@ -118,13 +120,20 @@ export default {
             })
         }
 
+        const handleSource = ()=>{
+            projects.value.current.path = `${projects.value.page.path}/${projects.value.contextMenu.row.name}`;
+            projects.value.current.remark = projects.value.contextMenu.row.remark;
+            projects.value.current.source = true;
+        }
+
         onMounted(()=>{
             document.addEventListener('click',(e)=>{
                 projects.value.contextMenu.show = false;
             });
         });
 
-        return {projects,hasInProject,canWizard,handleWizard,handleRefresh,handleUpload,handleDownload,handleCreateFile,handleDel}
+        return {projects,canSource,hasInProject,canWizard,
+            handleWizard,handleRefresh,handleUpload,handleDownload,handleCreateFile,handleDel,handleSource}
     }
 }
 </script>

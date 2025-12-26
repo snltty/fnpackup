@@ -6,6 +6,7 @@
     </div>
     <Editor></Editor>
     <Guide v-if="projects.current.guide"></Guide>
+    <SourceWrap v-if="projects.current.source"></SourceWrap>
 </template>
 
 <script>
@@ -15,8 +16,9 @@ import Table from './Table.vue';
 import { provideProjects } from './list';
 import Editor from './editor/Index.vue';
 import Guide from './editor/Guide.vue';
+import SourceWrap from './editor/SourceWrap.vue';
 export default {
-    components: { Path, Actions,Table,Editor,Guide },
+    components: { Path, Actions,Table,Editor,Guide,SourceWrap },
     setup () {
         
         const {projects} = provideProjects();
