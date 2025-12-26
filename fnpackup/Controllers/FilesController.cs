@@ -1,10 +1,8 @@
 
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace fnpackup.Controllers
 {
@@ -189,6 +187,10 @@ namespace fnpackup.Controllers
 
         [HttpPost]
         [DisableRequestSizeLimit]
+        [RequestFormLimits(
+            MultipartBodyLengthLimit = long.MaxValue,
+            ValueLengthLimit = int.MaxValue
+        )]
         public async Task<List<string>> Upload([FromQuery] string path, List<IFormFile> files)
         {
             path = Path.Join(root, path);
@@ -205,19 +207,68 @@ namespace fnpackup.Controllers
             foreach (var file in files)
             {
                 var filePath = System.IO.File.Exists(path) ? path : Path.Combine(path, file.FileName);
-                if (Directory.Exists(Path.GetDirectoryName(filePath)) == false)
+                if (files.Count == 1 && Path.GetExtension(filePath) == ".fpk")
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    await DecompressFpk(file);
                 }
+                else
+                {
+                    if (Directory.Exists(Path.GetDirectoryName(filePath)) == false)
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    }
 
-                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                    if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
 
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await file.CopyToAsync(stream);
+                    using var stream = new FileStream(filePath, FileMode.Create);
+                    await file.CopyToAsync(stream);
+                }
             }
 
             return [];
         }
+        private async Task DecompressFpk(IFormFile file)
+        {
+
+            string dir = Path.Join(root, Path.GetFileNameWithoutExtension(file.FileName));
+            string path = Path.Join(dir, Path.GetFileName(file.FileName));
+            if (Directory.Exists(dir))
+            {
+                return;
+            }
+            Directory.CreateDirectory(dir);
+
+            try
+            {
+                if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+                using var stream = new FileStream(path, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                CommandHelper.Execute($"tar", $" -xvf {Path.GetFileName(file.FileName)}", [], dir, out string error);
+                Directory.CreateDirectory(Path.Join(dir, "app"));
+                CommandHelper.Execute($"tar", $" -xzvf app.tgz -C app", [], dir, out error);
+
+            }
+            catch (Exception)
+            {
+                if (Directory.Exists(dir))
+                {
+                    Directory.Delete(dir, true);
+                }
+            }
+            finally
+            {
+                if (System.IO.File.Exists(Path.Join(dir, "app.tgz")))
+                {
+                    System.IO.File.Delete(Path.Join(dir, "app.tgz"));
+                }
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+            }
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Download(string path)
@@ -284,32 +335,15 @@ namespace fnpackup.Controllers
         {
             try
             {
-                string host =  $"{(Request.Host.Host=="localhost"? "172.23.212.86":Request.Host.Host)}:5666";
-                string token = $"trim {(string.IsNullOrWhiteSpace(Request.Cookies["fnos-token"]) ? "T+S+Oy4tTmk0VuIgCaMtAn4jtfREO4FkYDQ17kuTsX0=" : Request.Cookies["fnos-token"])}";
+                string host = $"{(Request.Host.Host == "localhost" ? "192.168.191.192" : Request.Host.Host)}:5666";
+                string token = $"trim {(string.IsNullOrWhiteSpace(Request.Cookies["fnos-token"]) ? "R5RmaRm5TmkSWpRYP5EaW4LRz+236ZrBjKUMWPTxaXY=" : Request.Cookies["fnos-token"])}";
 
-                using var client = httpClientFactory.CreateClient();
-
-                string url = $"http://{host}/app-center/v1/app/list?language=zh";
-                if (string.IsNullOrWhiteSpace(name) == false)
+                string[] names = (name ?? string.Empty).Split(':');
+                if (names.Length > 1)
                 {
-                    url = $"http://{host}/app-center/v1/app/search?keyword={name}&language=zh";
+                    return await Search(host, token, names);
                 }
-                client.DefaultRequestHeaders.Add("Authorization", token);
-                HttpResponseMessage resp = await client.GetAsync(url);
-
-                if (resp.StatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    return new AppCenterRespInfo
-                    {
-                        Code = 1,
-                        Msg = $"http code {resp.StatusCode}"
-                    };
-                }
-                string str = await resp.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<AppCenterRespInfo>(str, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,  // 忽略大小写
-                });
+                return await Search(host, token, name);
             }
             catch (Exception ex)
             {
@@ -319,6 +353,53 @@ namespace fnpackup.Controllers
                     Msg = ex.Message
                 };
             }
+        }
+        private async Task<AppCenterRespInfo> Search(string host, string token, string[] names)
+        {
+            AppCenterRespInfo finalResp = new AppCenterRespInfo
+            {
+                Code = 0,
+                Data = new AppCenterDataInfo
+                {
+                    List = []
+                },
+                Msg = "ok"
+            };
+            foreach (var name in names)
+            {
+                var resp = await Search(host, token, name);
+                if (resp.Code != 0)
+                {
+                    finalResp.Data.List.AddRange(resp.Data.List);
+                }
+            }
+            return finalResp;
+        }
+        private async Task<AppCenterRespInfo> Search(string host, string token, string name)
+        {
+            using var client = httpClientFactory.CreateClient();
+
+            string url = $"http://{host}/app-center/v1/app/list?language=zh";
+            if (string.IsNullOrWhiteSpace(name) == false)
+            {
+                url = $"http://{host}/app-center/v1/app/search?keyword={name}&language=zh";
+            }
+            client.DefaultRequestHeaders.Add("Authorization", token);
+            HttpResponseMessage resp = await client.GetAsync(url);
+
+            if (resp.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                return new AppCenterRespInfo
+                {
+                    Code = 1,
+                    Msg = $"http code {resp.StatusCode}"
+                };
+            }
+            string str = await resp.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<AppCenterRespInfo>(str, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,  // 忽略大小写
+            });
         }
     }
 

@@ -7,4 +7,46 @@ export const fetchApi = (url,options = {}) => {
     }
     return fetch(uri ,options);
 }
+export const xhrApi = (url,params,data,progressFn) => {
+    let uri = BASE_URL + url + '?1=1';
+    if(params){
+        uri += '&' + Object.keys(params).map(key => `${key}=${params[key]}`).join('&');
+    }
+
+    return new Promise((resolve, reject) => { 
+        try {
+            const xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener('progress', (event) => {
+                if (event.lengthComputable && progressFn) {
+                    if(event.loaded < event.total){
+                        const progress = (event.loaded / event.total) * 100;
+                        progressFn(progress);
+                    }
+                }
+            });
+            xhr.addEventListener('load', () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        resolve(response);
+                    } catch (e) {
+                        resolve(xhr.responseText);
+                    }
+                } else {
+                    reject(new Error(`上传失败: ${xhr.status}`));
+                }
+            });
+            xhr.addEventListener('error', () => {
+                reject(new Error('网络错误'));
+            });
+            xhr.addEventListener('abort', () => {
+                reject(new Error('上传已取消'));
+            });
+            xhr.open('POST', uri);
+            xhr.send(data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
 

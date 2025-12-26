@@ -1,9 +1,9 @@
 <template>
-    <el-dialog v-model="state.show" title="上传文件到当前目录" width="340" >
+    <el-dialog v-model="state.show" title="上传文件到当前目录" width="340" :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
         <div class="upload-wrap" ref="drag">
             <div class="inner"> 
                 <template v-if="state.loading">
-                    <div>{{state.process.current}} / {{state.process.total}}</div>
+                    <div>{{state.process.current}}({{ state.process.progress }}) / {{state.process.total}}</div>
                 </template>
                 <template v-else>
                     <p>
@@ -13,6 +13,7 @@
                         <el-button @click="triggerSelectFolder"><el-icon><Folder /></el-icon>上传文件夹</el-button>
                     </p>
                     <p>点击选择或拖拽文件/文件夹到此处</p>
+                    <p>上传单个.fpk文件视为导入应用</p>
                 </template>
             </div>
             <div class="drag" v-if="state.draging"></div>
@@ -23,11 +24,11 @@
 </template>
 
 <script>
-import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 import {Plus,Refresh,Document,Folder} from '@element-plus/icons-vue'
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
-import {fetchApi} from '@/api/api'
+import {fetchApi, xhrApi} from '@/api/api'
 export default {
     props: ['modelValue'],
     emits: ['update:modelValue'],
@@ -43,7 +44,8 @@ export default {
             dragingTimer:0,
             process:{
                 total:0,
-                current:0
+                current:0,
+                progress:'0%'
             }
         });
         watch(() => state.show, (val) => {
@@ -59,29 +61,35 @@ export default {
         const drag = ref(null);
 
         const upload = (files)=>{
-            const fn = (index = 0)=>{
+            state.loading = true;
+            state.process.total = files.length;
+            state.process.current = 0;
+            const fn = async (index = 0)=>{
                 if(index > files.length-1){
                     state.loading = false;
                     projects.value.load(); 
                     return;
                 }
+                const fileObj =  files[index];
                 const formData = new FormData();
-                formData.append('files', files[index].file);
-                fetchApi(`/files/upload`,{
-                    params:{path:files[index].path},
-                    method:'POST',
-                    body:formData,
-                }).then(res=>res.json()).then((res)=>{
+                formData.append('files', fileObj.file);
+                state.process.progress = `0%`;
+                xhrApi(`/files/upload`,{path:fileObj.path},formData,(progress)=>{
+                    state.process.progress = `${progress.toFixed(2)}%`;
+                }).then((res)=>{
                     if(res.length > 0){
                         res.forEach(item=>{
                             logger.value.error(item);
                         });
                     }else{
-                        logger.value.success(`已上传:${files[index].file.name}`);
+                        state.process.progress = `100%`;
+                        logger.value.success(`已上传:${fileObj.file.name}`);
                     }
+                    state.process.current = index+1;
                     fn(index+1);
                 }).catch((e)=>{
                     logger.value.error(`${e}`);
+                    state.process.current = index+1;
                     fn(index+1);
                 });
             }
@@ -91,6 +99,7 @@ export default {
             const files = Array.from(object.target.files);
             input.value.value = '';
             input1.value.value = '';
+            state.loading = true;
             upload(files.map(c=>{
                 return {
                     file:c,
@@ -140,6 +149,7 @@ export default {
                     await handleEntries(files,entry);
                 }
             }
+            state.loading = true;
             upload(files);
         }
         const asyncFn = (fn,obj)=>{

@@ -255,6 +255,7 @@ export default {
             readUiEndpoint();
 
             fetchApi('/files/appcenter',{
+                params:{names:state.ruleForm.install_dep_apps},
                 method:'GET',
                 headers:{'Content-Type':'application/json'},
             }).then(res => res.json()).then(res => {

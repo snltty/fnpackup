@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="state.show" title="创建应用" width="280" >
+    <el-dialog v-model="state.show" title="创建应用" width="280" :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
         <div>
             <el-form :model="state.createForm" :rules="state.createRules" ref="ruleFormRef"  label-width="50">
                 <el-form-item label="名称" prop="name">
