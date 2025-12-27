@@ -42,6 +42,11 @@ export default {
             const path = `${projects.value.current.path}`.split('/').filter(c=>c).join('/');
             state.component = markRaw(components.filter(c=>c.match.test(path))[0]);
             projects.value.current.width = state.component.width;
+            if(state.component.height !== undefined){
+                projects.value.current.height = `${state.component.height}px`;
+            }else{
+                projects.value.current.height = '';
+            }
         }
 
         const getContent = ()=>{

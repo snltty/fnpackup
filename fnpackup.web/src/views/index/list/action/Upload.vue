@@ -66,7 +66,9 @@ export default {
             state.process.current = 0;
             const fn = async (index = 0)=>{
                 if(index > files.length-1){
-                    state.loading = false;
+                    setTimeout(() => {
+                        state.loading = false;
+                    }, 1000);
                     projects.value.load(); 
                     return;
                 }

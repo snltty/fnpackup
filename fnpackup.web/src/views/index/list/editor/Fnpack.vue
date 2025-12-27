@@ -12,6 +12,7 @@ import { useProjects } from '../list';
 export default {
     match:/fnpack$/,
     width:300,
+    height:200,
     setup () {
         
         const logger = useLogger();

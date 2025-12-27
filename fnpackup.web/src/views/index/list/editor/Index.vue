@@ -1,6 +1,6 @@
 <template>
     <el-dialog v-model="projects.current.show" :title="`编辑器[${projects.current.remark}]`" 
-    :width="`${projects.current.width}px`" top="1vh" 
+    :width="`${projects.current.width}px`" top="1vh" :style="{height:projects.current.height || '90%'}"
     :close-on-click-modal="false" :close-on-press-escape="false"  draggable class="editor-dialog">
         <template v-if="projects.current.show">
             <div style="height:calc(100% - 4rem)">
@@ -36,7 +36,7 @@ export default {
 
 <style lang="stylus">
 .editor-dialog{
-    max-width: 80%;height:90%
+    max-width: 80%;
     .el-dialog__body{
         height:100%;
     }

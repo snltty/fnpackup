@@ -1,6 +1,6 @@
 <template>
     <el-dialog v-model="projects.current.guide" :title="`快速编辑`" :width="`${projects.current.width+200}px`" top="1vh" class="guide-dialog"
-    :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
+    :close-on-click-modal="false" :close-on-press-escape="false"  draggable style="max-width: 80%;height:90%">
         <el-tabs type="border-card" tabPosition="left" v-model="state.key" @tab-change="handleChange" class="h-100">
             <template v-for="(item,index) in state.tabs.filter(c=>!c.exists_key || c.exists)">
                 <el-tab-pane :label="item.label" :name="item.key" v-loading="projects.current.loading" class="h-100">
@@ -80,7 +80,6 @@ export default {
     overflow: hidden !important;
 }
 .guide-dialog{
-    max-width: 80%;height:90%
     .el-dialog__body{
         height: calc(100% - 40px);
     }

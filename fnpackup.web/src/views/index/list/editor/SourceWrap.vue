@@ -1,6 +1,6 @@
 <template>
     <el-dialog v-model="projects.current.source" :title="`源码编辑器[${projects.current.remark}]`" width="50%" top="1vh" 
-    :close-on-click-modal="false" :close-on-press-escape="false"  draggable class="editor-dialog">
+    :close-on-click-modal="false" :close-on-press-escape="false"  draggable class="editor-dialog" style="max-width: 80%;height:90%">
         <template v-if="projects.current.source">
             <Source plusHeight="110"></Source>
         </template>
@@ -58,7 +58,7 @@ export default {
 
 <style lang="stylus">
 .editor-dialog{
-    max-width: 80%;height:90%
+    
     .el-dialog__body{
         height:100%;
     }
