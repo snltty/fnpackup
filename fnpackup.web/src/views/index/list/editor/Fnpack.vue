@@ -1,6 +1,16 @@
 <template>
     <div class="fnpack-wrap h-100">
-        <el-button type="primary" @click="handleBuild">打包下载</el-button>
+        <div class="t-c">
+            <p>
+                <el-button @click="handleBuild(true)">打包并下载</el-button>
+            </p>
+            <p class="mgt-1">
+                打包后在项目根目录下找到fpk
+            </p>
+            <p class="mgt-1">
+                <el-button type="primary" @click="handleBuild(false)">仅打包</el-button>
+            </p>
+        </div>
     </div>
 </template>
 
@@ -17,7 +27,7 @@ export default {
         
         const logger = useLogger();
         const projects = useProjects();
-        const handleBuild = ()=>{
+        const handleBuild = (download)=>{
             projects.value.building = true;
             logger.value.debug('开始打包...');
 
@@ -31,18 +41,17 @@ export default {
                     logger.value.success(res);
                     projects.value.load(); 
 
-                    
-                    let href = process.env.NODE_ENV === 'development' 
-                    ? `http://localhost:1069/files/download?path=./${name}/${name}.fpk`
-                    : `/files/download?path=./${name}/${name}.fpk`;
-                    const a = document.createElement('a');
-                    a.target='_blank';
-                    a.href = href;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    
-
+                    if(download){
+                        let href = process.env.NODE_ENV === 'development' 
+                        ? `http://localhost:1069/files/download?path=./${name}/${name}.fpk`
+                        : `/files/download?path=./${name}/${name}.fpk`;
+                        const a = document.createElement('a');
+                        a.target='_blank';
+                        a.href = href;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    }
                 }else{
                     logger.value.error(res);
                 }
