@@ -96,11 +96,11 @@ export default {
         const archJson = {
             arch:{
                 name: 'arch', label: '架构类型', type: 'select', options: [{label: 'x86_64', value: 'x86_64'}],default:'x86_64',
-                to:{label:'新版',value:'platform'}
+                to:{label:'platform',value:'platform'}
             },
             platform:{
                 name: 'platform', label: '架构类型', type: 'select', options: [{label: 'all', value: 'all'},{label: 'x86', value: 'x86'},{label: 'arm', value: 'arm'}],default:'x86',
-                to:{label:'旧版',value:'arch'}
+                to:{label:'arch',value:'arch'}
             }
         }
 
