@@ -31,6 +31,7 @@ import { ElMessage } from 'element-plus';
 export default {
     match:/privilege$/,
     width:400,
+    height:300,
     setup () {
         const logger = useLogger();
         const projects = useProjects();

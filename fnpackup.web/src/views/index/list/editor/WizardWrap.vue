@@ -1,13 +1,12 @@
 <template>
-    <div class="wizard-wrap">
-        <el-tabs v-model="current" type="border-card" class="wizard-tab" @tab-change="handleChange">
+    
+        <el-tabs v-model="current" type="border-card" class="h-100 bs wizard-tab" @tab-change="handleChange">
             <template v-for="item in options">
-                <el-tab-pane :label="item.label" :name="item.value" v-loading="projects.current.loading" class="h-100">
+                <el-tab-pane :label="item.label" :name="item.value" v-loading="projects.current.loading" class="h-100 bs">
                     <Wizard v-if="projects.current.content && current==item.value" :type="current" @save="saveContent"></Wizard>
                 </el-tab-pane>
             </template>
         </el-tabs>
-    </div>
 </template>
 
 <script>
@@ -119,11 +118,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.wizard-wrap{
-    height:80vh;
-
-    .wizard-tab{
-        height:100%;
-    }
-}
 </style>

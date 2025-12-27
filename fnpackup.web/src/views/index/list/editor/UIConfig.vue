@@ -26,6 +26,7 @@ import { fetchApi } from '@/api/api';
 export default {
     match:/\/ui\/config$/,
     width:550,
+    height:660,
     components: { Edit,CircleCloseFilled,CirclePlusFilled ,UIConfigItem},
     setup (props,{emit}) {
 
@@ -148,6 +149,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.ui-tab{
+    box-sizing: border-box;
+}
 .fields{
     padding:1rem;
     border:1px solid #eee;

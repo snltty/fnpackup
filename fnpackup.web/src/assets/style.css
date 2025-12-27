@@ -255,6 +255,9 @@ span.split-pad10 {
     overflow: auto;
     scrollbar-width: thin;
 }
+.bs{
+    box-sizing: border-box;
+}
 
 
 .el-table {

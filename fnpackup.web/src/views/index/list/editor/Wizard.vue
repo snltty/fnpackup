@@ -1,5 +1,5 @@
 <template>
-    <el-tabs v-model="state.step" type="border-card" class="wizard-tab"  editable @edit="handleStepEdit">
+    <el-tabs v-model="state.step" type="border-card" class="wizard-tab h-100 bs"  editable @edit="handleStepEdit">
         <el-tab-pane :label="step.stepTitle" :name="step._id" :key="index" v-for="(step,index) in state.steps" class="h-100">
             <el-form ref="ruleFormRef" :model="step.items" label-width="80" class="wizard-form h-100 flex flex-column flex-nowrap">
                 <WizardPlusField :step="step"></WizardPlusField>
@@ -219,7 +219,7 @@ export default {
 
 <style lang="stylus" scoped>
 .wizard-tab{
-
+    
     .fields{
         border:1px solid #ddd;
         margin:1rem 0;

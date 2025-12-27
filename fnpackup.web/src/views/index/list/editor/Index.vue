@@ -3,7 +3,7 @@
     :width="`${projects.current.width}px`" top="1vh" :style="{height:projects.current.height || '90%'}"
     :close-on-click-modal="false" :close-on-press-escape="false"  draggable class="editor-dialog">
         <template v-if="projects.current.show">
-            <div style="height:calc(100% - 4rem)">
+            <div style="height:calc(100% - 4rem)" class="scrollbar">
                 <Editor plusHeight="110"></Editor>
             </div>
         </template>
@@ -37,6 +37,7 @@ export default {
 <style lang="stylus">
 .editor-dialog{
     max-width: 80%;
+    max-height: 90%;
     .el-dialog__body{
         height:100%;
     }
