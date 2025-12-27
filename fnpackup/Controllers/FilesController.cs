@@ -187,10 +187,7 @@ namespace fnpackup.Controllers
 
         [HttpPost]
         [DisableRequestSizeLimit]
-        [RequestFormLimits(
-            MultipartBodyLengthLimit = long.MaxValue,
-            ValueLengthLimit = int.MaxValue
-        )]
+        [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue, ValueLengthLimit = int.MaxValue)]
         public async Task<List<string>> Upload([FromQuery] string path, List<IFormFile> files)
         {
             path = Path.Join(root, path);
@@ -279,6 +276,11 @@ namespace fnpackup.Controllers
                 var stream = new FileStream(path, FileMode.Open);
                 return File(stream, "application/octet-stream", Path.GetFileName(path));
             }
+            if (Directory.Exists(path) == false)
+            {
+                return Content("文件或文件夹不存在，如果是fpk，那可能项目文件夹名与实际appname不一致", "text/plain");
+            }
+
 
             using (var memoryStream = new MemoryStream())
             {
@@ -318,7 +320,6 @@ namespace fnpackup.Controllers
 
             return result;
         }
-
 
         [HttpGet]
         public async Task<FileExistsInfo> Exists(string name)

@@ -1,6 +1,6 @@
 <template>
     <div class="fnpack-wrap h-100">
-        <el-button type="primary" @click="handleBuild">打包并下载</el-button>
+        <el-button type="primary" @click="handleBuild">打包下载</el-button>
     </div>
 </template>
 
@@ -31,14 +31,17 @@ export default {
                     logger.value.success(res);
                     projects.value.load(); 
 
+                    
                     let href = process.env.NODE_ENV === 'development' 
                     ? `http://localhost:1069/files/download?path=./${name}/${name}.fpk`
                     : `/files/download?path=./${name}/${name}.fpk`;
                     const a = document.createElement('a');
+                    a.target='_blank';
                     a.href = href;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
+                    
 
                 }else{
                     logger.value.error(res);
