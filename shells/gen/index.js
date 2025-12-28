@@ -89,9 +89,9 @@ readVersionDesc().then((desc) => {
     writeText('../publish-fpk.sh', publishFpkText);
 
     let installData = readYaml('../ymls/install.yml');
-    while (installData.indexOf('{{version}}') >= 0) {
-        installData = installData.replace('{{version}}', desc.version);
-    }
+    installData.jobs.build.steps.filter(c => c.id == 'create_release')[0].with.body = desc.desc;
+    installData.jobs.build.steps.filter(c => c.id == 'create_release')[0].with.tag_name = `v${desc.version}`;
+    installData.jobs.build.steps.filter(c => c.id == 'create_release')[0].with.release_name = `v${desc.version}.\${{ steps.date.outputs.today }}`;
     writeUploadIpk(installData, `v${desc.version}`);
     writeYaml('../../.github/workflows/install.yml', installData);
 
