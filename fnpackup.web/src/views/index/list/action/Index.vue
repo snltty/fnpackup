@@ -48,7 +48,7 @@ export default {
 
 <style lang="stylus" scoped>
 .actions-wrap{
-    border-bottom:1px solid #ddd;
+    border-bottom:1px solid #d0d7de;
     padding:.6rem 1rem;
 }
 </style>

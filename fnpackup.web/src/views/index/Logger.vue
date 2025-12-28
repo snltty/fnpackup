@@ -1,12 +1,14 @@
 <template>
-    <div class="logger-wrap scrollbar h-100" ref="wrap">
-        <ul class="ul" ref="ul">
-            <template v-for="item in logger.list">
-                <li :class="`color-${item.type}`">
-                    <pre>[{{item.time}}]:{{ item.msg }}</pre>
-                </li>
-            </template>
-        </ul>
+    <div class="logger-wrap h-100" ref="wrap">
+        <div class="inner scrollbar h-100">
+            <ul class="ul" ref="ul">
+                <template v-for="item in logger.list">
+                    <li :class="`color-${item.type}`">
+                        <pre>[{{item.time}}]:{{ item.msg }}</pre>
+                    </li>
+                </template>
+            </ul>
+        </div>
     </div>
 </template>
 
@@ -46,5 +48,12 @@ export default {
     .color-debug{color:blue;}
     .color-success{color:green;}
     .color-error{color:red;}
+
+    .inner{
+        border:1px solid #d0d7de;
+        border-radius: 4px;
+        padding:1rem;
+        box-sizing: border-box;
+    }
 }
 </style>

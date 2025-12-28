@@ -6,20 +6,16 @@
         <div class="body flex-1 relative">
             <Body></Body>
         </div>
-        <div class="foot">
-            <Foot></Foot>
-        </div>
     </div>
 </template>
 
 <script>
 import Head from './components/Head.vue';
 import Body from './components/Body.vue';
-import Foot from './components/Foot.vue';
 import { computed } from 'vue';
 export default {
     name: 'App',
-    components: {Head,Body,Foot},
+    components: {Head,Body},
     setup() {
 
         const showHead = computed(()=>window.self === window.top);

@@ -10,17 +10,7 @@ a {
 }
 
 a {
-    background-image: linear-gradient(92deg, #ff0000, #ff9000, #ffdc00, #23bf08, #00ffb2, #0072ff, #fd00ff);
-    background-size: 0% 2px;
-    background-position: left bottom;
-    background-repeat: no-repeat;
-
     transition: .3s;
-}
-
-a:hover {
-    background-size: 100% 2px;
-    background-position: right bottom;
 }
 
 :root {
@@ -231,24 +221,10 @@ span.split-pad10 {
 
 .gateway {
     &.green {
-        /* background: linear-gradient(270deg, #caff00, green, #0d6d23, #e38a00, green); */
-        /* linear-gradient(270deg, #caff00, green, #0d6d23, #e38a00, green) */
-        /* background-clip: text; */
-        /* -webkit-background-clip: text; */
-        /* -webkit-text-fill-color: hsla(0, 0%, 100%, 0); */
         transition: .3s;
-
-        &:hover {
-            background: linear-gradient(270deg, #caff00, green, #0d6d23, #e38a00, green);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: hsla(0, 0%, 100%, 0);
-        }
     }
 
 }
-/* .device-remark{position: absolute;left:0;top:0;right:0;bottom:0; backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);z-index: 99;} */
 
 
 .scrollbar{
@@ -264,6 +240,15 @@ span.split-pad10 {
     --el-table-header-text-color: var(--el-text-color-regular) !important;
 }
 
+.el-splitter-bar__dragger-horizontal:after, .el-splitter-bar__dragger-horizontal:before
+{
+    width:1px !important;
+    background-color:#d0d7de !important;
+}
+.el-splitter-bar__dragger-vertical:after, .el-splitter-bar__dragger-vertical:before{
+    height:1px !important;
+    background-color:#d0d7de !important;
+}
 .el-input-number--small {
     width: 100% !important;
 }

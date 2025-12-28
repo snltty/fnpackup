@@ -1,6 +1,6 @@
 <template>
-    <div class="h-100 flex flex-column flex-nowrap">
-        <ul>
+    <div class="h-100 flex flex-column flex-nowrap menu-wrap">
+        <ul class="flex-1">
             <template v-for="item in options">
                 <li>
                     <router-link :to="item.path">
@@ -10,6 +10,13 @@
                 </li>
             </template>
         </ul>
+        <div class="foot-wrap">
+            <a href="https://github.com/snltty/fnpackup" target="_blank">
+                <img src="../assets/github.svg" height="16">
+            </a>
+            <a href="javascript:;">©snltty 2025</a>
+            <a href="https://linker.snltty.com" target="_blank">Linker</a>
+        </div>
     </div>
 </template>
 
@@ -28,17 +35,21 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.menu-wrap{
+    background-color:#f1f4f9;
+}
 li{
+    padding:.5rem;
     a{
         display: block;
         font-size:0;
         padding:0 1rem 0 1rem;
-        line-height:3.7rem;
-        height: 3.7rem;
+        line-height:3.2rem;
+        height: 3.2rem;
+        border-radius:4px;
 
         &.router-link-active,&:hover{
-            background-color:#f6f8fa;
-            box-shadow: 0 0 5px rgba(0,0,0,0.05) inset;
+            background-color:#fff;
             color:#2568ed
         }
         .el-icon,span{
@@ -46,6 +57,18 @@ li{
             font-size:1.4rem;
         }
 
+    }
+}
+.foot-wrap{
+    padding:1rem .6rem;
+    font-size:1.2rem;
+    a{
+        display:block;padding:.6rem;
+        border-radius:4px;
+        &:hover{
+            background-color:#fff;
+            color:#2568ed
+        }
     }
 }
 </style>

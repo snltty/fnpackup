@@ -3,7 +3,7 @@
         <el-splitter-panel>
             <List></List>
         </el-splitter-panel>
-        <el-splitter-panel min="10%" size="20%" max="80%">
+        <el-splitter-panel min="10%" size="30%" max="80%">
             <Logger></Logger>
         </el-splitter-panel>
     </el-splitter>

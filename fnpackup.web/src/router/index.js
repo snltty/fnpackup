@@ -3,7 +3,7 @@ const routes = [
     {
         path: '/',
         name: 'Index',
-        meta: { title: '首页' },
+        meta: { title: '编辑器' },
         component: () => import('@/views/index/Index.vue'),
        
     }

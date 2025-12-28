@@ -75,7 +75,7 @@ export const provideProjects = () => {
             height:'',
             guide:false,
             source:false,
-            paint:true,
+            paint:false,
         },
 
         showCreate:false,

@@ -1,8 +1,10 @@
 <template>
-    <div class="h-100 flex flex-column flex-nowrap">
-        <Actions></Actions>
-        <Path></Path>
-        <Table></Table>
+    <div class="h-100 list-wrap">
+        <div class="h-100 inner flex flex-column flex-nowrap">
+            <Actions></Actions>
+            <Path></Path>
+            <Table></Table>
+        </div>
     </div>
     <Editor></Editor>
     <Guide v-if="projects.current.guide"></Guide>
@@ -31,5 +33,13 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.list-wrap{
+    padding:1rem;
+    box-sizing: border-box;
 
+    .inner{
+        border:1px solid #d0d7de;
+        border-radius: 4px;
+    }
+}
 </style>

@@ -1,31 +1,33 @@
 <template>
     <div class="path-wrap">
-        <ul class="flex">
-            <li @click="handleBack">
-                <span><el-icon size="14"><Back /></el-icon></span>
-            </li>
-            <li @click="handleRefresh">
-                <span><el-icon size="14"><Refresh /></el-icon></span>
-            </li>
-            <li @click="handleFolder(0)">
-                <span>应用列表</span>
-            </li>
+        <el-breadcrumb :separator-icon="ArrowRight">
+            <el-breadcrumb-item>
+                <a href="javascript:;" @click="handleBack"><el-icon><ArrowLeftBold /></el-icon></a>
+            </el-breadcrumb-item>
+            <el-breadcrumb-item>
+                <a href="javascript:;" @click="handleRefresh"><el-icon><Refresh /></el-icon></a>
+            </el-breadcrumb-item>
+            <el-breadcrumb-item>
+                <a href="javascript:;" @click="handleFolder(0)"><el-icon><HomeFilled /></el-icon>应用列表</a>
+            </el-breadcrumb-item>
             <template v-for="(value,index) in paths">
-                <li @click="handleFolder(index+1)">
-                    <el-icon size="12"><ArrowRight /></el-icon>
-                    <span :class="{project:index==0}">{{ value }}</span>
-                </li>
+                <el-breadcrumb-item @click="handleFolder(index+1)">
+                    <a href="javascript:;">
+                        <el-icon v-if="index===0"><StarFilled /></el-icon>
+                        <span>{{ value }}</span>
+                    </a>
+                </el-breadcrumb-item>
             </template>
-        </ul>
+        </el-breadcrumb>
     </div>
 </template>
 
 <script>
 import { computed } from 'vue';
-import { ArrowRight,Back,Refresh } from '@element-plus/icons-vue';
+import { ArrowRight,ArrowLeftBold,HomeFilled,Refresh, StarFilled } from '@element-plus/icons-vue';
 import { useProjects } from './list';
 export default {
-    components:{ArrowRight,Back,Refresh},
+    components:{ArrowRight,ArrowLeftBold,Refresh,HomeFilled,StarFilled},
     setup () {
         
         const projects = useProjects();
@@ -49,33 +51,13 @@ export default {
 
 <style lang="stylus" scoped>
 .path-wrap{
-    li{
-        padding:.8rem 1rem;
-        font-size:0;
-        border-right:1px solid #ddd;
-        color:#333;
-        &:hover{
-            background-color: #f6f8fa;
-            cursor pointer;
-            box-shadow: 0 0 5px rgba(0,0,0,0.05) inset;
-        }
-       
-        span{
-            font-size:1.3rem;
-            display: inline-flex;
-            align-items: center;
-            vertical-align: bottom;
-            line-height:1;
-            &.project{
-                font-weight: bold;
-                color:var(--primary-color);
-            }
-        }
+    padding:1rem;
+    border-bottom: 1px solid #d0d7de;
+    .el-breadcrumb{
+        font-size: 1.3rem;
+
         .el-icon{
-            display: inline-flex;
-            align-items: center;
-            poesition: relative;
-            top:0.1rem;
+            vertical-align: bottom;
         }
     }
 }
