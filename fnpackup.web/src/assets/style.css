@@ -243,11 +243,11 @@ span.split-pad10 {
 .el-splitter-bar__dragger-horizontal:after, .el-splitter-bar__dragger-horizontal:before
 {
     width:1px !important;
-    background-color:#d0d7de !important;
+    background-color:transparent !important;
 }
 .el-splitter-bar__dragger-vertical:after, .el-splitter-bar__dragger-vertical:before{
     height:1px !important;
-    background-color:#d0d7de !important;
+    background-color:transparent !important;
 }
 .el-input-number--small {
     width: 100% !important;

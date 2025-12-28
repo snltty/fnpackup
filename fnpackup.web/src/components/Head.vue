@@ -28,7 +28,6 @@ export default {
 <style lang="stylus" scoped>
 .head-wrap{
     background-color: #f1f4f9;
-    border-bottom: 1px solid #d0d7de;
     height: 5rem;
     line-height: 5rem;
 

@@ -1,13 +1,11 @@
 <template>
-    <div class="body-wrap h-100 absolute">
-        <el-splitter>
-            <el-splitter-panel :max="100" :min="100" size="100">
-                <Menu></Menu>
-            </el-splitter-panel>
-            <el-splitter-panel>
-                 <router-view></router-view>
-            </el-splitter-panel>
-        </el-splitter>
+    <div class="body-wrap h-100 absolute flex flex-nowrap">
+        <div>
+            <Menu></Menu>
+        </div>
+        <div class="flex-1 inner">
+            <router-view></router-view>
+        </div>
     </div>
 </template>
 
@@ -25,6 +23,10 @@ export default {
 
 <style lang="stylus" scoped>
 .body-wrap{
-    background-color: #fff;
+    background-color: #f1f4f9;
+    .inner{
+        background-color: #fff;
+        border-radius:1.2rem;
+    }
 }
 </style>

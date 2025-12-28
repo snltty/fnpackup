@@ -1,5 +1,8 @@
 <template>
     <div class="logger-wrap h-100" ref="wrap">
+        <div class="split">
+            <el-icon><Minus /></el-icon>
+        </div>
         <div class="inner scrollbar h-100">
             <ul class="ul" ref="ul">
                 <template v-for="item in logger.list">
@@ -15,8 +18,10 @@
 <script>
 import { nextTick, ref, watch } from 'vue';
 import {useLogger} from './logger'
+import { Minus } from '@element-plus/icons-vue';
 
 export default {
+    components: {Minus},
     setup () {
         const logger = useLogger();
         const wrap = ref(null);
@@ -38,9 +43,15 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.split{
+    position:absolute;
+    left:50%;
+    top:-7px;
+    color:#666;
+}
 .logger-wrap{
     font-size:1.2rem;
-    padding:1rem;
+    padding:.5rem 1rem 1rem 1rem;
     box-sizing: border-box;
     position:relative;
 

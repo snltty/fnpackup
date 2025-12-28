@@ -37,6 +37,7 @@ export default {
 <style lang="stylus" scoped>
 .menu-wrap{
     background-color:#f1f4f9;
+    width: 140px;
 }
 li{
     padding:.5rem;

@@ -34,7 +34,7 @@ export default {
 
 <style lang="stylus" scoped>
 .list-wrap{
-    padding:1rem;
+    padding:1rem 1rem .5rem 1rem;
     box-sizing: border-box;
 
     .inner{
