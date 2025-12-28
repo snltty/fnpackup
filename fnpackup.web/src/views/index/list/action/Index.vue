@@ -2,12 +2,13 @@
     <div class="actions-wrap">
         <template v-if="paths.length == 0">
             <el-button type="primary" plain size="small" @click="handleCreate"><el-icon><Plus /></el-icon>创建应用</el-button>
+            <el-button plain size="small" @click="handleUpload('.fpk')" :loading="projects.building"><el-icon><Upload /></el-icon>导入fpk</el-button>
         </template>
         <template v-if="paths.length >= 1">
             <el-button type="primary" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Coin /></el-icon>打包fpk</el-button>
             <el-button type="success" plain size="small" @click="handleGuide" :loading="projects.building"><el-icon><Files /></el-icon>快速编辑</el-button>
             
-            <el-button plain size="small" @click="handleUpload" :loading="projects.building"><el-icon><Upload /></el-icon>上传文件</el-button>
+            <el-button plain size="small" @click="handleUpload('*/*')" :loading="projects.building"><el-icon><Upload /></el-icon>上传文件</el-button>
             <el-button plain size="small" @click="handleCreateFile(true)" :loading="projects.building"><el-icon><DocumentAdd /></el-icon>新建文件</el-button>
             <el-button plain size="small" @click="handleCreateFile(false)" :loading="projects.building"><el-icon><FolderAdd /></el-icon>新建文件夹</el-button>
         </template>
@@ -36,8 +37,9 @@ export default {
         const handleCreate = ()=>{
             projects.value.showCreate = true;
         }
-        const handleUpload = ()=>{
+        const handleUpload = (mime)=>{
             projects.value.showUpload = true;
+            projects.value.uploadMime = mime;
         }
         const handleCreateFile = (isFile)=>{
             ElMessageBox.prompt('输入名称', `新建${isFile?'文件':'文件夹'}`, {

@@ -7,6 +7,7 @@
     <Editor></Editor>
     <Guide v-if="projects.current.guide"></Guide>
     <SourceWrap v-if="projects.current.source"></SourceWrap>
+    <Paint v-if="projects.current.paint"></Paint>
 </template>
 
 <script>
@@ -17,8 +18,9 @@ import { provideProjects } from './list';
 import Editor from './editor/Index.vue';
 import Guide from './editor/Guide.vue';
 import SourceWrap from './editor/SourceWrap.vue';
+import Paint from './editor/Paint.vue';
 export default {
-    components: { Path, Actions,Table,Editor,Guide,SourceWrap },
+    components: { Path, Actions,Table,Editor,Guide,SourceWrap,Paint },
     setup () {
         
         const {projects} = provideProjects();

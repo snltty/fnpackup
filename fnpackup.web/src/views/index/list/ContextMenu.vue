@@ -47,6 +47,7 @@ export default {
         }
         const handleUpload = ()=>{
             projects.value.showUpload = true;
+            projects.value.uploadMime = '*/*';
         }
         const handleDownload = ()=>{
             let href = process.env.NODE_ENV === 'development' 

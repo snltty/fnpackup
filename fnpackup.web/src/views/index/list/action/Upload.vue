@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="state.show" title="上传文件到当前目录" width="340" :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
+    <el-dialog v-model="state.show" :title="projects.uploadMime == '.fpk'?'导入项目':'上传文件到当前目录'" width="340" :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
         <div class="upload-wrap" ref="drag">
             <div class="inner"> 
                 <template v-if="state.loading">
@@ -9,18 +9,19 @@
                     <p>
                         <el-button @click="triggerSelectFile"><el-icon><Document /></el-icon>上传文件</el-button>
                     </p>
-                    <p>
+                    <p v-if="projects.uploadMime != '.fpk'">
                         <el-button @click="triggerSelectFolder"><el-icon><Folder /></el-icon>上传文件夹</el-button>
                     </p>
-                    <p>点击选择或拖拽文件/文件夹到此处</p>
-                    <p>上传单个.fpk文件视为导入应用</p>
+                    <p v-if="projects.uploadMime != '.fpk'">点击选择或拖拽文件/文件夹到此处</p>
+                    <p v-if="projects.uploadMime != '.fpk'">上传单个.fpk文件视为导入应用</p>
+                    <p v-if="projects.uploadMime == '.fpk'">上传单个.fpk文件导入应用</p>
                 </template>
             </div>
             <div class="drag" v-if="state.draging"></div>
         </div>
     </el-dialog>
-    <input multiple type="file" ref="input" @change="onFileChange"></input>
-    <input webkitdirectory directory multiple type="file" ref="input1" @change="onFileChange"></input>
+    <input multiple type="file" ref="input" @change="onFileChange" :accept="projects.uploadMime"></input>
+    <input webkitdirectory directory multiple type="file" ref="input1" @change="onFileChange" :accept="projects.uploadMime"></input>
 </template>
 
 <script>
@@ -28,7 +29,8 @@ import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 import {Plus,Refresh,Document,Folder} from '@element-plus/icons-vue'
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
-import {fetchApi, xhrApi} from '@/api/api'
+import {xhrApi} from '@/api/api'
+import { ElMessage } from 'element-plus';
 export default {
     props: ['modelValue'],
     emits: ['update:modelValue'],
@@ -70,6 +72,8 @@ export default {
                         state.loading = false;
                     }, 1000);
                     projects.value.load(); 
+                    logger.value.success(`已上传${files.length}个文件`);
+                    ElMessage.success(`已上传${files.length}个文件`);
                     return;
                 }
                 const fileObj =  files[index];
@@ -135,24 +139,27 @@ export default {
             state.draging = false;
             e.preventDefault();
             e.preventDefault();
+            const files = e.dataTransfer.files;
             const items = e.dataTransfer.items;
-            const files = [];
-            for(const item of items){
-                const entry = item.webkitGetAsEntry();
-                if(entry.isFile){
-                    const file = await asyncFn(entry.file,entry);
-                    const arr = entry.fullPath.split('/');
-                    const path = arr.slice(0,arr.length-1).join('/');
-                    files.push({
+            const result = [];
+
+            for(let file of files){
+                if(file.size > 0 || file.type){
+                    result.push({
                         file:file,
-                        path:`${projects.value.page.path}${path}`
+                        path:`${projects.value.page.path}`
                     });
-                }else{
-                    await handleEntries(files,entry);
                 }
             }
-            state.loading = true;
-            upload(files);
+            for(let item of items){
+                const entry = item.webkitGetAsEntry();
+                if(entry.isFile){
+                }else{
+                    await handleEntries(result,entry);
+                }
+            }
+            if(result.length == 0) return;
+            upload(result);
         }
         const asyncFn = (fn,obj)=>{
             return new Promise((resolve,reject)=>{
@@ -187,7 +194,7 @@ export default {
             });
         });
 
-        return {state,input,input1,drag,onFileChange,triggerSelectFile,triggerSelectFolder}
+        return {projects,state,input,input1,drag,onFileChange,triggerSelectFile,triggerSelectFolder}
     }
 }
 </script>
