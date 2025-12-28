@@ -38,7 +38,7 @@ export default {
     box-sizing: border-box;
 
     .inner{
-        border:1px solid #d0d7de;
+        border:1px solid #e2e8f0e6;
         border-radius: 4px;
     }
 }

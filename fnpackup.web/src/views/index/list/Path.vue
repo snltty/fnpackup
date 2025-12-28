@@ -52,7 +52,7 @@ export default {
 <style lang="stylus" scoped>
 .path-wrap{
     padding:1rem;
-    border-bottom: 1px solid #d0d7de;
+    border-bottom: 1px solid #e2e8f0e6;
     .el-breadcrumb{
         font-size: 1.3rem;
 
