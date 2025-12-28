@@ -1,12 +1,50 @@
 <template>
     <div class="context-menu-wrap" :style="{left:`${projects.contextMenu.x+4}px`,top:`${projects.contextMenu.y+4}px`}">
         <a href="javascript:;" @click="handleRefresh"><el-icon><Refresh/></el-icon> 刷新</a>
-        <a href="javascript:;" @click="handleUpload" v-if="hasInProject"><el-icon><Upload/></el-icon>上传</a>
-        <a href="javascript:;" @click="handleDownload" v-if="hasInProject"><el-icon><Download/></el-icon>下载</a>
-        <a href="javascript:;" @click="handleSource" v-if="canSource"><el-icon><EditPen/></el-icon>源码编辑</a>
-        <a href="javascript:;" @click="handleWizard" v-if="canWizard"><el-icon><DocumentAdd/></el-icon>编辑用户向导</a>
-        <a href="javascript:;" @click="handleCreateFile(true)" v-if="hasInProject"><el-icon><DocumentAdd/></el-icon>新建文件</a>
-        <a href="javascript:;" @click="handleCreateFile(false)" v-if="hasInProject"><el-icon><FolderAdd/></el-icon>新建文件夹</a>
+        <a href="javascript:;" v-if="hasInProject">
+            <div class="item">
+                <span><el-icon><More/></el-icon>目录</span>
+                <span class="flex-1"></span>
+                <el-icon><ArrowRight/></el-icon>
+            </div>
+            <div class="sub">
+                <a href="javascript:;" @click="handleBack"><el-icon><Back/></el-icon>回上一级</a>
+                <a href="javascript:;" @click="handleHome"><el-icon><Back/></el-icon>回应用列表</a>
+            </div>
+        </a>
+        <template v-if="hasInProject">
+            <a href="javascript:;" @click="handleUpload('*/*')"><el-icon><Upload/></el-icon>上传</a>
+        </template>
+        <a href="javascript:;" @click="handleDownload"><el-icon><Download/></el-icon>下载</a>
+        <a href="javascript:;" v-if="hasInProject">
+            <div class="item">
+                <span><el-icon><EditPen/></el-icon>编辑</span>
+                <span class="flex-1"></span>
+                <el-icon><ArrowRight/></el-icon>
+            </div>
+            <div class="sub">
+                <a href="javascript:;" @click="handleSource" v-if="canSource"><el-icon><EditPen/></el-icon>源码编辑</a>
+                <a href="javascript:;" @click="handleWizard"><el-icon><DocumentAdd/></el-icon>用户向导</a>
+            </div>
+        </a>
+        <a href="javascript:;">
+            <div class="item">
+                <span><el-icon><Plus/></el-icon>新建</span>
+                <span class="flex-1"></span>
+                <el-icon><ArrowRight/></el-icon>
+            </div>
+            <div class="sub">
+                <template v-if="hasInProject">
+                    <a href="javascript:;" @click="handleCreateFile(true)"><el-icon><DocumentAdd/></el-icon>新建文件</a>
+                    <a href="javascript:;" @click="handleCreateFile(false)"><el-icon><FolderAdd/></el-icon>新建文件夹</a>
+                </template>
+                <template v-else>
+                    <a href="javascript:;" @click="handleCreate()"><el-icon><Plus/></el-icon>创建应用</a>
+                    <a href="javascript:;" @click="handleUpload('.fpk')"><el-icon><Upload/></el-icon>导入fpk</a>
+                </template>
+            </div>
+        </a>
+        
         <template v-if="projects.contextMenu.row">
             <a href="javascript:;" class="red" @click="handleDel"><el-icon><Delete/></el-icon>删除</a>
         </template>
@@ -14,14 +52,14 @@
 </template>
 
 <script>
-import {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen} from '@element-plus/icons-vue'
+import {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen, Plus, Back, ArrowRight, More} from '@element-plus/icons-vue'
 import { useProjects } from './list';
 import { computed, onMounted } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { useLogger } from '../logger';
 import { fetchApi } from '@/api/api';
 export default {
-    components: {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen},
+    components: {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen,Plus,Back,ArrowRight,More},
     setup () {
 
         const logger = useLogger();
@@ -29,10 +67,6 @@ export default {
 
         const canSource = computed(()=>projects.value.contextMenu.row && projects.value.contextMenu.row.if);
         const hasInProject = computed(()=>projects.value.page.path != '.');
-        const canWizard = computed(()=>{
-            return /\/wizard/.test(projects.value.page.path)
-            || (projects.value.contextMenu.row && projects.value.contextMenu.row.name == 'wizard');
-        });
         const handleWizard = ()=>{
             if(projects.value.contextMenu.row){
                 projects.value.current.path = `${projects.value.page.path}/${projects.value.contextMenu.row.name}`;
@@ -45,9 +79,21 @@ export default {
         const handleRefresh = ()=>{
             projects.value.load();
         }
-        const handleUpload = ()=>{
+        const handleCreate = ()=>{
+            projects.value.showCreate = true;
+        }
+
+        const handleBack = ()=>{
+            projects.value.page.path = projects.value.page.path.replace(/\/[^\/]+$/,'');
+            projects.value.load();
+        }
+        const handleHome = ()=>{
+            projects.value.page.path = '.';
+            projects.value.load();
+        }
+        const handleUpload = (mime)=>{
             projects.value.showUpload = true;
-            projects.value.uploadMime = '*/*';
+            projects.value.uploadMime = mime;
         }
         const handleDownload = ()=>{
             let href = process.env.NODE_ENV === 'development' 
@@ -133,8 +179,8 @@ export default {
             });
         });
 
-        return {projects,canSource,hasInProject,canWizard,
-            handleWizard,handleRefresh,handleUpload,handleDownload,handleCreateFile,handleDel,handleSource}
+        return {projects,canSource,hasInProject,
+            handleWizard,handleRefresh,handleCreate,handleBack,handleHome,handleUpload,handleDownload,handleCreateFile,handleDel,handleSource}
     }
 }
 </script>
@@ -149,17 +195,44 @@ export default {
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
     z-index 99999;
     border-radius: 5px;
+    min-width: 10rem;
 
     a{
         display: block;
         padding: 5px 10px;
         cursor: pointer;
         font-size:1.3rem;
+        position: relative;
+        white-space : nowrap;
+        border-bottom: 1px solid #f5f5f5;
+        &:last-child{
+            border-bottom: none;
+        }
+
+        .item{
+            display:flex
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sub{
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background-color: rgba(255,255,255,1);
+            border: 1px solid #ddd;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            z-index 99999;
+            border-radius: 5px;
+            display: none;
+        }
 
         &:hover{
             background-color: #eee;
+            .sub{
+                display: block;
+            }
         }
-
     }
 }
 </style>

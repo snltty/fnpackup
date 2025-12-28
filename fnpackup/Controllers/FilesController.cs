@@ -303,9 +303,15 @@ namespace fnpackup.Controllers
                 }
 
                 memoryStream.Seek(0, SeekOrigin.Begin);
+
+                string filename = Path.GetFileName(path);
+                if (string.IsNullOrWhiteSpace(filename) || filename == ".")
+                {
+                    filename = $"fnpackup-{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}";
+                }
                 return File(memoryStream.ToArray(),
                     "application/zip",
-                    $"{Path.GetFileName(path)}.zip");
+                    $"{filename}.zip");
             }
         }
 
