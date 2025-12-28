@@ -175,7 +175,7 @@ html.dark .el-switch__core .el-switch__action{
 }
 html.dark .el-dialog{border: 1px solid #575c61;}
 html .el-overlay {
-    border-radius: 4px;
+    border-radius: 5px;
 }
 
 
@@ -238,6 +238,10 @@ span.split-pad10 {
 
 .el-table {
     --el-table-header-text-color: var(--el-text-color-regular) !important;
+}
+
+.el-tabs--border-card{
+    border-radius: 5px;
 }
 
 .el-splitter-bar__dragger-horizontal:after, .el-splitter-bar__dragger-horizontal:before

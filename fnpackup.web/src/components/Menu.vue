@@ -4,7 +4,7 @@
             <template v-for="item in options">
                 <li>
                     <router-link :to="item.path">
-                        <el-icon size="16"><HomeFilled /></el-icon>
+                        <el-icon size="16"><Guide /></el-icon>
                         <span>{{item.meta.title}}</span>
                     </router-link>
                 </li>
@@ -12,9 +12,9 @@
         </ul>
         <div class="foot-wrap">
             <a href="https://github.com/snltty/fnpackup" target="_blank">
-                <img src="../assets/github.svg" height="16">
+                <img src="../assets/github.svg" height="16" style="opacity: 0.5;">
             </a>
-            <a href="javascript:;">©snltty 2025</a>
+            <a href="javascript:;">Snltty ©2025</a>
             <a href="https://linker.snltty.com" target="_blank">Linker</a>
         </div>
     </div>
@@ -22,10 +22,10 @@
 
 <script>
 import { computed} from 'vue';
-import {HomeFilled} from '@element-plus/icons-vue'
+import { Guide} from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 export default {
-    components: {HomeFilled},
+    components: {Guide},
     setup () {
         const router = useRouter();
         const options = computed(()=>router.options.routes);
@@ -44,18 +44,20 @@ li{
     a{
         display: block;
         font-size:0;
-        padding:0 1rem 0 1rem;
-        line-height:3.2rem;
-        height: 3.2rem;
+        padding:.8rem .5rem;
         border-radius:4px;
 
         &.router-link-active,&:hover{
             background-color:#fff;
-            color:#2568ed
+            color:#2173df;
+            font-weight:500;
         }
         .el-icon,span{
             vertical-align: middle;
             font-size:1.4rem;
+        }
+        .el-icon{
+            margin-right:.6rem;
         }
 
     }

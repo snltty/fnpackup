@@ -39,7 +39,7 @@ export default {
 
     .inner{
         border:1px solid #e2e8f0e6;
-        border-radius: 4px;
+        border-radius: 5px;
     }
 }
 </style>
