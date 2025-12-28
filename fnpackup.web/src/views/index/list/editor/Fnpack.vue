@@ -18,6 +18,7 @@
 import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
+import { ElMessage } from 'element-plus';
 
 export default {
     match:/fnpack$/,
@@ -39,6 +40,7 @@ export default {
             }).then(res=>res.text()).then((res)=>{
                 if(res.indexOf('Packing successfully')){
                     logger.value.success(res);
+                    ElMessage.success('打包成功');
                     projects.value.load(); 
 
                     if(download){
@@ -52,13 +54,17 @@ export default {
                         a.click();
                         document.body.removeChild(a);
                     }
+                    
                 }else{
+                    ElMessage.error('打包失败');
                     logger.value.error(res);
                 }
             }).catch((e)=>{
                 logger.value.error(`${e}`);
+                ElMessage.error('打包失败');
             }).finally(()=>{
                 projects.value.building = false;
+                projects.value.current.show = false;
             });
         }
 
