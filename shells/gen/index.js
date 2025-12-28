@@ -88,7 +88,7 @@ readVersionDesc().then((desc) => {
     }
     writeText('../publish-fpk.sh', publishFpkText);
 
-    const installData = readYaml('../ymls/install.yml');
+    let installData = readYaml('../ymls/install.yml');
     while (installData.indexOf('{{version}}') >= 0) {
         installData = installData.replace('{{version}}', desc.version);
     }
