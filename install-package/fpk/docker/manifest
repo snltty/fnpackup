@@ -12,3 +12,4 @@ desktop_uidir=ui
 desktop_applaunchname=fnpackup.docker.Application
 service_port=1069
 checkport=true
+changelog=增加导入fpk
