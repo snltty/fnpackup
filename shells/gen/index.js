@@ -89,6 +89,9 @@ readVersionDesc().then((desc) => {
     writeText('../publish-fpk.sh', publishFpkText);
 
     const installData = readYaml('../ymls/install.yml');
+    while (installData.indexOf('{{version}}') >= 0) {
+        installData = installData.replace('{{version}}', desc.version);
+    }
     writeUploadIpk(installData, `v${desc.version}`);
     writeYaml('../../.github/workflows/install.yml', installData);
 

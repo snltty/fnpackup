@@ -18,8 +18,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         with:
-          tag_name: v1.0.0
-          release_name: v1.0.0.${{ steps.date.outputs.today }}
+          tag_name: v{{version}}
+          release_name: v{{version}}.${{ steps.date.outputs.today }}
           draft: false
           prerelease: false
           body: ""
