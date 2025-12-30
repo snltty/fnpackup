@@ -45,7 +45,7 @@ snltty/fnpackup
 ### [💼]打包fpk
 1. **创建应用**：在应用列表目录，选择创建应用，或导入已有的.fpk文件
 2. **进入应用**：双击应用文件夹
-3. **上传程序**：原生应用可以上传你的程序到`app/server`中，Docker应用直接编辑`app/docker/docker-compose.yaml`文件
+3. **上传程序**：原生应用上传你的程序到`app/server`中，Docker应用直接编辑`app/docker/docker-compose.yaml`
 4. **编辑方式**：可以使用`快速编辑`，或双击文件单独编辑，或右键文件源码编辑
 5. **打包应用**：编辑好全部内容后打包fpk，在项应用文件夹下查看生成的fpk文件
 
