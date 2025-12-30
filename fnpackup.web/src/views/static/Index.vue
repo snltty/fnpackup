@@ -5,14 +5,14 @@
                 <ul>
                     <li>自动托管以下目录静态资源，使用http://{appname}.domain.com:{{state.port}} 或 http://ip:{{state.port}}/{appname} 访问</li>
                     <li>1. fpk中的manifest配置的fnpackup={目录}，托管app/{目录}</li>
-                    <li>2. 应用文件/fnpackup-docker/statics/{目录}，托管{目录}，{目录}就是{appname}</li>
+                    <li>2. 文件管理/应用文件/fnpackup-docker/statics/{目录}，托管{目录}，{目录}就是{appname}</li>
                 </ul>
             </div>
             <div class="head">
                 <el-button type="primary" size="small" :loading="state.loading" @click="handleSearch"><el-icon><Refresh></Refresh></el-icon>重载托管和刷新列表</el-button>
             </div>
             <div class="flex-1">
-                <el-table :data="state.list" stripe size="small" height="100%" v-loading="state.loading" style="--el-table-header-bg-color: #f1f4f9">
+                <el-table :data="state.list" stripe size="small" height="98%" v-loading="state.loading" style="--el-table-header-bg-color: #f1f4f9">
                     <el-table-column prop="name" label="名称"></el-table-column>
                     <el-table-column prop="root" label="根目录"></el-table-column>
                 </el-table>
@@ -24,6 +24,7 @@
 <script>
 import { fetchApi } from '@/api/api';
 import { Refresh } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
 import { onMounted, reactive} from 'vue';
 export default {
     components:{Refresh},
@@ -60,7 +61,9 @@ export default {
         }
         const handleSearch = () => { 
             search().then(()=>{
-                getList();
+                getList().then(()=>{
+                    ElMessage.success('已重载');
+                });
             });
         }
         
