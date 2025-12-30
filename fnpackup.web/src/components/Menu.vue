@@ -40,13 +40,13 @@ export default {
     width: 140px;
 }
 ul{
-    padding:.5rem;
+    padding:.8rem;
     li{
         a{
             display: block;
             font-size:0;
             padding:.8rem .5rem;
-            border-radius:4px;
+            border-radius:6px;
 
             &.router-link-active,&:hover{
                 background-color:#fff;
