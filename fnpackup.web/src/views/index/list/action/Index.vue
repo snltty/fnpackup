@@ -40,8 +40,12 @@ export default {
         const handleGuide = ()=>{
             projects.value.current.guide = true;
         }
+        const handleUpload = (mime)=>{
+            projects.value.showUpload = true;
+            projects.value.uploadMime = mime;
+        }
 
-        return {paths,projects,handleCreate,handleBuild,handleGuide}
+        return {paths,projects,handleCreate,handleBuild,handleGuide,handleUpload}
     }
 }
 </script>
