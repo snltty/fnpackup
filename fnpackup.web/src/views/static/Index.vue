@@ -1,15 +1,9 @@
 <template>
     <div class="table-wrap h-100">
         <div class="inner h-100 flex flex-column flex-nowrap">
-            <div class="tips">
-                <ul>
-                    <li>自动托管以下目录静态资源，使用http://{appname}.domain.com:{{state.port}} 或 http://ip:{{state.port}}/{appname} 访问</li>
-                    <li>1. fpk中的manifest配置的fnpackup={目录}，托管app/{目录}</li>
-                    <li>2. 文件管理/应用文件/fnpackup-docker/statics/{目录}，托管{目录}，{目录}就是{appname}</li>
-                </ul>
-            </div>
             <div class="head">
                 <el-button type="primary" size="small" :loading="state.loading" @click="handleSearch"><el-icon><Refresh></Refresh></el-icon>重载托管和刷新列表</el-button>
+                <span class="tips">每60s自动重载一次，也可以手动重载</span>
             </div>
             <div class="flex-1">
                 <el-table :data="state.list" stripe size="small" height="98%" v-loading="state.loading" style="--el-table-header-bg-color: #f1f4f9">
@@ -87,9 +81,8 @@ export default {
         box-sizing: border-box;
 
         .tips{
-            padding:.6rem 1rem;
-            border-bottom:1px solid #e2e8f0e6;
             font-size:1.2rem;
+            margin-left:1rem;
         }
         .head{
             border-bottom:1px solid #e2e8f0e6;
