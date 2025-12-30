@@ -20,7 +20,7 @@
 </div>
 
 ## [🪂]Fnpackup
-fnpack二次包装UI，在线编辑和打包fpk
+fnpack二次包装UI，在线编辑和打包fpk，和帮助fpk自动托管静态资源
 
 ## [😂]使用方法
 
