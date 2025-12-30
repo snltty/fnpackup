@@ -51,12 +51,18 @@ snltty/fnpackup
 
 ### [🌍]静态托管
 
-如果你有一些静态网页，比如纯静态内容的fpk，啊！专门写一个http服务，或者写个cgi实在太麻烦了，那么可以使用本程序进行托管
+如果你有一些静态网页，或纯静态内容的fpk，但是专门写一个http服务 或者 cgi，都实在太麻烦了，那么可以使用本程序进行托管
 
 两种配置方式
 
-1. 是fpk里的静态内容，打包fpk时，manifest里填一个`fnpackup={目录}`，表示托管`app/{目录}`，也可以是`fnpackup={目录}/{下级目录}`，表示托管`app/{目录}/{下级目录}`
-2. 就纯静态网页，安装fnpackup后，在`文件管理/应用文件/fnpackup-docker/statics/`下新建一个文件夹，将静态内容放入，文件夹名称就是`{appname}`
+1. 是fpk里的静态内容
+    1. 打包fpk时，manifest里添加字段`fnpackup`
+    2. 可以`fnpackup={目录}`或`fnpackup={目录}/{下级目录}`，目录级数不限
+    3. manifest里的appname就是`{appname}`
+2. 就纯静态网页
+    1. 安装fnpackup后，找到`文件管理/应用文件/fnpackup-docker/statics/`
+    2. 在里面下新建一个文件夹，上传你的静态资源
+    3. 文件夹名称就是`{appname}`
 
 然后使用`http://{appname}.domain.com:1069`或`http://ip:1069/{appname}`访问
 
