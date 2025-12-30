@@ -105,73 +105,99 @@ namespace fnpackup
         }
         private List<FileProviderInfo> Statics()
         {
-            string root = "./statics";
-            if(Directory.Exists(root) == false)
+            try
             {
-                Directory.CreateDirectory(root);
-            }
+                string root = Path.GetFullPath("./statics");
+                if (Directory.Exists(root) == false)
+                {
+                    Directory.CreateDirectory(root);
+                }
+                var result = Directory.GetDirectories(root).Select(c => new FileProviderInfo
+                {
+                    Name = Path.GetFileName(c),
+                    Root = c,
+                    FileProvider = new PhysicalFileProvider(c)
+                }).ToList();
 
-            return Directory.GetDirectories(root).Select(c => new FileProviderInfo
+                return result;
+            }
+            catch (Exception)
             {
-                Name = c,
-                Root = Path.GetFullPath(Path.Join(root, c)),
-                FileProvider = new PhysicalFileProvider(Path.GetFullPath(Path.Join(root, c)))
-            }).ToList();
+            }
+            return [];
         }
         private List<FileProviderInfo> Apps()
         {
-            string root = "./apps";
-            if (Directory.Exists(root) == false)
+            try
             {
-                return [];
-            }
+                string root = Path.GetFullPath("./apps");
+                if (Directory.Exists(root) == false)
+                {
+                    return [];
+                }
 
-            return Directory.GetDirectories(root).Select(dirName =>
-            {
-                string path = System.IO.File.ReadAllText(Path.GetFullPath(Path.Join(root, dirName, "manifest")))
-                 .Split(Environment.NewLine)
-                 .Select(line =>
-                 {
-                     string key = string.Empty, value = string.Empty;
-                     if (string.IsNullOrWhiteSpace(line) == false)
+                return Directory.GetDirectories(root).Select(dir =>
+                {
+                    string path = System.IO.File.ReadAllText(Path.Join(dir, "manifest"))
+                     .Split(Environment.NewLine)
+                     .Select(line =>
                      {
-                         int index = line.IndexOf('=');
-                         if (index > 0)
+                         string key = string.Empty, value = string.Empty;
+                         if (string.IsNullOrWhiteSpace(line) == false)
                          {
-                             key = line.Substring(0, index).Trim();
-                             value = line.Substring(index + 1).Trim();
+                             int index = line.IndexOf('=');
+                             if (index > 0)
+                             {
+                                 key = line.Substring(0, index).Trim();
+                                 value = line.Substring(index + 1).Trim();
 
+                             }
                          }
-                     }
-                     return (key, value);
-                 })
-                 .Where(c => c.key == "fnpackup").Select(c => c.value).FirstOrDefault();
+                         return (key, value);
+                     })
+                     .Where(c => c.key == "fnpackup").Select(c => c.value).FirstOrDefault();
 
-                return (dirName, path);
+                    return (dir, path);
 
-            }).Where(c => string.IsNullOrWhiteSpace(c.path) == false).Select(c => new FileProviderInfo
+                }).Where(c => string.IsNullOrWhiteSpace(c.path) == false).Select(c => new FileProviderInfo
+                {
+                    Name = Path.GetFileName(c.dir),
+                    Root = Path.Join(c.dir, "target", c.path),
+                    FileProvider = new PhysicalFileProvider(Path.Join(c.dir, "target", c.path))
+                }).ToList();
+            }
+            catch (Exception)
             {
-                Name = c.dirName,
-                Root = Path.GetFullPath(Path.Join(root, "target", c.path)),
-                FileProvider = new PhysicalFileProvider(Path.GetFullPath(Path.Join(root, "target", c.path)))
-            }).ToList();
+            }
+            return [];
         }
 
 
         public IFileInfo GetFileInfo(string subpath)
         {
-            return GetFileProvider().GetFileInfo(subpath);
+            (IFileProvider fileProvider, bool query) = GetFileProvider();
+            if (query && subpath.IndexOf('/', 1) > 0)
+            {
+                subpath = subpath.Substring(subpath.IndexOf('/', 1));
+            }
+            return fileProvider.GetFileInfo(subpath);
         }
         public IDirectoryContents GetDirectoryContents(string subpath)
         {
-            return GetFileProvider().GetDirectoryContents(subpath);
+            (IFileProvider fileProvider, bool query) = GetFileProvider();
+            if (query && subpath.IndexOf('/', 1) > 0)
+            {
+                subpath = subpath.Substring(subpath.IndexOf('/', 1));
+            }
+            return fileProvider.GetDirectoryContents(subpath);
         }
         public IChangeToken Watch(string filter)
         {
-            return GetFileProvider().Watch(filter);
+            (IFileProvider fileProvider, bool query) = GetFileProvider();
+            return fileProvider.Watch(filter);
         }
 
-        private IFileProvider GetFileProvider()
+        private (IFileProvider fileProvider, bool query) GetFileProvider()
         {
             HttpContext httpContext = httpContextAccessor.HttpContext;
             string host = httpContext?.Request.Host.Host ?? string.Empty;
@@ -180,14 +206,15 @@ namespace fnpackup
             {
                 if (host2path.TryGetValue(host.Split('.')[0], out FileProviderInfo provider))
                 {
-                    return provider.FileProvider;
+                    return (provider.FileProvider, false);
                 }
-                if (string.IsNullOrWhiteSpace(path) == false && host2path.TryGetValue(path.Split('/')[0], out provider))
+                Console.WriteLine(path);
+                if (string.IsNullOrWhiteSpace(path) == false && host2path.TryGetValue(path.Split('/')[1], out provider))
                 {
-                    return provider.FileProvider;
+                    return (provider.FileProvider, true);
                 }
             }
-            return defaultFileProvider;
+            return (defaultFileProvider, false);
         }
 
 
