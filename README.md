@@ -69,7 +69,8 @@ snltty/fnpackup
 
 ## [🖼️]预览效果
 
-![pay](./fnpackup.web/public/fnpackup.png)
+![pay](./fnpackup.web/public/fnpackup1.png)
+![pay](./fnpackup.web/public/fnpackup2.png)
 
 ## [🎁]为爱发电
 
