@@ -8,11 +8,13 @@
 		<Authors>snltty</Authors>
 		<Company>snltty</Company>
 		<PackageReleaseNotes>fnpackup</PackageReleaseNotes>
-		<Version>0.0.2</Version>
-		<AssemblyVersion>0.0.2</AssemblyVersion>
-		<FileVersion>0.0.2</FileVersion>
+		<Version>0.0.3</Version>
+		<AssemblyVersion>0.0.3</AssemblyVersion>
+		<FileVersion>0.0.3</FileVersion>
 		<Description>1. 一些累计更新，一些BUG修复
-2. 增加导入fpk</Description>
+2. 优化上传
+3. 优化UI
+4. 静态托管</Description>
 		<Copyright>snltty</Copyright>
 
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>

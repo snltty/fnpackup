@@ -5,7 +5,7 @@
             <el-button plain size="small" @click="handleUpload('.fpk')" :loading="projects.building"><el-icon><Upload /></el-icon>导入fpk</el-button>
         </template>
         <template v-if="paths.length >= 1">
-            <el-button type="primary" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Coin /></el-icon>打包fpk</el-button>
+            <el-button type="primary" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Pointer /></el-icon>打包fpk</el-button>
             <el-button type="success" plain size="small" @click="handleGuide" :loading="projects.building"><el-icon><Files /></el-icon>快速编辑</el-button>     
         </template>
         <Create v-model="projects.showCreate" v-if="projects.showCreate"></Create>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { Coin, Upload,Plus,Files } from '@element-plus/icons-vue'
+import { Upload,Plus,Files, Pointer } from '@element-plus/icons-vue'
 import { computed } from 'vue';
 import { useProjects } from '../list';
 import Create from './Create.vue';
@@ -22,7 +22,7 @@ import { useLogger } from '../../logger';
 import UploadFile from './Upload.vue';
 export default {
     components: {
-        Upload,Coin,Plus,Files,Create,UploadFile
+        Upload,Pointer,Plus,Files,Create,UploadFile
     },
     setup () {
         const logger = useLogger();

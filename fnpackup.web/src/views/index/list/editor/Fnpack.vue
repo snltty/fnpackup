@@ -2,13 +2,13 @@
     <div class="fnpack-wrap h-100">
         <div class="t-c">
             <p>
-                <el-button @click="handleBuild(true)" :loading="projects.building">打包并下载</el-button>
+                <el-button plain @click="handleBuild(true)" :loading="projects.building">打包并下载</el-button>
             </p>
             <p class="mgt-1">
                 打包后在项目根目录下找到fpk
             </p>
             <p class="mgt-1">
-                <el-button type="primary" @click="handleBuild(false)" :loading="projects.building">仅打包</el-button>
+                <el-button plain type="primary" @click="handleBuild(false)" :loading="projects.building">仅打包</el-button>
             </p>
         </div>
     </div>

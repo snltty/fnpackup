@@ -10,7 +10,7 @@
         class="theme" ref="myEditor"></Codemirror>
         <div style="height:6px;"></div>
         <div class="btns t-c">
-            <el-button type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
+            <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
         </div>
     </div>
 </template>
@@ -109,6 +109,9 @@ export default {
 .v-codemirror {
   border: 1px solid #eee;
   height: auto;
+}
+.cm-editor,.cm-scroller{
+    border-radius:5px;
 }
 </style>
 <style lang="stylus" scoped>

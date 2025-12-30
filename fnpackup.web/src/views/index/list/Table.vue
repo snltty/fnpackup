@@ -1,7 +1,7 @@
 <template>
     <div class="table-wrap flex-1 flex flex-column flex-nowrap" @contextmenu="handleContextMenu1">
         <div class="flex-1 scrollbar">
-            <el-table :data="projects.page.list" size="small" height="100%" v-loading="projects.loading"
+            <el-table :data="projects.page.list" stripe size="small" height="100%" v-loading="projects.loading"
             @cell-dblclick="handleOpen" @row-contextmenu="handleContextMenu" ref="table" style="--el-table-header-bg-color: #f1f4f9">
                 <el-table-column prop="if" width="35">
                     <template #default="scope">

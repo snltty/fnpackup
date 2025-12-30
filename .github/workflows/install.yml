@@ -15,11 +15,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         with:
-          tag_name: v0.0.2
-          release_name: v0.0.2.${{ steps.date.outputs.today }}
+          tag_name: v0.0.3
+          release_name: v0.0.3.${{ steps.date.outputs.today }}
           draft: false
           prerelease: false
-          body: "1. 一些累计更新，一些BUG修复\r\n2. 增加导入fpk"
+          body: "1. 一些累计更新，一些BUG修复\r\n2. 优化上传\r\n3. 优化UI\r\n4. 静态托管"
       - name: setup node.js
         uses: actions/setup-node@v2
         with:

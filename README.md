@@ -32,8 +32,10 @@ fnpack二次包装UI，在线编辑和打包fpk
 docker run -it -d --name fnpackup \
 -p 1069:1069 \
 -v /usr/local/fnpackup-docker/projects:/app/projects \
+-v /usr/local/fnpackup-docker/statics:/app/statics \
 -v /usr/local/bin/appcenter-cli:/app/appcenter-cli:ro \
 -v /usr/local/bin/fnpack:/app/fnpack:ro \
+-v /var/apps:/app/apps:ro \
 --restart=always \
 --privileged=true \
 snltty/fnpackup
@@ -42,8 +44,10 @@ snltty/fnpackup
 docker run -it -d --name fnpackup \
 --network host \
 -v /usr/local/fnpackup-docker/projects:/app/projects \
+-v /usr/local/fnpackup-docker/statics:/app/statics \
 -v /usr/local/bin/appcenter-cli:/app/appcenter-cli:ro \
 -v /usr/local/bin/fnpack:/app/fnpack:ro \
+-v /var/apps:/app/apps:ro \
 --restart=always \
 --privileged=true \
 snltty/fnpackup

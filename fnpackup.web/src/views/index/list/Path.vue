@@ -1,6 +1,6 @@
 <template>
     <div class="path-wrap">
-        <el-breadcrumb :separator-icon="ArrowRight">
+        <el-breadcrumb>
             <el-breadcrumb-item>
                 <a href="javascript:;" @click="handleBack"><el-icon><ArrowLeftBold /></el-icon></a>
             </el-breadcrumb-item>
@@ -8,12 +8,12 @@
                 <a href="javascript:;" @click="handleRefresh"><el-icon><Refresh /></el-icon></a>
             </el-breadcrumb-item>
             <el-breadcrumb-item>
-                <a href="javascript:;" @click="handleFolder(0)"><el-icon><HomeFilled /></el-icon>应用列表</a>
+                <a href="javascript:;" @click="handleFolder(0)"><el-icon><Pointer /></el-icon>应用列表</a>
             </el-breadcrumb-item>
             <template v-for="(value,index) in paths">
                 <el-breadcrumb-item @click="handleFolder(index+1)">
                     <a href="javascript:;">
-                        <el-icon v-if="index===0"><StarFilled /></el-icon>
+                        <el-icon v-if="index===0"><Star /></el-icon>
                         <span>{{ value }}</span>
                     </a>
                 </el-breadcrumb-item>
@@ -24,10 +24,10 @@
 
 <script>
 import { computed } from 'vue';
-import { ArrowRight,ArrowLeftBold,HomeFilled,Refresh, StarFilled } from '@element-plus/icons-vue';
+import { ArrowLeftBold,Refresh, Star, Pointer } from '@element-plus/icons-vue';
 import { useProjects } from './list';
 export default {
-    components:{ArrowRight,ArrowLeftBold,Refresh,HomeFilled,StarFilled},
+    components:{ArrowLeftBold,Refresh,Pointer,Star},
     setup () {
         
         const projects = useProjects();

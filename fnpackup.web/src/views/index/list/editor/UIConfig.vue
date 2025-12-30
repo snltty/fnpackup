@@ -7,7 +7,7 @@
                 </div>
                 <el-form-item label-width="0">
                     <div class="t-c w-100">
-                        <el-button type="primary" @click="handleSubmit" :loading="state.loading">保存修改</el-button>
+                        <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">保存修改</el-button>
                     </div>
                 </el-form-item>
             </el-form>
@@ -155,5 +155,6 @@ export default {
 .fields{
     padding:1rem;
     border:1px solid #eee;
+    border-radius: 5px;
 }
 </style>

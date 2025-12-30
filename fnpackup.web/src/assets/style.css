@@ -240,9 +240,21 @@ span.split-pad10 {
     --el-table-header-text-color: var(--el-text-color-regular) !important;
 }
 
-.el-tabs--border-card{
+.el-tabs--border-card,
+.el-tabs--border-card>.el-tabs__header{
     border-radius: 5px;
 }
+.el-tabs--border-card>.el-tabs__header .el-tabs__nav .el-tabs__item:first-child{
+    border-radius: 7px 0 0 0;
+}
+.el-tabs--border-card>.el-tabs__header .el-tabs__nav.is-left .el-tabs__item{
+    border-radius: 0;
+}
+.el-tabs__new-tab{
+    margin:2px 0 0 0 !important;
+}
+
+
 
 .el-splitter-bar__dragger-horizontal:after, .el-splitter-bar__dragger-horizontal:before
 {

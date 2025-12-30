@@ -7,10 +7,10 @@
                 </template>
                 <template v-else>
                     <p>
-                        <el-button @click="triggerSelectFile"><el-icon><Document /></el-icon>上传文件</el-button>
+                        <el-button plain @click="triggerSelectFile"><el-icon><Document /></el-icon>上传文件</el-button>
                     </p>
                     <p v-if="projects.uploadMime != '.fpk'">
-                        <el-button @click="triggerSelectFolder"><el-icon><Folder /></el-icon>上传文件夹</el-button>
+                        <el-button plain @click="triggerSelectFolder"><el-icon><Folder /></el-icon>上传文件夹</el-button>
                     </p>
                     <p v-if="projects.uploadMime != '.fpk'">点击选择或拖拽文件/文件夹到此处</p>
                     <p v-if="projects.uploadMime != '.fpk'">上传单个.fpk文件视为导入应用</p>
@@ -30,7 +30,7 @@ import {Plus,Refresh,Document,Folder} from '@element-plus/icons-vue'
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
 import {xhrApi} from '@/api/api'
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElNotification } from 'element-plus';
 export default {
     props: ['modelValue'],
     emits: ['update:modelValue'],
@@ -70,10 +70,15 @@ export default {
                 if(index > files.length-1){
                     setTimeout(() => {
                         state.loading = false;
+                        logger.value.success(`已上传${files.length}个文件`);
+                        ElNotification({
+                            type: 'success',
+                            title: '文件上传',
+                            message: `已上传${files.length}个文件`,
+                            duration:3000,
+                        });
                     }, 1000);
                     projects.value.load(); 
-                    logger.value.success(`已上传${files.length}个文件`);
-                    ElMessage.success(`已上传${files.length}个文件`);
                     return;
                 }
                 const fileObj =  files[index];
@@ -90,6 +95,14 @@ export default {
                     }else{
                         state.process.progress = `100%`;
                         logger.value.success(`已上传:${fileObj.file.name}`);
+                        nextTick(()=>{
+                            ElNotification({
+                                type: 'success',
+                                title: '文件上传',
+                                message: `已上传:${fileObj.file.name}`,
+                                duration:3000,
+                            });
+                        });
                     }
                     state.process.current = index+1;
                     fn(index+1);

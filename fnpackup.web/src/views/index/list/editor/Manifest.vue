@@ -1,9 +1,22 @@
 <template>
-    <div class="manifset-wrap h-100">
+    <div class="manifest-wrap h-100">
         <el-form ref="ruleFormRef"  :model="state.ruleForm" :rules="state.rules" label-width="140" class="h-100 flex flex-column flex-nowrap">
             <div class="flex-1 inner scrollbar">
                 <template v-for="(item,index) in fieldsArray">
                     <el-form-item :label="item.type == 'checkbox'?'':item.label" :prop="item.name">
+                        <template #label="{label}">
+                            <div>
+                                <span>{{ label }}</span>
+                                <template v-if="item.help">
+                                    <el-popover title="提示" placement="top" width="240">
+                                        <template #reference>
+                                            <el-icon size="12"><QuestionFilled></QuestionFilled></el-icon>
+                                        </template>
+                                        <div v-html="item.help"></div>
+                                    </el-popover>
+                                </template>
+                            </div>
+                        </template>
                         <template v-if="item.type == 'input'">
                             <el-input v-model="state.ruleForm[item.name]" @change="handleChange(item.name)" />
                         </template>
@@ -33,7 +46,7 @@
                                         </template>
                                     </el-col>
                                     <el-col :span="12" class="t-r"> 
-                                        <el-button @click="handleTransform(index)">转为{{item.to.label}}</el-button>
+                                        <el-button plain @click="handleTransform(index)">转为{{item.to.label}}</el-button>
                                     </el-col>
                                 </el-row>
                             </template>
@@ -52,12 +65,13 @@
                                 </template>
                             </template>
                         </template>
+
                     </el-form-item>
                 </template>
             </div>
             <el-form-item class="mgt-1" label-width="0">
                 <div class="t-c w-100"> 
-                    <el-button type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
+                    <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
                 </div>
             </el-form-item>
         </el-form>
@@ -70,10 +84,12 @@ import { useProjects } from '../list';
 import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
 import { ElMessage } from 'element-plus';
+import {  QuestionFilled } from '@element-plus/icons-vue';
 
 export default {
     match:/manifest$/,
     width:500,
+    components:{QuestionFilled},
     setup () {
 
         const logger = useLogger();
@@ -103,6 +119,13 @@ export default {
                 to:{label:'arch',value:'arch'}
             }
         }
+
+        const staticHelp = [
+            '可以填写app下的文件夹<br/>比如填写www则可通过<br/>',
+            `{appname}.domain.com:${window.location.port}<br>`,
+            `domain.com:${window.location.port}/{appname}<br>`,
+            `访问app/www下的静态文件`
+        ];
 
         const fieldsArray = ref([
             {name: 'appname', label: '应用的唯一标识符', type: 'input',default:'',rules:[{required: true, message: '请填写唯一标识符', trigger: 'blur'}]},
@@ -139,6 +162,7 @@ export default {
             {name: 'service_port', label: '占用端口', type: 'input',default:''},
             {name: 'checkport', label: '检查端口占用', type: 'checkbox',default:true},
             {name: 'disable_authorization_path', label: '是否禁用授权目录功能', type: 'checkbox',default:false},
+            {name: 'fnpackup', label: '静态托管', type: 'input',default:'',help:staticHelp.join('')},
             {name: 'changelog', label: '应用更新日志', type: 'input',default:''},
             
         ]);
@@ -275,10 +299,11 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.manifset-wrap{
+.manifest-wrap{
     .inner{
         padding:2rem 1rem;
         border:1px solid #ddd;
+        border-radius:5px;
     }
 }
 </style>

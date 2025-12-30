@@ -6,7 +6,7 @@
             "type": "iframe",
             "protocol": "http",
             "port": "1069",
-            "url": "/web/index.html",
+            "url": "/",
             "allUsers": false
         }
     }

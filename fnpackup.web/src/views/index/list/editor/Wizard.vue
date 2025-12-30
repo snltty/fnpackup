@@ -17,14 +17,14 @@
                     <template v-else>
                         <el-form-item label-width="0" >
                             <div class="t-c w-100 mgt-1">
-                                <el-button @click="handleAddField(step,0)">添加字段</el-button>
+                                <el-button plain @click="handleAddField(step,0)">添加字段</el-button>
                             </div>
                         </el-form-item>
                     </template>
                 </div>
                 <el-form-item label-width="0">
                     <div class="t-c w-100">
-                        <el-button type="primary" @click="handleSubmit" :loading="state.loading">保存修改</el-button>
+                        <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">保存修改</el-button>
                     </div>
                 </el-form-item>
             </el-form>

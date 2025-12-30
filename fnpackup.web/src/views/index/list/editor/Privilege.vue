@@ -14,8 +14,8 @@
                 <el-input v-model="state.ruleForm.groupname" />
             </el-form-item>
             <el-form-item>
-                <el-button @click="handleCancel" :loading="state.loading">取消</el-button>
-                <el-button type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
+                <el-button plain @click="handleCancel" :loading="state.loading">取消</el-button>
+                <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
             </el-form-item>
         </el-form>
     </div>

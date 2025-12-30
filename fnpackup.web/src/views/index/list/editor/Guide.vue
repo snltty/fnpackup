@@ -4,7 +4,7 @@
         <el-tabs type="border-card" tabPosition="left" v-model="state.key" @tab-change="handleChange" class="h-100">
             <template v-for="(item,index) in state.tabs.filter(c=>!c.exists_key || c.exists)">
                 <el-tab-pane :label="item.label" :name="item.key" v-loading="projects.current.loading" class="h-100">
-                    <Editor v-if="projects.current.path && state.key == item.key"></Editor>
+                    <Editor v-if="projects.current.path && state.key == item.key" :plusHeight="item.plusHeight || 0"></Editor>
                 </el-tab-pane>
             </template>
         </el-tabs>
@@ -44,7 +44,7 @@ export default {
                 {label:'入口图标',key:'app/ui/images/icon_256.png','exists_key':'ui','exists':false},
                 {label:'用户向导',key:'wizard/install'},
                 {label:'启停脚本',key:'cmd/main'},
-                {label:'Docker',key:'app/docker/docker-compose.yaml','exists_key':'docker','exists':false},
+                {label:'Docker',key:'app/docker/docker-compose.yaml','exists_key':'docker','exists':false,plusHeight:130},
                 {label:'打包下载',key:'fnpack'}
             ]
         });

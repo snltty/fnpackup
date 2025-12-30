@@ -18,8 +18,8 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item>
-                    <el-button @click="state.show = false">取消</el-button>
-                    <el-button type="primary" @click="handleSubmit" :loading="state.loading">确认创建</el-button>
+                    <el-button plain @click="state.show = false">取消</el-button>
+                    <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">确认创建</el-button>
                 </el-form-item>
             </el-form>
         </div>

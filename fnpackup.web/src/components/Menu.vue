@@ -4,7 +4,9 @@
             <template v-for="item in options">
                 <li>
                     <router-link :to="item.path">
-                        <el-icon size="16"><Guide /></el-icon>
+                        <el-icon size="16">
+                            <component :is="item.meta.icon"></component>
+                        </el-icon>
                         <span>{{item.meta.title}}</span>
                     </router-link>
                 </li>
@@ -22,10 +24,8 @@
 
 <script>
 import { computed} from 'vue';
-import { Guide} from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 export default {
-    components: {Guide},
     setup () {
         const router = useRouter();
         const options = computed(()=>router.options.routes);
@@ -39,29 +39,32 @@ export default {
     background-color:#f1f4f9;
     width: 140px;
 }
-li{
+ul{
     padding:.5rem;
-    a{
-        display: block;
-        font-size:0;
-        padding:.8rem .5rem;
-        border-radius:4px;
+    li{
+        a{
+            display: block;
+            font-size:0;
+            padding:.8rem .5rem;
+            border-radius:4px;
 
-        &.router-link-active,&:hover{
-            background-color:#fff;
-            color:#2173df;
-            font-weight:500;
-        }
-        .el-icon,span{
-            vertical-align: middle;
-            font-size:1.4rem;
-        }
-        .el-icon{
-            margin-right:.6rem;
-        }
+            &.router-link-active,&:hover{
+                background-color:#fff;
+                color:#2173df;
+                font-weight:500;
+            }
+            .el-icon,span{
+                vertical-align: middle;
+                font-size:1.4rem;
+            }
+            .el-icon{
+                margin-right:.6rem;
+            }
 
+        }
     }
 }
+
 .foot-wrap{
     padding:1rem .6rem;
     font-size:1.2rem;

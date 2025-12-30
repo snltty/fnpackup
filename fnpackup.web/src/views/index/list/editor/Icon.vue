@@ -14,6 +14,7 @@ import { computed, nextTick, onMounted, reactive, ref } from 'vue';
 import { useProjects } from '../list';
 import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
+import { ElMessage } from 'element-plus';
 
 export default {
     match:/(ICON|icon).*(PNG|png)$/,
@@ -54,6 +55,7 @@ export default {
                     });
                 }else{
                     logger.value.success(`已上传:${file.name} 到 ${projects.value.current.path}`);
+                    ElMessage.success(`已上传:${file.name}`);
                     state.version++
                 }
             }).catch((e)=>{

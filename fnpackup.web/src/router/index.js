@@ -1,11 +1,17 @@
+import { Pointer, Service } from '@element-plus/icons-vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 const routes = [
     {
         path: '/',
         name: 'Index',
-        meta: { title: '编辑器' },
+        meta: { title: '打包fpk',icon:Pointer },
         component: () => import('@/views/index/Index.vue'),
-       
+    },
+    {
+        path: '/static',
+        name: 'Static',
+        meta: { title: '静态托管',icon:Service },
+        component: () => import('@/views/static/Index.vue'),
     }
 ]
 

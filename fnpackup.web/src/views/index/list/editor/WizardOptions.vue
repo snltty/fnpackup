@@ -38,9 +38,9 @@
     <el-dialog v-model="state.show" title="选项列表" width="400" top="2vh" >
         <div v-if="state.show">
             <div class="head t-c flex">
-                <el-button size="small" @click="handleAdd(0)">添加一项</el-button>
+                <el-button plain size="small" @click="handleAdd(0)">添加一项</el-button>
                 <span class="flex-1 t-c">双击某栏编辑值</span>
-                <el-button size="small" type="primary" @click="handleSubmit">确定保存</el-button>
+                <el-button plain size="small" type="primary" @click="handleSubmit">确定保存</el-button>
             </div>
             <el-table :data="state.data" stripe  border size="small" @cell-dblclick="handleCellClick">
                 <el-table-column prop="label" label="标签">
