@@ -138,7 +138,8 @@ namespace fnpackup
 
                 return Directory.GetDirectories(root).Select(dir =>
                 {
-                    string path = System.IO.File.ReadAllText(Path.Join(dir, "manifest"))
+                    string manifest = Path.Join(dir, "manifest");
+                    string path = File.Exists(manifest) ==false ? string.Empty : File.ReadAllText(manifest)
                      .Split(Environment.NewLine)
                      .Select(line =>
                      {
@@ -180,6 +181,8 @@ namespace fnpackup
             {
                 subpath = subpath.Substring(subpath.IndexOf('/', 1));
             }
+            Console.WriteLine(subpath);
+            Console.WriteLine(query);
             return fileProvider.GetFileInfo(subpath);
         }
         public IDirectoryContents GetDirectoryContents(string subpath)
@@ -202,17 +205,18 @@ namespace fnpackup
             HttpContext httpContext = httpContextAccessor.HttpContext;
             string host = httpContext?.Request.Host.Host ?? string.Empty;
             string path = httpContext?.Request.Path ?? string.Empty;
+
+            FileProviderInfo provider;
             if (IPAddress.TryParse(host, out _) == false)
             {
-                if (host2path.TryGetValue(host.Split('.')[0], out FileProviderInfo provider))
+                if (host2path.TryGetValue(host.Split('.')[0], out provider))
                 {
                     return (provider.FileProvider, false);
                 }
-                Console.WriteLine(path);
-                if (string.IsNullOrWhiteSpace(path) == false && host2path.TryGetValue(path.Split('/')[1], out provider))
-                {
-                    return (provider.FileProvider, true);
-                }
+            }
+            if (string.IsNullOrWhiteSpace(path) == false && host2path.TryGetValue(path.Split('/')[1], out provider))
+            {
+                return (provider.FileProvider, true);
             }
             return (defaultFileProvider, false);
         }

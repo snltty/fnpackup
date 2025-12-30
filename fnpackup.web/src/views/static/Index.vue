@@ -80,6 +80,7 @@ export default {
     box-sizing: border-box;
     .inner{
         border:1px solid #e2e8f0e6;
+        border-radius:5px;
         box-sizing: border-box;
 
         .tips{
