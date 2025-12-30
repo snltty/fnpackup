@@ -1,5 +1,5 @@
 appname=fnpackup
-version=0.0.1
+version={version}
 display_name=在线fpk
 desc="""fnpack二次包装UI，在线编辑和打包fpk，和帮助fpk自动托管静态资源"""
 platform=all
@@ -12,4 +12,4 @@ desktop_uidir=ui
 desktop_applaunchname=fnpackup.docker.Application
 service_port=1069
 checkport=true
-changelog=增加导入fpk
+changelog=优化UI和增加静态托管
