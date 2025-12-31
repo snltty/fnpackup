@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="state.show" :title="projects.uploadMime == '.fpk'?'导入项目':'上传文件到当前目录'" width="340" :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
+    <el-dialog v-model="state.show" :title="projects.uploadMime == '.fpk'?'导入fpk应用':'上传文件到当前目录'" width="340" :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
         <div class="upload-wrap" ref="drag">
             <div class="inner"> 
                 <template v-if="state.loading">

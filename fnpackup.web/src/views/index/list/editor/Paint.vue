@@ -1,12 +1,7 @@
 <template>
-    <el-dialog v-model="projects.current.paint" title="图标编辑"  width="336" top="1vh"
+    <el-dialog v-model="projects.current.paint" title="图标编辑"  width="310" top="1vh"
     :close-on-click-modal="false" :close-on-press-escape="false" draggable>
     <div class="paint-wrap flex flex-nowrap">
-        <div class="menu">
-            <template v-for="menu in state.menu.list">
-                <a href="javascript:;" :class="{current:menu.type==state.menu.type}"><img :src="menu.img"></a>
-            </template>
-        </div>
         <span class="flex-1"></span>
         <div class="svg-wrap" ref="wrap" @click="handleWrapClick">
             <svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
@@ -14,7 +9,11 @@
                     <rect :x="state.svg.stroke.size/2" :y="state.svg.stroke.size/2" 
                     :stroke-width="state.svg.stroke.size" :stroke="state.svg.stroke.color" :fill="state.svg.fill.color"
                     :width="256-state.svg.stroke.size" :height="256-state.svg.stroke.size" 
-                    :rx="state.svg.fill.rx" ></rect>
+                    :rx="state.svg.fill.rx" @click.stop="handleClick(state.svg)" id="svg-bg"></rect>
+                    <template v-if="state.svg.path.show">
+                        <rect :x="state.svg.path.x" :y="state.svg.path.y" :width="state.svg.path.width" :height="state.svg.path.height" 
+                        :stroke="state.svg.path.color" stroke-width="2" stroke-dasharray="5,3" fill="none"></rect>
+                    </template>
                 </g>
                 <template v-for="(text,index) in state.svg.texts">
                     <g>
@@ -28,7 +27,11 @@
                         :stroke="text.stroke.color">{{text.text}}</text>
                         <template v-if="text.path.show">
                             <rect :x="text.path.x" :y="text.path.y" :width="text.path.width" :height="text.path.height" 
-                            stroke="blue" stroke-width="2" fill="none"></rect>
+                            :stroke="text.path.color" stroke-width="2" stroke-dasharray="5,3" fill="none"></rect>
+                            <rect @click.stop :fill="text.path.color" :x="text.path.x-4" :y="text.path.y+text.path.height/2-4" width="8" height="8" class="resize-l"></rect>
+                            <rect @click.stop :fill="text.path.color" :x="text.path.x+text.path.width-4" :y="text.path.y+text.path.height/2-4" width="8" height="8" class="resize-r"></rect>
+                            <rect @click.stop :fill="text.path.color" :x="text.path.x+text.path.width/2-4" :y="text.path.y-4" width="8" height="8" class="resize-t"></rect>
+                            <rect @click.stop :fill="text.path.color" :x="text.path.x+text.path.width/2-4" :y="text.path.y+text.path.height-4" width="8" height="8" class="resize-b"></rect>
                         </template>
                     </g>
                 </template>
@@ -58,14 +61,6 @@ export default {
                 startX: 0,
                 startY: 0,
             },
-            menu:{
-                type:'bg',
-                list:[
-                    {type:'bg',img:'paint-bg.svg'},
-                    {type:'text',img:'paint-text.svg'},
-                    {type:'image',img:'paint-image.svg'}
-                ]
-            },
 
             svg:{
                 stroke:{
@@ -76,6 +71,13 @@ export default {
                     color: '#2568ed',
                     rx:68
                 },
+                path:{
+                    show:false,
+                    x:0,y:0,width:0,height:0,
+                    color:'blue',
+                    chooiceColor:'blue',
+                    dragColor:'yellow',
+                },
                 texts:[
                     {text:'Styled Text',x:20,y:60,font:'Arial',size:20,fill:'#fff',weight:'bold',
                         stroke:{
@@ -85,6 +87,9 @@ export default {
                         path:{
                             show:false,
                             x:0,y:0,width:0,height:0,
+                            color:'blue',
+                            chooiceColor:'blue',
+                            dragColor:'yellow',
                         }
                     }
                 ]
@@ -96,14 +101,17 @@ export default {
         const handleWrapClick = (e)=>{ 
             state.svg.texts.forEach((text,index)=>{ 
                 text.path.show = false;
-                text.path.width = 0;
-                text.path.height = 0;
             });
         }
         const handleClick = (element)=>{ 
+            state.svg.texts.forEach((text,index)=>{ 
+                text.path.show = false;
+            });
+            state.svg.path.show = false;
             element.path.show = true;
+
             nextTick(()=>{
-                strokeText();
+                strokeBorder();
             });
         }
         const handleDown = (event,element)=>{
@@ -111,8 +119,9 @@ export default {
             
             state.timer = setTimeout(()=>{
                 element.path.show = true;
+                element.path.color = element.path.dragColor;
                 nextTick(()=>{
-                    strokeText();
+                    strokeBorder();
                 });
                 state.drag.dom = event.target;
                 state.drag.element = element;
@@ -149,24 +158,27 @@ export default {
         }
         const handleUp = ()=>{
             clearTimeout(state.timer);
+            if(state.drag.element)
+                state.drag.element.path.color = state.drag.element.path.chooiceColor;
             state.drag.element = null;
         }
 
-        const strokeText = ()=>{ 
+        const strokeBorderPath = (path,el)=>{
+            path.width = el.getBBox().width;
+            path.height = el.getBBox().height;
+            path.x = el.getBBox().x;
+            path.y = el.getBBox().y;
+        }
+        const strokeBorder = ()=>{ 
             state.svg.texts.forEach((text,index)=>{ 
-                if(text.path.show && text.path.width==0){
-                    const textEl = document.querySelector(`#text-${index}`);
-                    text.path.width = textEl.getBBox().width;
-                    text.path.height = textEl.getBBox().height;
-                    text.path.x = textEl.getBBox().x;
-                    text.path.y = textEl.getBBox().y;
-                }
+                strokeBorderPath(text.path,document.querySelector(`#text-${index}`));
             });
+            strokeBorderPath(state.svg.path,document.querySelector(`#svg-bg`));
         }
 
         onMounted(()=>{
             nextTick(()=>{
-                strokeText();
+                strokeBorder();
             });
             document.addEventListener('mouseup',handleUp);
             document.addEventListener('mousemove',handleMove);
@@ -200,7 +212,12 @@ text{
     &.move{ 
         cursor move
     }
-    
+}
+rect.resize-l,rect.resize-r{
+    cursor: e-resize;
+}
+rect.resize-t,rect.resize-b{
+    cursor: s-resize;
 }
 
 .paint-wrap{
@@ -211,35 +228,5 @@ text{
     .svg-wrap{
         font-size:0;
     }
-}
-.menu{
-    display:flex
-    flex-direction: column;
-    justify-content: center;
-    align-items: left;
-
-    a{
-        display: block;
-        border:1px solid #eee;
-        width:2rem;
-        height:2rem;
-        margin-bottom:1rem;
-        border-radius: 0.5rem;
-        &.current,&:hover{
-            border-color:#008000;
-            img{
-                opacity:1;
-            }
-        }
-
-
-        img{
-            width:2rem;
-            height:2rem;
-            object-fit: cover;
-            opacity 0.5;
-        }
-    }
-    
 }
 </style>

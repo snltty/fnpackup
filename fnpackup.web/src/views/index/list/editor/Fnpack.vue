@@ -5,7 +5,7 @@
                 <el-button plain @click="handleBuild(true)" :loading="projects.building">打包并下载</el-button>
             </p>
             <p class="mgt-1">
-                打包后在项目根目录下找到fpk
+                打包后在应用根目录下找到fpk
             </p>
             <p class="mgt-1">
                 <el-button plain type="primary" @click="handleBuild(false)" :loading="projects.building">仅打包</el-button>
