@@ -407,12 +407,7 @@ span.split-pad10 {
     vertical-align: middle;
 }
 
-.el-color-picker__trigger {
-    border: 0 !important;
-}
-
 .el-color-picker__color {
-    border: 0 !important;
     border-radius: 2px;
 }
 

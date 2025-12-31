@@ -18,7 +18,7 @@ import Icon from './Icon.vue';
 export default {
     match:/(ICON|icon).*(PNG|png)$/,
     width:500,
-    height:560,
+    height:550,
     components:{Icon},
     setup () {
         const projects = useProjects();

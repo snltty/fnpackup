@@ -12,8 +12,14 @@
             </div>
             <div class="split"></div>
             <div>圆角:</div>
-            <div class="flex-1 mgl-1">
-                <el-slider v-model="state.radius"  @change="handleArgChange" size="small" :min="0" :max="state.size" />
+            <div class="flex-1 mgl-2">
+                <el-slider v-model="state.radius"  @change="handleArgChange" size="small" :min="0" :max="state.size/2" />
+            </div>
+            <div class="split"></div>
+            <div class="to-small">
+                <el-tooltip content="保存时也保存到小图标，使用同一个图标" placement="top" effect="light">
+                    <el-checkbox v-model="state.toSmall" size="small" label="到小图标"/>
+                </el-tooltip>
             </div>
         </div>
     </div>
@@ -48,40 +54,54 @@ export default {
             file:null,
             changed:false,
             size:0,
-            radius:0
+            radius:0,
+            toSmall:false
 
         });
         const input = ref(null);
         const drag = ref(null);
-        const upload = (file)=>{
-            state.loading = true;
-            const formData = new FormData();
-            formData.append('files', file);
-            fetchApi(`/files/upload`,{
-                params:{path:projects.value.current.path},
-                method:'POST',
-                body:formData,
-            }).then(res=>res.json()).then((res)=>{
-                state.loading = false;
-                if(res.length > 0){
-                    res.forEach(item=>{
-                        logger.value.error(item);
-                    });
-                }else{
-                    logger.value.success(`已上传:${file.name} 到 ${projects.value.current.path}`);
-                    ElMessage.success(`已上传:${file.name}`);
-                    state.version ++ ;
-                    loadIcon();
-                }
-            }).catch((e)=>{
-                state.loading = false;
-                logger.value.error(`${e}`);
+        const upload = (file,path)=>{
+            return new Promise((resolve,reject)=>{
+                state.loading = true;
+                const formData = new FormData();
+                formData.append('files', file);
+                const filename = path.split('/').pop();
+                fetchApi(`/files/upload`,{
+                    params:{path:path},
+                    method:'POST',
+                    body:formData,
+                }).then(res=>res.json()).then((res)=>{
+                    state.loading = false;
+                    if(res.length > 0){
+                        res.forEach(item=>{
+                            logger.value.error(item);
+                        });
+                        reject();
+                    }else{
+                        logger.value.success(`已上传:${filename} 到 ${path}`);
+                        ElMessage.success(`已上传:${filename}`);
+                        state.version ++ ;
+                        loadIcon();
+                        resolve();
+                    }
+                }).catch((e)=>{
+                    state.loading = false;
+                    logger.value.error(`${e}`);
+                    reject();
+                }); 
             });
         }
         const handleSave = () => { 
             state.loading = true;
             toFile(state.fileShowImage).then((file)=>{
-                upload(file);
+                upload(file,projects.value.current.path).then(()=>{
+                    if(state.toSmall){
+                        const arr = projects.value.current.path.split('/');
+                        arr[arr.length-1] = /\.PNG$/.test(projects.value.current.path) ? 'ICON.PNG' : 'icon_64.png';
+                        upload(file,arr.join('/'));
+                    }
+                });
+                
             });
         }
 
@@ -302,6 +322,12 @@ input[type=file]
         padding-top:1rem;
         .split{
             width:1rem;
+        }
+        .number{
+            width:8rem;
+        }
+        .to-small{
+            width:6rem;
         }
     }
 
