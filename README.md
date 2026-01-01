@@ -71,6 +71,7 @@ snltty/fnpackup
 
 ![pay](./fnpackup.web/public/fnpackup1.png)
 ![pay](./fnpackup.web/public/fnpackup2.png)
+![pay](./fnpackup.web/public/fnpackup3.png)
 
 ## [🎁]为爱发电
 
