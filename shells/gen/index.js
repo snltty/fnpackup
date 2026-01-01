@@ -87,7 +87,7 @@ readVersionDesc().then((desc) => {
         publishFpkText = publishFpkText.replace('{{version}}', desc.version);
     }
     while (publishFpkText.indexOf('{{changelog}}') >= 0) {
-        publishFpkText = publishFpkText.replace('{{changelog}}', desc.desc.split('\n').join('、'));
+        publishFpkText = publishFpkText.replace('{{changelog}}', desc.desc.replace(/\r\n/g,'、'));
     }
     writeText('../publish-fpk.sh', publishFpkText);
 
