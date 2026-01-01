@@ -129,6 +129,8 @@ export default {
                 const sourceX = (image.width - size) / 2;
                 const sourceY = (image.height - size) / 2;
                 
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(
                     image, 
                     sourceX,sourceY,
@@ -178,7 +180,8 @@ export default {
                 canvas.width = size;
                 canvas.height = size;
                 const ctx = canvas.getContext('2d');
-                
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(
                     image, 
                     0,0,

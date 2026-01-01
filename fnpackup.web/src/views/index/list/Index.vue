@@ -9,7 +9,7 @@
     <Editor></Editor>
     <Guide v-if="projects.current.guide"></Guide>
     <SourceWrap v-if="projects.current.source"></SourceWrap>
-    <Paint v-if="projects.current.paint"></Paint>
+    <Paint v-if="projects.showPaint"></Paint>
 </template>
 
 <script>

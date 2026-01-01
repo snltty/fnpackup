@@ -12,4 +12,4 @@ desktop_uidir=ui
 desktop_applaunchname=fnpackup.docker.Application
 service_port=1069
 checkport=true
-changelog=优化UI和增加静态托管
+changelog={changelog}

@@ -181,8 +181,6 @@ namespace fnpackup
             {
                 subpath = subpath.Substring(subpath.IndexOf('/', 1));
             }
-            Console.WriteLine(subpath);
-            Console.WriteLine(query);
             return fileProvider.GetFileInfo(subpath);
         }
         public IDirectoryContents GetDirectoryContents(string subpath)

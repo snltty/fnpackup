@@ -4,6 +4,7 @@ mkdir -p public/publish-fpk/docker
 cp -rf install-package/fpk/docker/* public/publish-fpk/docker
 
 sed -i "s|{version}|{{version}}|g" public/publish-fpk/docker/manifest
+sed -i "s|{changelog}|{{changelog}}|g" public/publish-fpk/docker/manifest
 sed -i 's/\r$//' public/publish-fpk/docker/manifest
 sed -i 's/\r$//' public/publish-fpk/docker/cmd/main
 sed -i 's/\r$//' public/publish-fpk/docker/cmd/uninstall_callback

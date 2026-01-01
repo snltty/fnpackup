@@ -7,6 +7,7 @@
         <template v-if="paths.length >= 1">
             <el-button type="primary" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Pointer /></el-icon>打包fpk</el-button>
             <el-button type="success" plain size="small" @click="handleGuide" :loading="projects.building"><el-icon><Files /></el-icon>快速编辑</el-button>     
+            <el-button type="warning" plain size="small" @click="handleIcon" :loading="projects.building"><el-icon><Picture /></el-icon>图标设计</el-button>     
         </template>
         <Create v-model="projects.showCreate" v-if="projects.showCreate"></Create>
         <UploadFile v-model="projects.showUpload" v-if="projects.showUpload"></UploadFile>
@@ -14,7 +15,7 @@
 </template>
 
 <script>
-import { Upload,Plus,Files, Pointer } from '@element-plus/icons-vue'
+import { Upload,Plus,Files, Pointer, Picture } from '@element-plus/icons-vue'
 import { computed } from 'vue';
 import { useProjects } from '../list';
 import Create from './Create.vue';
@@ -22,7 +23,7 @@ import { useLogger } from '../../logger';
 import UploadFile from './Upload.vue';
 export default {
     components: {
-        Upload,Pointer,Plus,Files,Create,UploadFile
+        Upload,Pointer,Plus,Files,Create,UploadFile,Picture
     },
     setup () {
         const logger = useLogger();
@@ -44,8 +45,11 @@ export default {
             projects.value.showUpload = true;
             projects.value.uploadMime = mime;
         }
+        const handleIcon = ()=>{
+            projects.value.showPaint = true;
+        }
 
-        return {paths,projects,handleCreate,handleBuild,handleGuide,handleUpload}
+        return {paths,projects,handleCreate,handleBuild,handleGuide,handleUpload,handleIcon}
     }
 }
 </script>

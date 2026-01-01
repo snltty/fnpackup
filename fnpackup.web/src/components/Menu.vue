@@ -2,7 +2,7 @@
     <div class="h-100 flex flex-column flex-nowrap menu-wrap">
         <ul class="flex-1">
             <template v-for="item in options">
-                <li>
+                <li v-if="item.meta">
                     <router-link :to="item.path">
                         <el-icon size="16">
                             <component :is="item.meta.icon"></component>

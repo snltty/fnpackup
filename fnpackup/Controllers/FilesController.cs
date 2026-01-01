@@ -359,7 +359,7 @@ namespace fnpackup.Controllers
                     Code = 1,
                     Msg = ex.Message
                 };
-            }
+            }finally
         }
         private async Task<AppCenterRespInfo> Search(string host, string token, string[] names)
         {

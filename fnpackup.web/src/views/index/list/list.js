@@ -74,13 +74,13 @@ export const provideProjects = () => {
             width:600,
             height:'',
             guide:false,
-            source:false,
-            paint:false,
+            source:false
         },
 
         showCreate:false,
         showUpload:false,
         uploadMime:'*/*',
+        showPaint:false,
 
         contextMenu:{
             show:false,

@@ -12,6 +12,11 @@ const routes = [
         name: 'Static',
         meta: { title: '静态托管',icon:Service },
         component: () => import('@/views/static/Index.vue'),
+    },
+    {
+        path: '/static-view',
+        name: 'StaticView',
+        component: () => import('@/views/static/View.vue'),
     }
 ]
 
