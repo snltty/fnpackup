@@ -576,12 +576,14 @@ export default {
                 headers:{'Content-Type':'application/json'},
             }).then(c=>c.text()).then((res)=>{
                 state.svg = JSON.parse(res || JSON.stringify(defaultSvg)); 
-            }).catch(()=>{
+            }).catch((e)=>{
                 logger.value.error(`${e}`);
                 state.svg = defaultSvg;
             }).finally(()=>{
                 state.loading = false;
-                handleClick(state.svg.background);
+                if(state.svg){
+                    handleClick(state.svg.background);
+                }
             });
         }
         const handleSaveSvg = ()=>{ 
