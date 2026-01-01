@@ -16,17 +16,7 @@
             <a href="javascript:;" @click="handleUpload('*/*')"><el-icon><Upload/></el-icon>上传</a>
         </template>
         <a href="javascript:;" @click="handleDownload"><el-icon><Download/></el-icon>下载</a>
-        <a href="javascript:;" v-if="hasInProject">
-            <div class="item">
-                <span><el-icon><EditPen/></el-icon>编辑</span>
-                <span class="flex-1"></span>
-                <el-icon><ArrowRight/></el-icon>
-            </div>
-            <div class="sub">
-                <a href="javascript:;" @click="handleSource" v-if="canSource"><el-icon><EditPen/></el-icon>源码编辑</a>
-                <a href="javascript:;" @click="handleWizard"><el-icon><DocumentAdd/></el-icon>用户向导</a>
-            </div>
-        </a>
+        <a href="javascript:;" v-if="canSource" @click="handleSource"><el-icon><EditPen/></el-icon>源码</a>
         <a href="javascript:;">
             <div class="item">
                 <span><el-icon><Plus/></el-icon>新建</span>
@@ -67,15 +57,6 @@ export default {
 
         const canSource = computed(()=>projects.value.contextMenu.row && projects.value.contextMenu.row.if);
         const hasInProject = computed(()=>projects.value.page.path != '.');
-        const handleWizard = ()=>{
-            if(projects.value.contextMenu.row){
-                projects.value.current.path = `${projects.value.page.path}/${projects.value.contextMenu.row.name}`;
-            }else{
-                projects.value.current.path = projects.value.page.path;
-            }
-            projects.value.current.remark = '用户向导';
-            projects.value.current.show = true;
-        }
         const handleRefresh = ()=>{
             projects.value.load();
         }
@@ -180,7 +161,7 @@ export default {
         });
 
         return {projects,canSource,hasInProject,
-            handleWizard,handleRefresh,handleCreate,handleBack,handleHome,handleUpload,handleDownload,handleCreateFile,handleDel,handleSource}
+            handleRefresh,handleCreate,handleBack,handleHome,handleUpload,handleDownload,handleCreateFile,handleDel,handleSource}
     }
 }
 </script>
