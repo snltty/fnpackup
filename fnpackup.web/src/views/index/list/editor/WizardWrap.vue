@@ -77,7 +77,7 @@ export default {
                         logger.value.error(res);
                     }else{
                         ElMessage.success('操作成功!');
-                        logger.value.success(`未配置字段，[${paths.join('/')}]删除成功`);
+                        logger.value.error(`未配置字段，[${paths.join('/')}]删除成功`);
                         projects.value.load(); 
                     }
                 }).catch((e)=>{

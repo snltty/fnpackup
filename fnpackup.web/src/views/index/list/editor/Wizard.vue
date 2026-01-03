@@ -83,7 +83,7 @@ export default {
         _default.forEach((step,index)=>{
             step._id = index;
             step.items.forEach((item,index)=>{
-                Object.assign(defaultItem,item);
+                Object.assign(JSON.parse(JSON.stringify(defaultItem)),item);
             });
             step['_plus_field'] = Object.keys(step).filter(c=>['stepTitle','items','_id'].indexOf(c) < 0).map(c=>{
                 const value = step[c];
@@ -176,9 +176,7 @@ export default {
             });
         }
         const handleSubmit = () => {
-            const arr = JSON.parse(JSON.stringify(state.steps.filter(c=>{
-                return c.items.filter(item=>item.field != 'wizard_default').length > 0;
-            })));
+            const arr = JSON.parse(JSON.stringify(state.steps));
             arr.forEach(step=>{
 
                 step._plus_field.forEach(item=>{

@@ -15,11 +15,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         with:
-          tag_name: v0.0.4
-          release_name: v0.0.4.${{ steps.date.outputs.today }}
+          tag_name: v0.0.5
+          release_name: v0.0.5.${{ steps.date.outputs.today }}
           draft: false
           prerelease: false
-          body: "1. 一些累计更新，一些BUG修复\r\n2. 优化静态托管\r\n3. 优化图标上传处理\r\n4. 增加图标设计器"
+          body: "1. 一些累计更新，一些BUG修复\r\n2. 优化用户向导编辑"
       - name: setup node.js
         uses: actions/setup-node@v2
         with:

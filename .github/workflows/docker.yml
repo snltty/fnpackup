@@ -56,6 +56,6 @@ jobs:
         docker tag snltty/fnpackup-x64:latest snltty/fnpackup:amd64 &&  \
         docker push snltty/fnpackup:amd64 &&  \
         docker manifest create snltty/fnpackup:latest snltty/fnpackup:amd64 snltty/fnpackup:arm64 snltty/fnpackup:arm && \
-        docker manifest create snltty/fnpackup:v0.0.4 snltty/fnpackup:amd64 snltty/fnpackup:arm64 snltty/fnpackup:arm && \
+        docker manifest create snltty/fnpackup:v0.0.5 snltty/fnpackup:amd64 snltty/fnpackup:arm64 snltty/fnpackup:arm && \
         docker manifest push snltty/fnpackup:latest && \
-        docker manifest push snltty/fnpackup:v0.0.4
+        docker manifest push snltty/fnpackup:v0.0.5
