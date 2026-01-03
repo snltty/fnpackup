@@ -59,19 +59,18 @@ export default {
             {label: '正则',value: 'pattern',default:{_pattern:''}},
         ];
         const types = [
-            {label:'文本框',value:'text',default:''},
-            {label:'密码框',value:'password',default:''},
-            {label:'单选按钮',value:'radio',default:''},
-            {label:'多选框',value:'checkbox',default:[]},
-            {label:'下拉框',value:'select',default:''},
-            {label:'开关',value:'switch',default:true},
-            {label:'提示文本',value:'tips',default:''},
+            {label:'文本框',value:'text',default:'',field:'initValue'},
+            {label:'密码框',value:'password',default:'',field:'initValue'},
+            {label:'单选按钮',value:'radio',default:'',field:'initValue'},
+            {label:'多选框',value:'checkbox',default:[],field:'initValue'},
+            {label:'下拉框',value:'select',default:'',field:'initValue'},
+            {label:'开关',value:'switch',default:true,field:'initValue'},
+            {label:'提示文本',value:'tips',default:'',field:'helpText'},
         ];
         const defaultItem = Object.assign({
             type:'text',
             field:'wizard_default',
             label:'示例项',
-            initValue:'',
             rules:[],
             options:[]
         }, types.reduce((json,item)=>{
@@ -80,11 +79,17 @@ export default {
         },{}));
 
         const _default = JSON.parse(projects.value.current.content == '[]' ? JSON.stringify([{'stepTitle':'欢迎使用','items':[]}]) : projects.value.current.content);
+        
         _default.forEach((step,index)=>{
             step._id = index;
-            step.items.forEach((item,index)=>{
-                Object.assign(JSON.parse(JSON.stringify(defaultItem)),item);
-            });
+            for(let i =0; i < step.items.length; i++){
+                step.items[i] = Object.assign(JSON.parse(JSON.stringify(defaultItem)),step.items[i]);
+                const type = types.filter(c=>c.value == step.items[i].type)[0];
+                if(type){
+                    step.items[i][`_${step.items[i].type}`] = step.items[i][type.field];
+
+                }
+            }
             step['_plus_field'] = Object.keys(step).filter(c=>['stepTitle','items','_id'].indexOf(c) < 0).map(c=>{
                 const value = step[c];
                 delete step[c];
@@ -94,6 +99,7 @@ export default {
                 }
             });
         });
+        console.log(_default);
         const state = reactive({
             step:_default.length > 0 ? _default[0]._id : '',
             steps:_default,
@@ -191,7 +197,11 @@ export default {
                 step.items = items;
                 step.items.forEach(item=>{
                     //删除字段的辅助字段，每个字段类型有一个单独的初始值辅助字段
-                    item.initValue = item[`_${item.type}`];
+                    types.forEach(type=>{
+                        delete item[type.field];
+                    });
+                    const type = types.filter(c=>c.value == item.type)[0]
+                    item[type.field] = item[`_${item.type}`];
                     deleteField(item);
 
                     //删除验证的辅助字段，并将对应不同类型的辅助字段的值还原到真正字段

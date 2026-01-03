@@ -15,39 +15,75 @@
             <div class="flex-1 mgl-2">
                 <el-slider v-model="state.radius"  @change="handleArgChange" size="small" :min="0" :max="state.size/2" />
             </div>
-            <div class="split"></div>
-            <div class="to-small">
-                <el-tooltip content="保存时也保存到小图标，使用同一个图标" placement="top" effect="light">
-                    <el-checkbox v-model="state.toSmall" size="small" label="到小图标"/>
-                </el-tooltip>
-            </div>
         </div>
     </div>
     <div class="t-c">
         <el-button type="primary" @click="handleSave" :loading="state.loading">确定保存</el-button>
     </div>
+    <el-dialog v-model="state.showSave" width="360" top="1vh"
+    :close-on-click-modal="false" :close-on-press-escape="false" draggable>
+        <el-descriptions title="选择保存项" :column="1" size="small" border class="w-100" :label-width="80">
+            <el-descriptions-item label="小图缩放吗">
+                <div class="flex">
+                    <el-radio-group v-model="state.toSmall" size="small" @change="handleSmallChange">
+                        <el-radio :value="1" size="large" class="mgr-1">不变</el-radio>
+                        <el-radio :value="0.5" size="large" class="mgr-1">1/2</el-radio>
+                        <el-radio :value="0.25" size="large" class="mgr-1">1/4</el-radio>
+                        <el-radio :value="0.125" size="large">1/8</el-radio>
+                    </el-radio-group>
+                </div>
+            </el-descriptions-item>
+            <el-descriptions-item label="保存项">
+                <div class="flex">
+                    <template v-for="icon in state.icons">
+                        <el-checkbox v-model="icon.use" size="small">{{icon.name}}</el-checkbox>
+                    </template>
+                </div>
+            </el-descriptions-item>
+            
+            <el-descriptions-item>
+                <el-button plain type="primary" :loading="state.loading" @click="handleConfirmIcon">
+                    <template v-if="state.loading">
+                        {{ state.process.progress }}
+                    </template>
+                    <template v-else>确定保存</template>
+                </el-button>
+            </el-descriptions-item>
+        </el-descriptions>
+    </el-dialog>
     <input multiple type="file" ref="input" accept="image/*" @change="handleFileChange"></input>
 </template>
 
 <script>
 import { nextTick, onMounted, reactive, ref } from 'vue';
 import { useProjects } from '../list';
-import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElNotification } from 'element-plus';
+import { xhrApi } from '@/api/api';
 
 export default {
     match:/(ICON|icon).*(PNG|png)$/,
     width:500,
     setup () {
 
+       
         const logger = useLogger();
         const projects = useProjects();
+
+        const root = projects.value.current.path.split('/').filter((c,i)=>i<=1).join('/');
+        const defaultOption = projects.value.current.path.replace(root,'');
+        const icons = [
+            {name:'应用大图标',path:`${root}/ICON_256.PNG`,use:defaultOption == '/ICON_256.PNG',size:256},
+            {name:'应用小图标',path:`${root}/ICON.PNG`,use:defaultOption == '/ICON.PNG',size:256,small:true},
+            {name:'入口大图标',path:`${root}/app/ui/images/icon_256.png`,use:defaultOption == '/app/ui/images/icon_256.png',size:256},
+            {name:'入口小图标',path:`${root}/app/ui/images/icon_64.png`,use:defaultOption == '/app/ui/images/icon_64.png',size:256,small:true},
+        ];
+
         const state = reactive({
             loading:false,
             draging:false,
             dragingTimer:0,
-            version:0,
+            version:Date.now(),
             fileName:projects.value.current.path.split('/').pop(),
             fileImage:undefined,
             fileShowImage:undefined,
@@ -55,53 +91,88 @@ export default {
             changed:false,
             size:0,
             radius:0,
-            toSmall:false
+
+            toSmall:1,
+            icons:icons,
+            showSave:false,
+            process:{
+                total:0,
+                current:0,
+                progress:'0%'
+            },
 
         });
         const input = ref(null);
         const drag = ref(null);
-        const upload = (file,path)=>{
-            return new Promise((resolve,reject)=>{
-                state.loading = true;
+        const handleSave = () => { 
+            state.showSave = true;
+            state.icons.forEach(item=>{ 
+                item.size = state.size;
+            });
+        }
+        const handleConfirmIcon = async ()=>{ 
+            const icons = state.icons.filter(c=>c.use);
+            if(icons.length == 0){
+                ElMessage.error('请选择保存项');
+                return;
+            }
+            state.loading = true;
+            
+            const fn = async (index = 0)=>{
+                if(index > icons.length-1){
+                    state.loading = false;
+                    state.showSave = false;
+                    logger.value.success(`已上传${icons.length}个文件`);
+                    ElNotification({
+                        type: 'success',
+                        title: '文件上传',
+                        message: `已上传${icons.length}个文件`,
+                        duration:3000,
+                    });
+                    return;
+                }
+
+                const fileObj =  icons[index];
+                const file = await toFile(state.fileShowImage,fileObj.size,fileObj.path.split('/').pop());
                 const formData = new FormData();
                 formData.append('files', file);
-                const filename = path.split('/').pop();
-                fetchApi(`/files/upload`,{
-                    params:{path:path},
-                    method:'POST',
-                    body:formData,
-                }).then(res=>res.json()).then((res)=>{
-                    state.loading = false;
+
+                state.process.progress = `0%`;
+                xhrApi(`/files/upload`,{path:fileObj.path},formData,(progress)=>{
+                    state.process.progress = `${progress.toFixed(2)}%`;
+                }).then((res)=>{
                     if(res.length > 0){
                         res.forEach(item=>{
                             logger.value.error(item);
                         });
-                        reject();
                     }else{
-                        logger.value.success(`已上传:${filename} 到 ${path}`);
-                        ElMessage.success(`已上传:${filename}`);
-                        state.version ++ ;
-                        loadIcon();
-                        resolve();
+                        state.process.progress = `100%`;
+                        logger.value.success(`已上传:${fileObj.path}`);
+                        nextTick(()=>{
+                            ElNotification({
+                                type: 'success',
+                                title: '文件上传',
+                                message: `已上传:${fileObj.path}`,
+                                duration:3000,
+                            });
+                        });
                     }
+                    state.process.current = index+1;
+                    fn(index+1);
                 }).catch((e)=>{
-                    state.loading = false;
                     logger.value.error(`${e}`);
-                    reject();
-                }); 
-            });
-        }
-        const handleSave = () => { 
-            state.loading = true;
-            toFile(state.fileShowImage).then((file)=>{
-                upload(file,projects.value.current.path).then(()=>{
-                    if(state.toSmall){
-                        const arr = projects.value.current.path.split('/');
-                        arr[arr.length-1] = /\.PNG$/.test(projects.value.current.path) ? 'ICON.PNG' : 'icon_64.png';
-                        upload(file,arr.join('/'));
-                    }
+                    state.process.current = index+1;
+                    fn(index+1);
                 });
-                
+            }
+            fn();
+            
+        }
+        const handleSmallChange = ()=>{ 
+            state.icons.forEach((item,index)=>{ 
+                if(item.small){
+                    item.size = Math.round(state.icons[index-1].size * state.toSmall);
+                }
             });
         }
 
@@ -150,23 +221,50 @@ export default {
             const image = new Image();
             image.src = URL.createObjectURL(file);
             image.onload = async () => { 
-                const img = image.width != image.height ? await clipSize(image,Math.min(image.width, image.height)): image;
-                state.size = Math.min(img.width, img.height);
+                let img = image.width != image.height? await clipSize(image,state.size) : await toSize(image,state.size);
+                if(state.radius > 0){
+                    img = await toRadius(img,state.radius);
+                }
+                state.size = img.width;
 
-                state.fileImage = img.src;
+                state.fileImage = image.src;
                 state.fileShowImage = img.src;
                 state.changed = true;
             };
         }
-        const toFile = (src) => { 
-            return new Promise(async (resolve,reject)=>{ 
-                const response = await fetch(src);
-                const blob = await response.blob();
-                const file = new File([blob], state.fileName, {
-                    type: 'image/png',
-                    lastModified: Date.now()
-                });
-                resolve(file);
+        const toFile = (src,size,name) => { 
+            return new Promise(async (resolve,reject)=>{
+                const image = new Image();
+                image.onload = async () => {
+                    const dpr = window.devicePixelRatio || 1;
+                    const canvas = document.createElement('canvas');
+                    const canvas1 = document.createElement('canvas');
+                    
+                    canvas.width = size * dpr;
+                    canvas.height = size * dpr;
+                    canvas.style.width = size + 'px';
+                    canvas.style.height = size + 'px';
+
+                    canvas1.width = size ;
+                    canvas1.height = size;
+
+                    const ctx = canvas.getContext('2d');
+                    const ctx1 = canvas1.getContext('2d');
+                    ctx.scale(dpr, dpr);
+                    ctx.imageSmoothingEnabled = true;
+                    ctx1.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx1.imageSmoothingQuality = 'high';
+                    ctx.drawImage( image, 0,0, image.width,image.height, 0,0,size,size);
+                    ctx1.drawImage( canvas, 0,0, canvas.width,canvas.height,0,0,canvas1.width,canvas1.height);
+                    canvas1.toBlob(blob => {
+                        resolve(new File([blob], name, {
+                            type: 'image/png',
+                            lastModified: Date.now()
+                        }));
+                    }, 'image/png');
+                };
+                image.src = src;
             });
         }
 
@@ -308,7 +406,7 @@ export default {
             });
         });
         
-        return {projects,state,input,drag,handleSave,handleFileChange,handleSelectFile,handleArgChange}
+        return {projects,state,input,drag,handleSave,handleFileChange,handleSelectFile,handleArgChange,handleConfirmIcon,handleSmallChange}
     }
 }
 </script>

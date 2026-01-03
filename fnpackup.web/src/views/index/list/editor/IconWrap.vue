@@ -18,7 +18,7 @@ import Icon from './Icon.vue';
 export default {
     match:/(ICON|icon).*(PNG|png)$/,
     width:500,
-    height:550,
+    height:560,
     components:{Icon},
     setup () {
         const projects = useProjects();
@@ -26,16 +26,18 @@ export default {
         const names = [
             /\/ui/.test(projects.value.current.path)?'icon_256.png':'ICON_256.PNG',
             /\/ui/.test(projects.value.current.path)?'icon_64.png':'ICON.PNG',
-        ]
+        ];
+        const prefix = /\.PNG$/.test(projects.value.current.path) ? '应用':'入口';
 
         const paths = (/\/cmd$/.test(projects.value.current.path) 
         ?`${projects.value.current.path}/${names[0]}`
         :projects.value.current.path).split('/');
 
         const current = ref('');
+        
         const options = [
-            {label:'大图标',value:names[0]},
-            {label:'小图标',value:names[1]}
+            {label:`${prefix}大图标`,value:names[0]},
+            {label:`${prefix}小图标`,value:names[1]}
         ]
         const handleChange = (type) => {
             current.value = type;

@@ -654,7 +654,7 @@ export default {
                 ElMessage.error('请选择保存项');
                 return;
             }
-
+            state.loading = true;
             const fn = async (index = 0)=>{
                 if(index > icons.length-1){
                     state.loading = false;
