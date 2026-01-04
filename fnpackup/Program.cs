@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using System.Collections.Frozen;
@@ -44,6 +45,16 @@ namespace fnpackup
             services.AddHttpContextAccessor();
             services.AddSingleton<DynamicFileProvider>();
 
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor |
+                    ForwardedHeaders.XForwardedProto |
+                    ForwardedHeaders.XForwardedHost;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
             return services;
         }
         public static WebApplication UseDynamicStaticFile(this WebApplication app)
@@ -55,10 +66,11 @@ namespace fnpackup
                 FileProvider = dfp,
                 EnableDefaultFiles = true,
                 EnableDirectoryBrowsing = false,
-                
             };
             options.DefaultFilesOptions.DefaultFileNames = ["index.html", "index.htm", "default.html", "default.htm"];
             app.UseFileServer(options);
+
+            app.UseForwardedHeaders();
 
             return app;
         }
