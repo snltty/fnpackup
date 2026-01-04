@@ -74,8 +74,8 @@ export default {
         const excludeEditor = [
             /\.DS_Store$/,
             /\.fpk$/,
-            /\/app\/server\//,
-            /\/app\/www\//,
+            ///\/app\/server\//,
+            ///\/app\/www\//,
         ]
         const handleOpen = (row,cell)=>{
             if(excludeEditor.some(e=>e.test(`${projects.value.page.path}/${row.name}`))){
