@@ -1,6 +1,6 @@
 <template>
     <div class="h-100">
-        <iframe :src="`${baseUrl}/${$route.query.name}`" frameborder="0" width="100%" height="100%"></iframe>
+        <iframe :src="`${baseUrl}/${$route.query.name}/t=${Date.now()}`" frameborder="0" width="100%" height="100%"></iframe>
     </div>
 </template>
 
