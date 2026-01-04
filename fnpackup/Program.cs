@@ -47,10 +47,8 @@ namespace fnpackup
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {
-                options.ForwardedHeaders =
-                    ForwardedHeaders.XForwardedFor |
-                    ForwardedHeaders.XForwardedProto |
-                    ForwardedHeaders.XForwardedHost;
+                options.ForwardedHeaders = ForwardedHeaders.All;
+                options.ForwardLimit = null;
                 options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
             });
@@ -59,6 +57,8 @@ namespace fnpackup
         }
         public static WebApplication UseDynamicStaticFile(this WebApplication app)
         {
+            app.UseForwardedHeaders();
+
             DynamicFileProvider dfp = app.Services.GetService<DynamicFileProvider>();
             dfp.SetDefault(Path.Combine(app.Environment.ContentRootPath, "web"));
             FileServerOptions options = new FileServerOptions
@@ -70,7 +70,7 @@ namespace fnpackup
             options.DefaultFilesOptions.DefaultFileNames = ["index.html", "index.htm", "default.html", "default.htm"];
             app.UseFileServer(options);
 
-            app.UseForwardedHeaders();
+           
 
             return app;
         }
