@@ -188,7 +188,6 @@ export default {
                 step._plus_field.forEach(item=>{
                     step[item.field] = item.value;
                 });
-
                 //删除步骤的辅助字段
                 deleteField(step);
 

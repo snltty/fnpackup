@@ -34,22 +34,24 @@ export default {
         const projects = useProjects();
 
         const resetForm = (item) => { 
-            Object.assign(item,Object.assign({
-                "noDisplay":true,
+            const json = JSON.parse(JSON.stringify(item));
+            return Object.assign(Object.assign({
+                "noDisplay":false,
+                "allUsers":true,
                 "fileTypes":[],
                 "control": {
                     "accessPerm": "readonly",
                     "portPerm": "readonly", 
                     "pathPerm": "readonly"
                 }
-            },item),{protocol:'http'});
+            },json),{protocol:'http'});
         }
 
         const configJson = JSON.parse(projects.value.current.content);
         const urlJson = configJson['.url'];
         for(let j in urlJson){
             urlJson[j]._key = j;
-            resetForm(urlJson[j]);
+            urlJson[j] = resetForm(urlJson[j]);
         }
         const values = Object.values(urlJson);
         values.forEach((item,index)=>{
@@ -113,7 +115,7 @@ export default {
                     urlJson[value]._key = value;
                     urlJson[value]._id = Date.now();
                     state.key = urlJson[value]._id;
-                    resetForm(urlJson[value]);
+                    urlJson[value] = resetForm(urlJson[value]);
                     state.values = Object.values(urlJson);
                 }).catch((e) => {
                     logger.value.error(`${e}`);
