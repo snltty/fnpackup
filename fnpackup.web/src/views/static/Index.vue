@@ -3,13 +3,13 @@
         <div class="inner h-100 flex flex-column flex-nowrap">
             <div class="head">
                 <el-button plain type="primary" size="small" :loading="state.loading" @click="handleSearch"><el-icon><Refresh></Refresh></el-icon>重载托管和刷新列表</el-button>
-                <span class="tips">每60s自动重载一次，也可以手动重载，可以直接点击名称内嵌访问</span>
+                <span class="tips">每60s自动重载一次，也可以手动重载，可以直接点击名称跳转访问</span>
             </div>
             <div class="flex-1">
                 <el-table :data="state.list" stripe size="small" height="98%" v-loading="state.loading" style="--el-table-header-bg-color: #f1f4f9">
                     <el-table-column prop="name" label="名称">
                         <template #default="scope">
-                            <router-link :to="{name:'StaticView',query:{name:scope.row.name}}" class="a-line">{{ scope.row.name }}</router-link>
+                            <a :href="`${state.baseUrl}/${scope.row.name}`" target="_blank" class="a-line">{{ scope.row.name }}</a>
                         </template>
                     </el-table-column>
                     <el-table-column prop="root" label="根目录"></el-table-column>
@@ -31,7 +31,7 @@ export default {
         const state = reactive({
             list:[],
             loading:false,
-            port:window.location.port
+            baseUrl: process.env.NODE_ENV === 'development' ? `http://localhost:1069` : `${window.location.origin}`
         });
 
         const getList = () => { 
