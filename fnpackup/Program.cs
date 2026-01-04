@@ -151,7 +151,7 @@ namespace fnpackup
                 return Directory.GetDirectories(root).Select(dir =>
                 {
                     string manifest = Path.Join(dir, "manifest");
-                    string path = File.Exists(manifest) ==false ? string.Empty : File.ReadAllText(manifest)
+                    string path = File.Exists(manifest) == false ? string.Empty : File.ReadAllText(manifest)
                      .Split(Environment.NewLine)
                      .Select(line =>
                      {
@@ -189,18 +189,18 @@ namespace fnpackup
         public IFileInfo GetFileInfo(string subpath)
         {
             (IFileProvider fileProvider, bool query) = GetFileProvider();
-            if (query && subpath.IndexOf('/', 1) > 0)
+            if (query)
             {
-                subpath = subpath.Substring(subpath.IndexOf('/', 1));
+                subpath = SplitSubPath(subpath);
             }
             return fileProvider.GetFileInfo(subpath);
         }
         public IDirectoryContents GetDirectoryContents(string subpath)
         {
             (IFileProvider fileProvider, bool query) = GetFileProvider();
-            if (query && subpath.IndexOf('/', 1) > 0)
+            if (query)
             {
-                subpath = subpath.Substring(subpath.IndexOf('/', 1));
+                subpath = SplitSubPath(subpath);
             }
             return fileProvider.GetDirectoryContents(subpath);
         }
@@ -210,6 +210,14 @@ namespace fnpackup
             return fileProvider.Watch(filter);
         }
 
+        private string SplitSubPath(string subpath)
+        {
+            if (subpath.IndexOf('/', 1) > 0)
+            {
+                return subpath[subpath.IndexOf('/', 1)..];
+            }
+            return "/";
+        }
         private (IFileProvider fileProvider, bool query) GetFileProvider()
         {
             HttpContext httpContext = httpContextAccessor.HttpContext;
