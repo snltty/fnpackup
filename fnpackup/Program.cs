@@ -69,6 +69,7 @@ namespace fnpackup
             };
             options.DefaultFilesOptions.DefaultFileNames = ["index.html", "index.htm", "default.html", "default.htm"];
             app.UseFileServer(options);
+            app.UseDefaultFiles(options.DefaultFilesOptions);
 
             return app;
         }
