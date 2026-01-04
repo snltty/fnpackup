@@ -55,6 +55,7 @@ namespace fnpackup
                 FileProvider = dfp,
                 EnableDefaultFiles = true,
                 EnableDirectoryBrowsing = false,
+                
             };
             options.DefaultFilesOptions.DefaultFileNames = ["index.html", "index.htm", "default.html", "default.htm"];
             app.UseFileServer(options);
