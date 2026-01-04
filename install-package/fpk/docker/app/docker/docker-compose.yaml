@@ -1,6 +1,6 @@
 services:
   fnpackup:
-    image: snltty/fnpackup
+    image: snltty/fnpackup:{version}
     container_name: fnpackup
     privileged: true
     network_mode: host
