@@ -65,16 +65,7 @@ namespace fnpackup
             {
                 FileProvider = dfp,
                 EnableDefaultFiles = true,
-                EnableDirectoryBrowsing = false,
-                 StaticFileOptions =
-                {
-                    OnPrepareResponse = ctx =>
-                    {
-                        ctx.Context.Response.StatusCode = 200;
-                        ctx.Context.Response.Headers.CacheControl = "public, max-age=31536000";
-                        ctx.Context.Response.Headers.XContentTypeOptions = "nosniff";
-                    }
-                }
+                EnableDirectoryBrowsing = false
             };
             options.DefaultFilesOptions.DefaultFileNames = ["index.html", "index.htm", "default.html", "default.htm"];
             app.UseFileServer(options);
