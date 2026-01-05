@@ -223,7 +223,7 @@ export default {
     align-items: center;
 
     height:30rem;
-    border:2px dashed #ccc;
+    border:2px dashed var(--main-border-color);
     cursor: pointer;
 
     position: relative;

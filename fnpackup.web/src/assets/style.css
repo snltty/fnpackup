@@ -23,9 +23,9 @@ a.a-line {
 }
 
 .ellipsis {
-    white-space: nowrap;      /* 禁止换行 */
-    overflow: hidden;         /* 隐藏超出部分 */
-    text-overflow: ellipsis;  /* 显示省略号 */
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
     max-width: 100%;
 }
 .nowrap {
@@ -184,21 +184,12 @@ html.dark{
     background-color:#14171a;
     --main-border-color:#39434c;
 }
-html.dark{
-    .el-switch__core .el-switch__action{
-        background-color: #ccc;
-    }
-    .el-dialog{border: 1px solid #575c61;}
-    .el-table{
-        tr{
-            --el-table-header-bg-color:#14171a;
-        }
-    }
-    .el-tabs--left.el-tabs--border-card .el-tabs__item.is-left.is-active{
-        border-color:var(--main-border-color) transparent
-    }
+html.dark .el-switch__core .el-switch__action{background-color: #ccc; }
+html.dark .el-dialog{border: 1px solid #575c61;}
+html.dark .el-table tr{ --el-table-header-bg-color:#14171a;}
+html.dark .el-tabs--left.el-tabs--border-card .el-tabs__item.is-left.is-active{
+     border-color:var(--main-border-color) transparent
 }
-
 
 
 body {
@@ -412,17 +403,12 @@ span.split-pad10 {
 .el-input-group__append,
 .el-input-group__prepend {
     padding: 0 6px !important;
-    /* background-color: transparent !important; */
 }
 
 .el-checkbox__label .el-icon {
     vertical-align: middle;
     margin-top: -2px;
 }
-
-/* .el-input__inner:read-only {
-    background-color: #fafafa;
-} */
 
 .el-color-picker {
     vertical-align: middle;
@@ -482,24 +468,4 @@ h3.title {
 .el-dialog--center .el-dialog__body {
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
-}
-
-@media screen and (max-width: 1000px) {
-    body .phone-hide{
-        display: none;
-    }
-}
-
-@keyframes skeleton {
-    0%{opacity: 0;  transform: scale(0) ;}
-    100%{opacity: 1;  transform:scale(1) ;position:none; }
-}
-.skeleton-animation{
-    opacity: 0;  transform: scale(0) ;
-    transform-origin: center center;
-    animation:skeleton 0.3s cubic-bezier(0,0, 0, 1.5) forwards;
-}
-.skeleton-animation-cell{
-    position: absolute ;
-    left:8px;top:4px; right: 8px;bottom: 4px;
 }
