@@ -43,6 +43,11 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+html.dark .logger-wrap{
+    .inner{
+        border-color:#39434c;
+    }
+}
 .split{
     position:absolute;
     left:50%;

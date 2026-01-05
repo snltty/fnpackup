@@ -6,7 +6,7 @@
                 <span class="tips">每60s自动重载一次，也可以手动重载</span>
             </div>
             <div class="flex-1">
-                <el-table :data="state.list" stripe size="small" height="98%" v-loading="state.loading" style="--el-table-header-bg-color: #f1f4f9">
+                <el-table :data="state.list" stripe size="small" height="98%" v-loading="state.loading">
                     <el-table-column prop="name" label="名称">
                         <template #default="scope">
                             <div class="flex">
@@ -79,15 +79,25 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-
+html.dark .table-wrap{
+    .inner{
+        border-color:#39434c;
+        .head{
+            border-color:#39434c;
+        }
+    }
+}
 .table-wrap{
+    
     overflow hidden;
     padding:1rem;
     box-sizing: border-box;
+    
     .inner{
         border:1px solid #e2e8f0e6;
         border-radius:5px;
         box-sizing: border-box;
+        
 
         .tips{
             font-size:1.2rem;

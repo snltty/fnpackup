@@ -107,7 +107,7 @@ export default {
 </script>
 <style lang="stylus">
 .v-codemirror {
-  border: 1px solid #eee;
+  border: 1px solid var(--main-border-color);;
   height: auto;
 }
 .cm-editor,.cm-scroller{

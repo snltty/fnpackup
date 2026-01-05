@@ -167,12 +167,25 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+html.dark .context-menu-wrap{
+    background-color: #1a1e23;
+    a{
+        border-bottom-color: var(--main-border-color);
+        color: var(--main-text-color);
+        &:hover{
+            background-color: #3f4955;
+        }
+    }
+    .sub{
+        background-color: #1a1e23;
+    }
+}
 .context-menu-wrap{
     position: fixed;
     left:0;
     top:0;
     background-color: rgba(255,255,255,1);
-    border: 1px solid #ddd;
+    border: 1px solid var(--main-border-color);
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
     z-index 99999;
     border-radius: 5px;
@@ -201,7 +214,7 @@ export default {
             left: 100%;
             top: 0;
             background-color: rgba(255,255,255,1);
-            border: 1px solid #ddd;
+            border: 1px solid var(--main-border-color);
             box-shadow: 0 0 5px rgba(0,0,0,0.1);
             z-index 99999;
             border-radius: 5px;

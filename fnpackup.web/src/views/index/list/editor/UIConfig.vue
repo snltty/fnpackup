@@ -156,7 +156,7 @@ export default {
 }
 .fields{
     padding:1rem;
-    border:1px solid #eee;
+    border:1px solid var(--main-border-color);;
     border-radius: 5px;
 }
 </style>

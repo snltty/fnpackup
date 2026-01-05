@@ -228,13 +228,13 @@ export default {
 .wizard-tab{
     
     .fields{
-        border:1px solid #ddd;
+        border:1px solid var(--main-border-color);
         margin:1rem 0;
     }
     
     .field-item{
         margin-bottom:1rem;
-        border-bottom:1px solid #ddd;
+        border-bottom:1px solid var(--main-border-color);
         padding:.5rem .5rem .5rem 0;
         position:relative;
         &:nth-child(odd){

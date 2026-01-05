@@ -50,6 +50,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+html.dark .path-wrap{
+    border-color:#39434c;
+}
 .path-wrap{
     padding:1rem;
     border-bottom: 1px solid #e2e8f0e6;

@@ -22,10 +22,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.body-wrap{
-    background-color: #f1f4f9;
+html.dark .body-wrap{
     .inner{
-        background-color: #fff;
+        background-color: #1a1e23;
+    }
+}
+.body-wrap{
+    .inner{
+        background-color:#fff;
         border-radius:1.2rem;
     }
 }

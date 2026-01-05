@@ -26,8 +26,10 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+html.dark .head-wrap{
+    span{color:#fff;}
+}
 .head-wrap{
-    background-color: #f1f4f9;
     height: 5rem;
     line-height: 5rem;
 

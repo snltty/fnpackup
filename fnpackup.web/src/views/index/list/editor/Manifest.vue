@@ -302,7 +302,7 @@ export default {
 .manifest-wrap{
     .inner{
         padding:2rem 1rem;
-        border:1px solid #ddd;
+        border:1px solid var(--main-border-color);
         border-radius:5px;
     }
 }

@@ -168,17 +168,35 @@ table {
 
 html {
     font-size: 10px;
-    background-color: #f5f5f5;
+    background-color: #f1f4f9;
+
+    --main-border-color: #ddd;
 }
-html.dark{
-    background-color: #000;
-}
-html.dark .el-switch__core .el-switch__action{
-    background-color: #ccc;
-}
-html.dark .el-dialog{border: 1px solid #575c61;}
 html .el-overlay {
     border-radius: 5px;
+}
+.el-table{
+    tr{
+        --el-table-header-bg-color:#f1f4f9;
+    }
+}
+html.dark{
+    background-color:#14171a;
+    --main-border-color:#39434c;
+}
+html.dark{
+    .el-switch__core .el-switch__action{
+        background-color: #ccc;
+    }
+    .el-dialog{border: 1px solid #575c61;}
+    .el-table{
+        tr{
+            --el-table-header-bg-color:#14171a;
+        }
+    }
+    .el-tabs--left.el-tabs--border-card .el-tabs__item.is-left.is-active{
+        border-color:var(--main-border-color) transparent
+    }
 }
 
 

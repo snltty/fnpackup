@@ -809,13 +809,13 @@ rect.resize-t,rect.resize-b{
 
 .paint-wrap{
     
-    border:1px solid #ddd;
+    border:1px solid var(--main-border-color);
     border-radius: 0.5rem;
     
 
     .svg-wrap{
         font-size:0;
-        border-right:1px solid #ddd;
+        border-right:1px solid var(--main-border-color);
         padding:1rem;
         
         position: relative;

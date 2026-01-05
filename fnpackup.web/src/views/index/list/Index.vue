@@ -33,6 +33,11 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+html.dark .list-wrap{
+    .inner{
+        border-color:#39434c;
+    }
+}
 .list-wrap{
     padding:1rem 1rem .5rem 1rem;
     box-sizing: border-box;
