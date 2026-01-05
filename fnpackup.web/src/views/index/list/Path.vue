@@ -1,6 +1,6 @@
 <template>
     <div class="path-wrap">
-        <el-breadcrumb>
+        <el-breadcrumb :separator-icon="ArrowRight">
             <el-breadcrumb-item>
                 <a href="javascript:;" @click="handleBack"><el-icon><ArrowLeftBold /></el-icon></a>
             </el-breadcrumb-item>
@@ -24,10 +24,10 @@
 
 <script>
 import { computed } from 'vue';
-import { ArrowLeftBold,Refresh, Star, Pointer } from '@element-plus/icons-vue';
+import { ArrowLeftBold,Refresh, Star, Pointer, ArrowRight } from '@element-plus/icons-vue';
 import { useProjects } from './list';
 export default {
-    components:{ArrowLeftBold,Refresh,Pointer,Star},
+    components:{ArrowLeftBold,Refresh,Pointer,Star,ArrowRight},
     setup () {
         
         const projects = useProjects();

@@ -16,7 +16,8 @@
             <a href="javascript:;" @click="handleUpload('*/*')"><el-icon><Upload/></el-icon>上传</a>
         </template>
         <a href="javascript:;" @click="handleDownload"><el-icon><Download/></el-icon>下载</a>
-        <a href="javascript:;" v-if="canSource" @click="handleSource"><el-icon><EditPen/></el-icon>源码</a>
+        <a href="javascript:;" v-if="canSource" @click="handleSource"><el-icon><Edit/></el-icon>源码编辑</a>
+        <a href="javascript:;" v-if="canRename" @click="handleRename"><el-icon><EditPen/></el-icon>重命名</a>
         <a href="javascript:;">
             <div class="item">
                 <span><el-icon><Plus/></el-icon>新建</span>
@@ -42,20 +43,21 @@
 </template>
 
 <script>
-import {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen, Plus, Back, ArrowRight, More} from '@element-plus/icons-vue'
+import {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen, Plus, Back, ArrowRight, More, Edit} from '@element-plus/icons-vue'
 import { useProjects } from './list';
 import { computed, onMounted } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { useLogger } from '../logger';
 import { fetchApi } from '@/api/api';
 export default {
-    components: {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen,Plus,Back,ArrowRight,More},
+    components: {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen,Plus,Back,ArrowRight,More,Edit},
     setup () {
 
         const logger = useLogger();
         const projects = useProjects();
 
         const canSource = computed(()=>projects.value.contextMenu.row && projects.value.contextMenu.row.if);
+        const canRename = computed(()=>!!projects.value.contextMenu.row);
         const hasInProject = computed(()=>projects.value.page.path != '.');
         const handleRefresh = ()=>{
             projects.value.load();
@@ -117,6 +119,41 @@ export default {
                 logger.value.error(`${e}`);
             });
         }
+        const handleRename = ()=>{
+            ElMessageBox.prompt('输入名称', '重命名', {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                inputValue: projects.value.contextMenu.row.name,
+                draggable:true,
+                customStyle: {
+                    'vertical-align':'unset'
+                },
+            }).then(({ value }) => {
+                if(!value) {
+                    return;
+                }
+                fetchApi(`/files/renamefile`,{
+                    params:{
+                        path:`${projects.value.page.path}/${projects.value.contextMenu.row.name}`,
+                        path1:`${projects.value.page.path}/${value}`,
+                        f:projects.value.contextMenu.row.if
+                    },
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                }).then(res=>res.text()).then((res)=>{
+                    if(res){
+                        logger.value.error(res);
+                    }else{
+                        logger.value.success(`[${projects.value.contextMenu.row.name}]重命名成功`);
+                        projects.value.load(); 
+                    }
+                }).catch((e)=>{
+                    logger.value.error(`${e}`);
+                });
+            }).catch((e) => {
+                logger.value.error(`${e}`);
+            });
+        }
         const handleDel = ()=>{
             ElMessageBox.confirm('确定要删除吗？', '提示', {
                 confirmButtonText: '确认',
@@ -160,8 +197,8 @@ export default {
             });
         });
 
-        return {projects,canSource,hasInProject,
-            handleRefresh,handleCreate,handleBack,handleHome,handleUpload,handleDownload,handleCreateFile,handleDel,handleSource}
+        return {projects,canSource,hasInProject,canRename,
+            handleRefresh,handleCreate,handleBack,handleHome,handleUpload,handleDownload,handleCreateFile,handleDel,handleSource,handleRename}
     }
 }
 </script>
@@ -201,6 +238,10 @@ html.dark .context-menu-wrap{
         border-bottom: 1px solid #f5f5f5;
         &:last-child{
             border-bottom: none;
+        }
+
+        .el-icon{
+            margin-right: 5px;
         }
 
         .item{
