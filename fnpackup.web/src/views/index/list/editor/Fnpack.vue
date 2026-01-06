@@ -28,33 +28,59 @@ export default {
         
         const logger = useLogger();
         const projects = useProjects();
-        const handleBuild = (download)=>{
+        const getExt = async (name)=>{
+            const manifest = (await fetchApi(`/files/read`,{params:{path:`./${name}/manifest`}})
+            .then(res=>res.text())).split('\n').reduce((json,item)=>{
+                const index = item.indexOf('=');
+                if(index>0){
+                    const key = item.substring(0,index).trim();
+                    const value = item.substring(index+1).trim();
+                    json[key] = value;
+                }
+                return json;
+            },{});
+            return `-${manifest['version']}-${manifest['platform']||manifest['arch']}`;
+        }
+        const rename = async (name)=>{
+            const ext = await getExt(name);
+            const newName = `${name}${ext}`;
+            await fetchApi(`/files/renamefile`,{
+                params:{path:`./${name}/${name}.fpk`,path1:`./${name}/${newName}.fpk`},
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+            });
+            return newName;
+        }
+        const download = (projectName,name)=>{
+            let href = process.env.NODE_ENV === 'development' 
+            ? `http://localhost:1069/files/download?path=./${projectName}/${name}.fpk`
+            : `/files/download?path=./${projectName}/${name}.fpk`;
+            const a = document.createElement('a');
+            a.target='_blank';
+            a.href = href;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        const handleBuild = async (_download)=>{
             projects.value.building = true;
             logger.value.debug('开始打包...');
 
-            const name = projects.value.page.path.split('/').filter(item=>item && item!='.')[0];
+            let name = projects.value.page.path.split('/').filter(item=>item && item!='.')[0];
+            let projectName = name;
             fetchApi(`/files/build`,{
-                params:{name:name},
+                params:{name:projectName},
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
-            }).then(res=>res.text()).then((res)=>{
+            }).then(res=>res.text()).then(async (res)=>{
                 if(res.indexOf('Packing successfully')){
                     logger.value.success(res);
                     ElMessage.success('打包成功');
+
+                    name = await rename(projectName);
                     projects.value.load(); 
 
-                    if(download){
-                        let href = process.env.NODE_ENV === 'development' 
-                        ? `http://localhost:1069/files/download?path=./${name}/${name}.fpk`
-                        : `/files/download?path=./${name}/${name}.fpk`;
-                        const a = document.createElement('a');
-                        a.target='_blank';
-                        a.href = href;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    }
-                    
+                    if(_download)download(projectName,name);
                 }else{
                     ElMessage.error('打包失败');
                     logger.value.error(res);

@@ -150,7 +150,7 @@ namespace fnpackup.Controllers
             }
             if (f)
             {
-                System.IO.File.Move(path, path1);
+                System.IO.File.Move(path, path1,true);
             }
             else
             {
@@ -324,7 +324,7 @@ namespace fnpackup.Controllers
         }
 
         [HttpPost]
-        public async Task<string> Build(string name)
+        public async Task<string> Build(string name,string name1)
         {
             string result = CommandHelper.Execute($"fnpack", $" build", [], Path.Join(root, name), out string error);
             if (string.IsNullOrWhiteSpace(error) == false)

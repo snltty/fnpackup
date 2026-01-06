@@ -40,9 +40,7 @@ export default {
                 "allUsers":true,
                 "fileTypes":[],
                 "control": {
-                    "accessPerm": "readonly",
-                    "portPerm": "readonly", 
-                    "pathPerm": "readonly"
+                    "accessPerm": "readonly"
                 }
             },json),{protocol:'http'});
         }
