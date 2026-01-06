@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Compression;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -17,6 +18,13 @@ namespace fnpackup.Controllers
         {
             this.httpClientFactory = httpClientFactory;
         }
+
+        [HttpGet]
+        public string Version()
+        {
+            return $"v{string.Join(".", Assembly.GetExecutingAssembly().GetName().Version.ToString().Split('.').Take(3))}";
+        }
+
 
         [HttpPost]
         public string Create([FromBody] ProjectCreateInfo info)

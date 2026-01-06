@@ -15,11 +15,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         with:
-          tag_name: v0.0.6
-          release_name: v0.0.6.${{ steps.date.outputs.today }}
+          tag_name: v0.0.7
+          release_name: v0.0.7.${{ steps.date.outputs.today }}
           draft: false
           prerelease: false
-          body: "1. 一些累计更新，一些BUG修复\r\n2. 优化用户向导编辑"
+          body: "1. 一些累计更新，一些BUG修复\r\n2. 20251231飞牛更新\r\n3. 适应最新文档"
       - name: setup node.js
         uses: actions/setup-node@v2
         with:

@@ -13,10 +13,12 @@
             </template>
         </ul>
         <div class="foot-wrap">
-            <a href="javascript:;" @click="changeMode('light')" v-if="state.mode == 'dark'"><el-icon size="16"><Moon /></el-icon></a>
-            <a href="javascript:;" @click="changeMode('dark')" v-else><el-icon size="16"><Sunny /></el-icon></a>
+            <a href="javascript:;" @click="changeMode('light')" v-if="state.mode == 'dark'"><el-icon size="20"><Moon /></el-icon></a>
+            <a href="javascript:;" @click="changeMode('dark')" v-else><el-icon size="20"><Sunny /></el-icon></a>
             <a href="https://github.com/snltty/fnpackup" target="_blank">
-                <img src="../assets/github.svg" height="16" style="opacity: 0.5;">
+                <img v-if="state.mode == 'light'" src="../assets/github-light.svg" height="24" style="vertical-align: text-bottom;">
+                <img v-else-if="state.mode == 'dark'" src="../assets/github-dark.svg" height="24" style="vertical-align: text-bottom;">
+                <span>{{ state.version }}</span>
             </a>
             <a href="javascript:;">Snltty ©2025</a>
             <a href="https://linker.snltty.com" target="_blank">Linker</a>
@@ -25,6 +27,7 @@
 </template>
 
 <script>
+import { fetchApi } from '@/api/api';
 import { Moon, Sunny } from '@element-plus/icons-vue';
 import { computed, onMounted, reactive} from 'vue';
 import { useRouter } from 'vue-router';
@@ -39,6 +42,7 @@ export default {
         const cacheMode = localStorage.getItem('theme-mode') || (isSystemDarkMode?'dark':'light');
         const state = reactive({
             mode: cacheMode,
+            version: 'v0.0.0'
         });
         const changeMode = (mode)=>{
             state.mode = mode;
@@ -51,6 +55,9 @@ export default {
 
         onMounted(()=>{
             setMode();
+            fetchApi('/files/version').then(c=>c.text()).then(res=>{
+                state.version = res;
+            })
         })
 
         return {options,state,changeMode}
@@ -100,7 +107,7 @@ ul{
 
 .foot-wrap{
     padding:1rem .6rem;
-    font-size:1.2rem;
+    font-size:1.4rem;
     a{
         display:block;padding:.6rem;
         border-radius:4px;

@@ -8,7 +8,7 @@
             <span class="flex-1"></span>
             <span class="github">
                 <a href="https://github.com/snltty/fnpackup" target="_blank">
-                    <img src="../assets/github.svg" alt="" height="20">
+                    <img src="../assets/github-light.svg" alt="" height="20">
                 </a>
             </span>
         </div>
