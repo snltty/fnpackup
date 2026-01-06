@@ -46,5 +46,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./public/publish-fpk/docker/fnpackup-docker.fpk
-          asset_name: fnpackup-docker.fpk
+          asset_name: fnpackup-docker-v0.0.7.fpk
           asset_content_type: application/fpk

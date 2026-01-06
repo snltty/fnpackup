@@ -59,7 +59,7 @@ function writeUploadIpk(data, tagName) {
             with: {
                 'upload_url': '${{ steps.create_release.outputs.upload_url }}',
                 'asset_path': `./public/publish-fpk/${type}/fnpackup-${type}.fpk`,
-                'asset_name': `fnpackup-${type}.fpk`,
+                'asset_name': `fnpackup-${type}-${tagName}.fpk`,
                 'asset_content_type': 'application/fpk'
             }
         });
