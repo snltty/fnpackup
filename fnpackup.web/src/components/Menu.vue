@@ -20,7 +20,7 @@
                 <img v-else-if="state.mode == 'dark'" src="../assets/github-dark.svg" height="24" style="vertical-align: text-bottom;">
                 <span>{{ state.version }}</span>
             </a>
-            <a href="javascript:;">Snltty ©2025</a>
+            <a href="javascript:;">Snltty ©2026</a>
             <a href="https://linker.snltty.com" target="_blank">Linker</a>
         </div>
     </div>
