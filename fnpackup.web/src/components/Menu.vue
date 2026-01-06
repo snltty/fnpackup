@@ -107,7 +107,7 @@ ul{
 
 .foot-wrap{
     padding:1rem .6rem;
-    font-size:1.4rem;
+    font-size:1.3rem;
     a{
         display:block;padding:.6rem;
         border-radius:4px;
