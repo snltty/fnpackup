@@ -115,8 +115,15 @@ export default {
                 to:{label:'platform',value:'platform'}
             },
             platform:{
-                name: 'platform', label: '架构类型', type: 'select', options: [{label: 'all', value: 'all'},{label: 'x86', value: 'x86'},{label: 'arm', value: 'arm'}],default:'x86',
-                to:{label:'arch',value:'arch'}
+                name: 'platform', label: '架构类型', type: 'select', 
+                options: [
+                    {label: '任意', value: 'all'},
+                    {label: '仅x86', value: 'x86'},
+                    {label: '仅arm', value: 'arm'},
+                    {label: '仅loongarch', value: 'loongarch'},
+                    {label: '仅risc-v', value: 'risc-v'},
+                ],
+                default:'x86', to:{label:'arch',value:'arch'}
             }
         }
 

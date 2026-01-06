@@ -17,6 +17,7 @@
                             <el-select v-model="item.protocol">
                                 <el-option key="http" label="http" value="http"></el-option>
                                 <el-option key="https" label="https" value="https"></el-option>
+                                <el-option key="--" label="自适应https" value=""></el-option>
                             </el-select>
                         </el-form-item>
                     </el-col>
@@ -55,26 +56,8 @@
                 <el-form-item label="" label-width="0">
                     <el-row class="w-100">
                         <el-col :span="10">
-                            <el-form-item label="访问权限" prop="accessPerm">
+                            <el-form-item label="用户权限" prop="accessPerm">
                                 <el-select v-model="item.control.accessPerm">
-                                    <el-option key="editable" label="可编辑" value="editable"></el-option>
-                                    <el-option key="readonly" label="只读" value="readonly"></el-option>
-                                    <el-option key="hidden" label="隐藏" value="hidden"></el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="7">
-                            <el-form-item label="端口" prop="portPerm" label-width="40">
-                                <el-select v-model="item.control.portPerm">
-                                    <el-option key="editable" label="可编辑" value="editable"></el-option>
-                                    <el-option key="readonly" label="只读" value="readonly"></el-option>
-                                    <el-option key="hidden" label="隐藏" value="hidden"></el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="7">
-                            <el-form-item label="路径" prop="pathPerm" label-width="40">
-                                <el-select v-model="item.control.pathPerm">
                                     <el-option key="editable" label="可编辑" value="editable"></el-option>
                                     <el-option key="readonly" label="只读" value="readonly"></el-option>
                                     <el-option key="hidden" label="隐藏" value="hidden"></el-option>
