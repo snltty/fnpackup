@@ -48,8 +48,7 @@ namespace fnpackup.Controllers
             try
             {
                 System.IO.Directory.CreateDirectory(Path.Join(root, info.Name, "building"));
-                System.IO.Directory.CreateDirectory(Path.Join(root, info.Name, "building", "dist"));
-                using var fs = System.IO.File.Create(Path.Join(root, info.Name, "building", "building"));
+                System.IO.Directory.CreateDirectory(Path.Join(root, info.Name, "building", "platform"));
             }
             catch (Exception)
             {
@@ -57,7 +56,6 @@ namespace fnpackup.Controllers
 
             return result;
         }
-
         [HttpGet]
         public FilePageInfo Get(string path = "", int p = 1, int ps = 20)
         {
@@ -150,7 +148,7 @@ namespace fnpackup.Controllers
             }
             if (f)
             {
-                System.IO.File.Move(path, path1,true);
+                System.IO.File.Move(path, path1, true);
             }
             else
             {
@@ -158,6 +156,50 @@ namespace fnpackup.Controllers
             }
             return string.Empty;
         }
+        [HttpPost]
+        public async Task<string> CopyFile(string path, string path1, bool f = true)
+        {
+            path = Path.Join(root, path);
+            path1 = Path.Join(root, path1);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
+            }
+            if (Path.GetFullPath(path1).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path1)}] is denied";
+            }
+            if (f)
+            {
+                System.IO.File.Copy(path, path1, true);
+            }
+            else
+            {
+                string error = string.Empty;
+                if (OperatingSystem.IsWindows())
+                {
+                    CommandHelper.Execute("cmd.exe", string.Empty, [
+                    $"rmdir \"{path1}\" /S /Q",
+                    $"mkdir \"{path1}\"",
+                    $"xcopy \"{path}\" \"{path1}\" /E /I /H /Y",
+                    ], root, out error);
+                }
+                else if (OperatingSystem.IsLinux())
+                {
+                    CommandHelper.Execute("/bin/bash", string.Empty, [
+                    $"rm -rf \"{path1}\"",
+                    $"mkdir -p \"{path1}\"",
+                    $"cp -a \"{path}/.\" \"{path1}\"",
+                    ], root, out error);
+                }
+                if (string.IsNullOrWhiteSpace(error) == false)
+                {
+                    return error;
+                }
+            }
+            return string.Empty;
+        }
+
         [HttpGet]
         public async Task<string> Read(string path)
         {
@@ -324,7 +366,7 @@ namespace fnpackup.Controllers
         }
 
         [HttpPost]
-        public async Task<string> Build(string name,string name1)
+        public async Task<string> Build(string name)
         {
             string result = CommandHelper.Execute($"fnpack", $" build", [], Path.Join(root, name), out string error);
             if (string.IsNullOrWhiteSpace(error) == false)

@@ -13,8 +13,10 @@ namespace fnpackup
         {
 
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddHttpClient();
+           
             builder.Services.AddControllers();
+            builder.Services.AddHttpClient();
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -28,11 +30,12 @@ namespace fnpackup
 
             var app = builder.Build();
 
-            app.MapControllers();
+           
             app.UseCors("AllowAll");
             app.UseRouting();
 
             app.UseDynamicStaticFile();
+            app.MapControllers();
 
             app.Run();
         }
@@ -49,7 +52,6 @@ namespace fnpackup
             {
                 options.ForwardedHeaders = ForwardedHeaders.All;
                 options.ForwardLimit = null;
-                options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
             });
 
