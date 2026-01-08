@@ -1,16 +1,47 @@
 <template>
     <div class="fnpack-wrap h-100">
-        <div class="t-c">
-            <p>
-                <el-button plain @click="handleBuild(true)" :loading="projects.building">打包并下载</el-button>
-            </p>
-            <p class="mgt-1">
-                打包后在应用根目录下找到fpk
-            </p>
-            <p class="mgt-1">
-                <el-button plain type="primary" @click="handleBuild(false)" :loading="projects.building">仅打包</el-button>
-            </p>
-        </div>
+        <el-descriptions :column="1" size="small" border class="w-100" :label-width="80">
+            <el-descriptions-item label="发布模式">
+                <el-switch v-model="state.platform" active-text="多平台" inactive-text="单平台"/>
+            </el-descriptions-item>
+            <template v-if="state.platform">
+                <el-descriptions-item label="已找到">
+                    <template v-if="state.platforms.length > 0">
+                        <el-checkbox-group v-model="state.platforms"> 
+                            <template v-for="item in state.platformNames">
+                                <el-checkbox :label="item" :value="item" />
+                            </template>
+                        </el-checkbox-group>
+                    </template>
+                    <template v-else>
+                        <span class="red">未找到，请按说明新建文件夹和放入程序</span>
+                    </template>
+                </el-descriptions-item>
+                <el-descriptions-item label="目标路径">
+                    <el-input v-model="state.server"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="说明">
+                    <div>
+                        <p>
+                            新建对应平台的文件夹，如 building/platform/arm、building/platform/x86，打包时会先清空[{{state.server}}]，再复制对应目录下的文件到[{{state.server}}]，如果文件夹为空则不清空不复制，仅打包
+                        </p>
+                    </div>
+                </el-descriptions-item>
+            </template>
+            <template v-else>
+                <el-descriptions-item label="说明">
+                    <div>
+                        仅打包manifest中platform指定的平台
+                    </div>
+                </el-descriptions-item>
+            </template>
+            <el-descriptions-item label="下载">
+                <el-checkbox label="打包后下载" v-model="state.download" />
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <el-button class="mgl-1" plain type="primary" @click="handleBuild" :loading="projects.building">开始打包</el-button>
+            </el-descriptions-item>
+        </el-descriptions>
     </div>
 </template>
 
@@ -18,43 +49,31 @@
 import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElNotification } from 'element-plus';
+import { onMounted, reactive } from 'vue';
 
 export default {
     match:/fnpack$/,
-    width:300,
-    height:200,
+    width:500,
+    height:400,
     setup () {
         
         const logger = useLogger();
         const projects = useProjects();
-        const getExt = async (name)=>{
-            const manifest = (await fetchApi(`/files/read`,{params:{path:`./${name}/manifest`}})
-            .then(res=>res.text())).split('\n').reduce((json,item)=>{
-                const index = item.indexOf('=');
-                if(index>0){
-                    const key = item.substring(0,index).trim();
-                    const value = item.substring(index+1).trim();
-                    json[key] = value;
-                }
-                return json;
-            },{});
-            return `-${manifest['version']}-${manifest['platform']||manifest['arch']}`;
-        }
-        const rename = async (name)=>{
-            const ext = await getExt(name);
-            const newName = `${name}${ext}`;
-            await fetchApi(`/files/renamefile`,{
-                params:{path:`./${name}/${name}.fpk`,path1:`./${name}/${newName}.fpk`},
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-            });
-            return newName;
-        }
+        const name = projects.value.page.path.split('/').filter(item=>item && item!='.')[0];
+
+        const state = reactive({
+            platform:false,
+            platformNames:[],
+            platforms:[],
+            download:false,
+            server:'app/server/'
+        });
+
         const download = (projectName,name)=>{
             let href = process.env.NODE_ENV === 'development' 
-            ? `http://localhost:1069/files/download?path=./${projectName}/${name}.fpk`
-            : `/files/download?path=./${projectName}/${name}.fpk`;
+            ? `http://localhost:1069/files/download?path=./${projectName}/${name}`
+            : `/files/download?path=./${projectName}/${name}`;
             const a = document.createElement('a');
             a.target='_blank';
             a.href = href;
@@ -62,29 +81,80 @@ export default {
             a.click();
             document.body.removeChild(a);
         }
-        const handleBuild = async (_download)=>{
-            projects.value.building = true;
-            logger.value.debug('开始打包...');
-
-            let name = projects.value.page.path.split('/').filter(item=>item && item!='.')[0];
-            let projectName = name;
-            fetchApi(`/files/build`,{
-                params:{name:projectName},
+        const loadSettings = ()=>{
+            return new Promise((resolve,reject)=>{ 
+                fetchApi(`/files/read`,{
+                    params:{path:`./${name}/building/settings.json`},
+                    method:'GET',
+                }).then(res=>res.json()).then(res=>{
+                    if(res){
+                        state.platform = res.platform || false;
+                        state.server = res.server || 'app/server/';
+                        state.download = res.download  || false;
+                        state.platforms = res.platforms || [];
+                    }
+                    resolve();
+                }).catch(()=>{
+                    resolve();
+                })
+            });
+            
+        }
+        const saveSettings = ()=>{
+            fetchApi(`/files/write`,{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
-            }).then(res=>res.text()).then(async (res)=>{
-                if(res.indexOf('Packing successfully')){
-                    logger.value.success(res);
-                    ElMessage.success('打包成功');
+                body:JSON.stringify({
+                    path:`./${name}/building/settings.json`,
+                    content:JSON.stringify({
+                        platform:state.platform || false,
+                        server:state.server || 'app/server/',
+                        download:state.download || false,
+                        platforms:state.platforms || []
+                    },null,2)
+                })
+            }).then(()=>{}).catch(()=>{});
+        }
 
-                    name = await rename(projectName);
-                    projects.value.load(); 
-
-                    if(_download)download(projectName,name);
-                }else{
-                    ElMessage.error('打包失败');
-                    logger.value.error(res);
-                }
+        const handleBuild = async ()=>{
+            saveSettings();
+            if(state.platform && state.platforms.length == 0){
+                ElMessage.error('请选择平台');
+                logger.value.error('请选择平台');
+                return false;
+            }
+            projects.value.building = true;
+            logger.value.debug('开始打包...');
+            fetchApi(`/files/build`,{
+                params:{name:name,platform:state.platform ? state.platforms.join(','):'',server:state.server},
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+            }).then(res=>res.json()).then(async (res)=>{
+                res.forEach(c=>{
+                    if(c.msg.indexOf('Packing successfully')>=0){
+                        logger.value.success(c.msg);
+                        ElNotification({
+                            type: 'success',
+                            title: '打包',
+                            message: `[${c.fileName}]打包成功`,
+                            duration:3000,
+                        });
+                        if(state.download){
+                            download(name,c.fileName);
+                        }
+                        
+                    }else{
+                        ElNotification({
+                            type: 'error',
+                            title: '打包',
+                            message: `[${c.fileName}]打包失败`,
+                            duration:3000,
+                        });
+                        logger.value.error(c.msg);
+                    }
+                });
+                projects.value.load(); 
+                
             }).catch((e)=>{
                 logger.value.error(`${e}`);
                 ElMessage.error('打包失败');
@@ -94,7 +164,32 @@ export default {
             });
         }
 
-        return {projects,handleBuild}
+        const loadPlatforms = ()=>{
+            fetchApi(`/files/get`,{
+                params:{path:`./${name}/building/platform/`,p:1,ps:100},
+                method:'GET',
+                headers:{'Content-Type':'application/json'},
+            }).then(res=>res.json())
+            .then((res)=>{
+                state.platformNames = res.list.filter(c=>c.if==false).map(c=>c.name);
+                if(state.platforms.length == 0){
+                    state.platforms = res.list.filter(c=>c.if==false).map(c=>c.name);
+                }else{
+                    state.platforms = state.platforms.filter(c=>state.platformNames.includes(c));
+                }
+                state.platform = state.platforms.length>0 && state.platform;
+            }).catch(e=>{
+                logger.value.error(`${e}`);
+                ElMessage.error('获取平台失败');
+            });
+        }
+        onMounted(()=>{
+            loadSettings().then(()=>{
+                loadPlatforms();
+            });
+        })
+
+        return {projects,state,handleBuild}
     }
 }
 </script>
@@ -102,7 +197,6 @@ export default {
 <style lang="stylus" scoped>
 .fnpack-wrap{
     display: flex;
-    align-items: center;
     justify-content: center;
 }
 </style>

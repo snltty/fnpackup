@@ -20,15 +20,15 @@ do
         mkdir -p public/publish/docker/linux-${r}/${f}/projects
     done
     cd public/publish/docker/linux-x64/${f}
-    docker buildx build -f ${target}/public/publish/docker/linux-x64/${f}/Dockerfile --platform="linux/x86_64"  --force-rm -t "${image}-x64:latest" -t "${image}-x64:v0.0.7" . --push
+    docker buildx build -f ${target}/public/publish/docker/linux-x64/${f}/Dockerfile --platform="linux/x86_64"  --force-rm -t "${image}-x64:latest" -t "${image}-x64:v0.0.8" . --push
     cd ../../../../../
 
     cd public/publish/docker/linux-arm64/${f}
-    docker buildx build -f ${target}/public/publish/docker/linux-arm64/${f}/Dockerfile --platform="linux/arm64"  --force-rm -t "${image}-arm64:latest" -t "${image}-arm64:v0.0.7" . --push
+    docker buildx build -f ${target}/public/publish/docker/linux-arm64/${f}/Dockerfile --platform="linux/arm64"  --force-rm -t "${image}-arm64:latest" -t "${image}-arm64:v0.0.8" . --push
     cd ../../../../../
 
     cd public/publish/docker/linux-arm/${f}
-    docker buildx build -f ${target}/public/publish/docker/linux-arm/${f}/Dockerfile --platform="linux/arm/v7"  --force-rm -t "${image}-arm:latest" -t "${image}-arm:v0.0.7" . --push
+    docker buildx build -f ${target}/public/publish/docker/linux-arm/${f}/Dockerfile --platform="linux/arm/v7"  --force-rm -t "${image}-arm:latest" -t "${image}-arm:v0.0.8" . --push
     cd ../../../../../
 	
 done

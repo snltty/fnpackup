@@ -13,8 +13,10 @@ namespace fnpackup
         {
 
             var builder = WebApplication.CreateBuilder(args);
-           
+
+#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
             builder.Services.AddControllers();
+#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
             builder.Services.AddHttpClient();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddCors(options =>
@@ -30,7 +32,7 @@ namespace fnpackup
 
             var app = builder.Build();
 
-           
+
             app.UseCors("AllowAll");
             app.UseRouting();
 

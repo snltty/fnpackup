@@ -15,11 +15,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         with:
-          tag_name: v0.0.7
-          release_name: v0.0.7.${{ steps.date.outputs.today }}
+          tag_name: v0.0.8
+          release_name: v0.0.8.${{ steps.date.outputs.today }}
           draft: false
           prerelease: false
-          body: "1. 一些累计更新，一些BUG修复\r\n2. 20251231飞牛更新\r\n3. 适应最新文档"
+          body: "1. 一些累计更新，一些BUG修复\r\n2. 一些bug修复，目录跳转什么的\r\n3. 一键打包多平台"
       - name: setup node.js
         uses: actions/setup-node@v2
         with:
@@ -46,5 +46,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./public/publish-fpk/docker/fnpackup-docker.fpk
-          asset_name: fnpackup-docker-v0.0.7.fpk
+          asset_name: fnpackup-docker-v0.0.8.fpk
           asset_content_type: application/fpk

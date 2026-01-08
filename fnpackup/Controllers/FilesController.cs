@@ -17,6 +17,11 @@ namespace fnpackup.Controllers
         public FilesController(IHttpClientFactory httpClientFactory)
         {
             this.httpClientFactory = httpClientFactory;
+
+            if (Directory.Exists(root) == false)
+            {
+                Directory.CreateDirectory(root);
+            }
         }
 
         [HttpGet]
@@ -75,7 +80,7 @@ namespace fnpackup.Controllers
                 {
                     P = p,
                     Ps = ps,
-                    Count = 0,
+                    Count = -1,
                 };
             }
 
@@ -179,17 +184,13 @@ namespace fnpackup.Controllers
                 if (OperatingSystem.IsWindows())
                 {
                     CommandHelper.Execute("cmd.exe", string.Empty, [
-                    $"rmdir \"{path1}\" /S /Q",
-                    $"mkdir \"{path1}\"",
                     $"xcopy \"{path}\" \"{path1}\" /E /I /H /Y",
                     ], root, out error);
                 }
                 else if (OperatingSystem.IsLinux())
                 {
                     CommandHelper.Execute("/bin/bash", string.Empty, [
-                    $"rm -rf \"{path1}\"",
-                    $"mkdir -p \"{path1}\"",
-                    $"cp -a \"{path}/.\" \"{path1}\"",
+                    $"cp -rf \"{path}/.\" \"{path1}\"",
                     ], root, out error);
                 }
                 if (string.IsNullOrWhiteSpace(error) == false)
@@ -199,7 +200,6 @@ namespace fnpackup.Controllers
             }
             return string.Empty;
         }
-
         [HttpGet]
         public async Task<string> Read(string path)
         {
@@ -316,7 +316,6 @@ namespace fnpackup.Controllers
             }
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Download(string path)
         {
@@ -366,16 +365,115 @@ namespace fnpackup.Controllers
         }
 
         [HttpPost]
-        public async Task<string> Build(string name)
+        public async Task<List<BuildResultInfo>> Build(string name, string platform = "", string server = "app/server")
         {
-            string result = CommandHelper.Execute($"fnpack", $" build", [], Path.Join(root, name), out string error);
+            Dictionary<string, string> manifest = await GetManifest(name).ConfigureAwait(false);
+            Backup(name);
+
+            List<BuildResultInfo> result = new List<BuildResultInfo>();
+            if (string.IsNullOrWhiteSpace(platform))
+            {
+                result.Add(BuildRename(name, manifest));
+            }
+            else
+            {
+                foreach (var item in platform.Split(','))
+                {
+                    try
+                    {
+                        manifest["platform"] = item;
+                        await WritePlatform(name, manifest).ConfigureAwait(false);
+
+                        CopyPlatform(name, item, server);
+
+                        result.Add(BuildRename(name, manifest));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+            return result;
+
+        }
+        private BuildResultInfo BuildRename(string name, Dictionary<string, string> manifest)
+        {
+            string msg = CommandHelper.Execute($"fnpack", $" build", [], Path.Join(root, name), out string error);
             if (string.IsNullOrWhiteSpace(error) == false)
             {
-                return error;
+                return new BuildResultInfo { FileName = manifest["platform"], Msg = error };
+            }
+            string newName = $"{name}-{manifest["version"]}-{manifest["platform"]}";
+            System.IO.File.Move(Path.Join(root, name, $"{name}.fpk"), Path.Join(root, name, $"{newName}.fpk"), true);
+            return new BuildResultInfo { FileName = $"{newName}.fpk", Msg = msg };
+        }
+        private void CopyPlatform(string name,string platform,string dist)
+        {
+            string platformDir = Path.Join(root, name, "building", "platform", platform);
+            if (DirAreEmoty(platformDir) == false)
+            {
+                ClearFile(Path.Join(root, name, dist));
+                CopyDir(platformDir, Path.Join(root, name, dist));
+            }
+        }
+        private void Backup(string name)
+        {
+            if (System.IO.File.Exists(Path.Join(root, name, "building", "manifest")) == false)
+            {
+                System.IO.File.Copy(Path.Join(root, name, "manifest"), Path.Join(root, name, "building", "manifest"));
+            }
+        }
+        private bool DirAreEmoty(string path)
+        {
+            return Directory.Exists(path) == false || (Directory.GetFiles(path).Length == 0 && Directory.GetDirectories(path).Length == 0);
+        }
+        private void ClearFile(string path)
+        {
+            if (Directory.Exists(path) == false)
+            {
+                return;
+            }
+            foreach (var item in Directory.GetFiles(path))
+            {
+                System.IO.File.Delete(item);
+            }
+            foreach (var item in Directory.GetDirectories(path))
+            {
+                ClearFile(item);
+                Directory.Delete(item);
+            }
+        }
+        private void CopyDir(string sourceDir, string destDir)
+        {
+            if (Directory.Exists(sourceDir) == false)
+            {
+                return;
             }
 
-            return result;
+            Directory.CreateDirectory(destDir);
+            foreach (var file in Directory.GetFiles(sourceDir))
+            {
+                var destFile = Path.Combine(destDir, Path.GetFileName(file));
+                System.IO.File.Copy(file, destFile, true);
+            }
+            foreach (var directory in Directory.GetDirectories(sourceDir))
+            {
+                var destSubDir = Path.Combine(destDir, Path.GetFileName(directory));
+                CopyDir(directory, destSubDir);
+            }
         }
+        private async Task<Dictionary<string, string>> GetManifest(string name)
+        {
+            string str = await System.IO.File.ReadAllTextAsync(Path.Join(root, name, "manifest")).ConfigureAwait(false);
+            return str.Split(Environment.NewLine).Select(c => c.Split('=')).ToDictionary(k => k[0].Trim(), v => v.Length > 1 ? v[1].Trim() : string.Empty);
+        }
+        private async Task WritePlatform(string name, Dictionary<string, string> dic)
+        {
+            string content = string.Join(Environment.NewLine, dic.Where(c => string.IsNullOrWhiteSpace(c.Key) == false).Select(c => $"{c.Key}={c.Value}"));
+            await System.IO.File.WriteAllTextAsync(Path.Join(root, name, "manifest"), content).ConfigureAwait(false);
+        }
+
 
         [HttpGet]
         public async Task<FileExistsInfo> Exists(string name)
@@ -453,11 +551,19 @@ namespace fnpackup.Controllers
                 };
             }
             string str = await resp.Content.ReadAsStringAsync();
+#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
             return JsonSerializer.Deserialize<AppCenterRespInfo>(str, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,  // ºöÂÔ´óÐ¡Ð´
             });
+#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
         }
+    }
+
+    public sealed class BuildResultInfo
+    {
+        public string FileName { get; set; }
+        public string Msg { get; set; }
     }
 
     public sealed class FileWriteInfo

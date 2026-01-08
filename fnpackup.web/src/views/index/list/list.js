@@ -94,6 +94,17 @@ export const provideProjects = () => {
         loading:false,
         load(){
             this.loading = true;
+
+            if(this.page.path == '.' || !this.page.path){
+                this.page.path = './'
+                return;
+            }
+            if(this.page.path.indexOf('//')>=0){
+                this.page.path = this.page.path.replace(/\/\//g,'/');
+                return;
+            }
+            
+            
             localStorage.setItem('projects_path', this.page.path);
             fetchApi(`/files/get`,{
                 params:{
@@ -106,6 +117,12 @@ export const provideProjects = () => {
             })
             .then(res=>res.json())
             .then(json=>{
+
+                if(json.count === -1 && this.page.path !== './'){
+                    this.page.path = this.page.path.substring(0,this.page.path.lastIndexOf('/'));
+                    return;
+                }
+
                 this.loading = false;
                 this.page.p = json.p;
                 this.page.ps = json.ps;

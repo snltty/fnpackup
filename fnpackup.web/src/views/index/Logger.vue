@@ -1,9 +1,9 @@
 <template>
-    <div class="logger-wrap h-100" ref="wrap">
+    <div class="logger-wrap h-100" >
         <div class="split">
             <el-icon><Minus /></el-icon>
         </div>
-        <div class="inner scrollbar h-100">
+        <div class="inner scrollbar h-100" ref="wrap">
             <ul class="ul" ref="ul">
                 <template v-for="item in logger.list">
                     <li :class="`color-${item.type}`">
@@ -28,6 +28,7 @@ export default {
         const ul = ref(null);
 
         watch(() => logger.value.version, (val) => {
+           
             if(wrap.value){
                 nextTick(()=>{
                     wrap.value.scrollTop =  (ul.value.offsetHeight + 20);
