@@ -8,14 +8,16 @@
             <el-button type="primary" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Pointer /></el-icon>打包fpk</el-button>
             <el-button type="success" plain size="small" @click="handleGuide" :loading="projects.building"><el-icon><Files /></el-icon>快速编辑</el-button>     
             <el-button type="warning" plain size="small" @click="handleIcon" :loading="projects.building"><el-icon><Picture /></el-icon>图标设计</el-button>     
+            <el-button type="info" plain size="small" @click="handleEnv" :loading="projects.building"><el-icon><MessageBox /></el-icon>环境变量</el-button> 
         </template>
+            
         <Create v-model="projects.showCreate" v-if="projects.showCreate"></Create>
         <UploadFile v-model="projects.showUpload" v-if="projects.showUpload"></UploadFile>
     </div>
 </template>
 
 <script>
-import { Upload,Plus,Files, Pointer, Picture } from '@element-plus/icons-vue'
+import { Upload,Plus,Files, Pointer, Picture, MessageBox } from '@element-plus/icons-vue'
 import { computed } from 'vue';
 import { useProjects } from '../list';
 import Create from './Create.vue';
@@ -23,7 +25,7 @@ import { useLogger } from '../../logger';
 import UploadFile from './Upload.vue';
 export default {
     components: {
-        Upload,Pointer,Plus,Files,Create,UploadFile,Picture
+        Upload,Pointer,Plus,Files,Create,UploadFile,Picture,MessageBox
     },
     setup () {
         const logger = useLogger();
@@ -48,8 +50,14 @@ export default {
         const handleIcon = ()=>{
             projects.value.showPaint = true;
         }
+        const handleEnv = ()=>{
+            const name = projects.value.page.path.split('/').filter(item=>item && item!='.')[0];
+            projects.value.current.path =`./${name}/env`;
+            projects.value.current.remark = '环境变量';
+            projects.value.current.show = true;
+        }
 
-        return {paths,projects,handleCreate,handleBuild,handleGuide,handleUpload,handleIcon}
+        return {paths,projects,handleCreate,handleBuild,handleGuide,handleUpload,handleIcon,handleEnv}
     }
 }
 </script>

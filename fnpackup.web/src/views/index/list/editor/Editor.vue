@@ -17,6 +17,7 @@ import UiConfig from './UIConfig.vue';
 import WizardWrap from './WizardWrap.vue';
 import CommandWrap from './CommandWrap.vue';
 import Fnpack from './Fnpack.vue';
+import Env from './Env.vue';
 export default {
     components:{Privilege,UiConfig},
     props:['plusHeight'],
@@ -30,7 +31,8 @@ export default {
             WizardWrap,
             CommandWrap,
             Fnpack,
-            Source
+            Env,
+            Source,
         ];
 
         const logger = useLogger();
