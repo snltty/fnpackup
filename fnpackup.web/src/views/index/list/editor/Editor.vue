@@ -1,15 +1,15 @@
 <template>
     <template v-if="state.component">
-        <component :is="state.component" :plusHeight="plusHeight"></component>
+        <component :is="state.component" :path="state.path" :content="state.content" ref="dom"></component>
     </template>
 </template>
 
 <script>
-import { markRaw, onMounted, reactive } from 'vue';
+import { markRaw, nextTick, onMounted, reactive, ref } from 'vue';
 import Source from './Source.vue';
 import { useProjects } from '../list';
 import { useLogger } from '../../logger';
-import { fetchApi } from '@/api/api';
+import { fetchRead } from '@/api/api';
 import Manifest from './Manifest.vue';
 import IconWrap from './IconWrap.vue';
 import Privilege from './Privilege.vue';
@@ -20,8 +20,8 @@ import Fnpack from './Fnpack.vue';
 import Env from './Env.vue';
 export default {
     components:{Privilege,UiConfig},
-    props:['plusHeight'],
-    setup () {
+    props:['path'],
+    setup (props) {
 
         const components = [
             Manifest,
@@ -38,45 +38,65 @@ export default {
         const logger = useLogger();
         const projects = useProjects();
         const state = reactive({
-            component:undefined
+            component:undefined,
+            path:props.path,
+            content:'',
+            loading:false
         });
-        const resetComponent = ()=>{
-            const path = `${projects.value.current.path}`.split('/').filter(c=>c).join('/');
-            state.component = markRaw(components.filter(c=>c.match.test(path))[0]);
-            projects.value.current.width = state.component.width;
+
+        const doLayout = ()=>{ 
+            if(!state.component){
+                return;
+            }
+            projects.value.editor.width = state.component.width;
             if(state.component.height !== undefined){
-                projects.value.current.height = `${state.component.height}px`;
+                if(state.component.height == 'auto'){
+                    projects.value.editor.height = 'auto';
+                }
+                else{
+                    projects.value.editor.height = `${state.component.height}px`;
+                }
             }else{
-                projects.value.current.height = '';
+                projects.value.editor.height = '';
             }
         }
+        const resetComponent = ()=>{
+            const path = `${state.path}`.split('/').filter(c=>c).join('/');
+            state.component = markRaw(components.filter(c=>c.match.test(path))[0]);
+            doLayout();
+        }
 
-        const getContent = ()=>{
+        const loadContent = ()=>{
             return new Promise((resolve,reject)=>{ 
-                projects.value.current.loading = true;
-                fetchApi(`/files/read`,{
-                    params:{path:projects.value.current.path},
-                    method:'GET',
-                    headers:{'Content-Type':'application/json'},
-                }).then(res => res.text()).then(res => {
-                    projects.value.current.loading = false;
-                    projects.value.current.content = res;
+                state.loading = true;
+                fetchRead(state.path)
+                .then(res => res.text()).then(res => {
+                    state.loading = false;
+                    state.content = res;
                     resolve();
                 }).catch((e)=>{
-                    projects.value.current.loading = false;
+                    state.loading = false;
                     logger.value.error(`${e}`);
                     reject();
                 });
             });
         }
 
+        const dom = ref(null);
+        const getContent = ()=>{
+            return new Promise((resolve,reject)=>{ 
+                if(!dom.value || !dom.value.getContent) resolve();
+                else dom.value.getContent().then(resolve);
+            });
+        }
+
         onMounted(()=>{ 
-            getContent().then(()=>{
+            loadContent().then(()=>{
                 resetComponent();
             });
-        })
+        });
 
-        return {state,projects}
+        return {state,projects,dom,getContent,doLayout}
     }
 }
 </script>

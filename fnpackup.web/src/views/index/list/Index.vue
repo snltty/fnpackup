@@ -6,10 +6,10 @@
             <Table></Table>
         </div>
     </div>
-    <Editor></Editor>
-    <Guide v-if="projects.current.guide"></Guide>
-    <SourceWrap v-if="projects.current.source"></SourceWrap>
-    <Paint v-if="projects.showPaint"></Paint>
+    <Editor v-if="projects.editor.show" v-model="projects.editor.show"></Editor>
+    <Guide v-if="projects.editor.guide" v-model="projects.editor.guide"></Guide>
+    <SourceWrap v-if="projects.editor.source" v-model="projects.editor.source"></SourceWrap>
+    <Paint v-if="projects.editor.paint" v-model="projects.editor.paint"></Paint>
 </template>
 
 <script>

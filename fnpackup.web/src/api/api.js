@@ -50,3 +50,27 @@ export const xhrApi = (url,params,data,progressFn) => {
     });
 }
 
+export const fetchRead = (path) => {
+    return fetchApi(`/files/read`,{
+        params:{path:path},
+        method:'GET',
+        headers:{'Content-Type':'application/json'},
+    });
+}
+export const fetchWrite = (path,content) => { 
+    return fetchApi(`/files/write`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+            path:path,
+            content:content
+        })
+    });
+}
+export const fetchDelete = (path,f) => { 
+    return fetchApi(`/files/delfile`,{
+        params:{ path:path, f:f},
+        method:'POST',
+        headers:{'Content-Type':'application/json'}
+    });
+}

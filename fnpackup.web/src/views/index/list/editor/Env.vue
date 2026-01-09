@@ -274,7 +274,6 @@ export default {
                     arr.push(...item);
                     return arr;
                 },[]);
-                console.log(state.wizards);
             });
         }
 

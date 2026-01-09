@@ -56,22 +56,22 @@
 
 <script>
 import { nextTick, onMounted, reactive, ref } from 'vue';
-import { useProjects } from '../list';
 import { useLogger } from '../../logger';
 import { ElMessage, ElNotification } from 'element-plus';
 import { xhrApi } from '@/api/api';
+import { useProjects } from '../list';
 
 export default {
     match:/(ICON|icon).*(PNG|png)$/,
     width:500,
-    setup () {
+    props:['path'],
+    setup (props) {
 
        
         const logger = useLogger();
         const projects = useProjects();
-
-        const root = projects.value.current.path.split('/').filter((c,i)=>i<=1).join('/');
-        const defaultOption = projects.value.current.path.replace(root,'');
+        const root = projects.value.page.root.join('/');
+        const defaultOption = props.path.replace(root,'');
         const icons = [
             {name:'应用大图标',path:`${root}/ICON_256.PNG`,use:defaultOption == '/ICON_256.PNG',size:256},
             {name:'应用小图标',path:`${root}/ICON.PNG`,use:defaultOption == '/ICON.PNG',size:256,small:true},
@@ -84,7 +84,7 @@ export default {
             draging:false,
             dragingTimer:0,
             version:Date.now(),
-            fileName:projects.value.current.path.split('/').pop(),
+            fileName:props.path.split('/').pop(),
             fileImage:undefined,
             fileShowImage:undefined,
             file:null,
@@ -178,8 +178,8 @@ export default {
 
         const loadIcon = () => { 
             const url = process.env.NODE_ENV==='development' 
-                ? `http://localhost:1069/files/img?path=${projects.value.current.path}&t=${state.version}`
-                : `/files/img?path=${projects.value.current.path}&t=${state.version}`;
+                ? `http://localhost:1069/files/img?path=${props.path}&t=${state.version}`
+                : `/files/img?path=${props.path}&t=${state.version}`;
 
             const image = new Image();
             image.src = url;
@@ -406,7 +406,7 @@ export default {
             });
         });
         
-        return {projects,state,input,drag,handleSave,handleFileChange,handleSelectFile,handleArgChange,handleConfirmIcon,handleSmallChange}
+        return {state,input,drag,handleSave,handleFileChange,handleSelectFile,handleArgChange,handleConfirmIcon,handleSmallChange}
     }
 }
 </script>

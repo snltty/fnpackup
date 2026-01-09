@@ -69,11 +69,6 @@
                     </el-form-item>
                 </template>
             </div>
-            <el-form-item class="mgt-1" label-width="0">
-                <div class="t-c w-100"> 
-                    <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
-                </div>
-            </el-form-item>
         </el-form>
     </div>
 </template>
@@ -83,18 +78,18 @@ import { onMounted, reactive, ref } from 'vue';
 import { useProjects } from '../list';
 import { fetchApi } from '@/api/api';
 import { useLogger } from '../../logger';
-import { ElMessage } from 'element-plus';
 import {  QuestionFilled } from '@element-plus/icons-vue';
 
 export default {
     match:/manifest$/,
     width:500,
     components:{QuestionFilled},
-    setup () {
+    props:['path','content'],
+    setup (props) {
 
         const logger = useLogger();
         const projects = useProjects();
-        const contentJson = projects.value.current.content.split('\n').reduce((json,item)=>{
+        const contentJson = props.content.split('\n').reduce((json,item)=>{
             const index = item.indexOf('=');
             if(index>0){
                 const key = item.substring(0,index).trim();
@@ -232,54 +227,36 @@ export default {
         }
 
         const ruleFormRef = ref(null);
-        const handleCancel = ()=>{
-            projects.value.current.show = false;
-        }
-        const handleSubmit = ()=>{
-            ruleFormRef.value.validate(valid => {
-                if (valid) {
-                    
-                    const json = JSON.parse(JSON.stringify(state.ruleForm));
-                    json.install_dep_apps = json.install_dep_apps.join(':');
+        const getContent = ()=>{
+            return new Promise((resolve,reject)=>{ 
+                ruleFormRef.value.validate(valid => {
+                    if (!valid){
+                        reject();
+                    } else {
+                        const json = JSON.parse(JSON.stringify(state.ruleForm));
+                        json.install_dep_apps = json.install_dep_apps.join(':');
 
-                    const keys = Object.keys(json);
-                    const content = keys.reduce((arr,item)=>{
-                        let value = json[item];
-                        if(typeof value == 'string'){
-                            value = value.trim();
-                        }
-                        if(value){
-                            if(item == 'desc'){
-                                value  = `"""${value}"""`
+                        const keys = Object.keys(json);
+                        const content = keys.reduce((arr,item)=>{
+                            let value = json[item];
+                            if(typeof value == 'string'){
+                                value = value.trim();
                             }
-                            arr.push(`${item}=${value}`);
-                        }
-                        return arr;
-                    },[]).join('\n');
-                    state.loading = true;
-                    fetchApi(`/files/write`,{
-                        method:'POST',
-                        headers:{'Content-Type':'application/json'},
-                        body:JSON.stringify({
-                            path:projects.value.current.path,
-                            content:content
-                        })
-                    }).then(res => res.text()).then(res => {
-                        state.loading = false;
-                        if(res){
-                            logger.value.error(res);
-                        }else{
-                            state.show = false;
-                            ElMessage.success('保存成功');
-                            logger.value.success(`保存成功`);
-                            projects.value.load();
-                        }
-                    }).catch((e)=>{
-                        state.loading = false;
-                        logger.value.error(`${e}`);
-                    })
-                }
-            })
+                            if(value){
+                                if(item == 'desc'){
+                                    value  = `"""${value}"""`
+                                }
+                                arr.push(`${item}=${value}`);
+                            }
+                            return arr;
+                        },[]).join('\n');
+                        resolve({
+                            content: content,
+                            path: props.path
+                        });
+                    }
+                })
+            });
         }
 
         onMounted(()=>{
@@ -300,7 +277,7 @@ export default {
             });
         })
     
-        return {state,fieldsArray,ruleFormRef,handleChange,handleCancel,handleSubmit,handleTransform,remoteFn}
+        return {state,fieldsArray,ruleFormRef,handleChange,handleTransform,remoteFn,getContent}
     }
 }
 </script>

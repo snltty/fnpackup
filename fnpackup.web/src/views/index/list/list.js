@@ -59,28 +59,33 @@ export const provideProjects = () => {
     const logger = useLogger();
     const projects = ref({
         page:{
+            loading:false,
             path:localStorage.getItem('projects_path') || './',
+            root:'',
+            name:'',
             p:1,
             ps:20,
             count:0,
             list:[]
         },
-        current:{
+        editor:{
             path:'',
-            content:'',
+            root:'',
             remark:'',
+
             show:false,
             loading:false,
             width:600,
             height:'',
+
             guide:false,
-            source:false
+            source:false,
+            create:false,
+            upload:false,
+            mime:'*/*',
+            paint:false
         },
 
-        showCreate:false,
-        showUpload:false,
-        uploadMime:'*/*',
-        showPaint:false,
 
         contextMenu:{
             show:false,
@@ -90,10 +95,8 @@ export const provideProjects = () => {
             cell:null
         },
 
-        building:false,
-        loading:false,
         load(){
-            this.loading = true;
+            this.page.loading = true;
 
             if(this.page.path == '.' || !this.page.path){
                 this.page.path = './'
@@ -104,8 +107,12 @@ export const provideProjects = () => {
                 return;
             }
             
-            
             localStorage.setItem('projects_path', this.page.path);
+
+            const arr = this.page.path.split('/');
+            this.page.root = arr.length > 1 ? arr.filter((c,i)=>i<=1) : '';
+            this.page.name = arr[1] || '';
+
             fetchApi(`/files/get`,{
                 params:{
                     path:this.page.path,
@@ -123,7 +130,7 @@ export const provideProjects = () => {
                     return;
                 }
 
-                this.loading = false;
+                this.page.loading = false;
                 this.page.p = json.p;
                 this.page.ps = json.ps;
                 this.page.count = json.count;
@@ -138,7 +145,7 @@ export const provideProjects = () => {
                 logger.value.success(`[${this.page.path}]文件列表加载成功，${this.page.list.length}/${this.page.count}`);
             }).catch((e)=>{
                 logger.value.error(`文件列表加载失败：${e}`);
-                this.loading = false;
+                this.page.loading = false;
             });
         }
     });

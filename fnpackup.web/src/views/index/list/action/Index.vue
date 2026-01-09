@@ -2,17 +2,17 @@
     <div class="actions-wrap">
         <template v-if="paths.length == 0">
             <el-button type="primary" plain size="small" @click="handleCreate"><el-icon><Plus /></el-icon>创建应用</el-button>
-            <el-button plain size="small" @click="handleUpload('.fpk')" :loading="projects.building"><el-icon><Upload /></el-icon>导入fpk</el-button>
+            <el-button plain size="small" @click="handleUpload('.fpk')"><el-icon><Upload /></el-icon>导入fpk</el-button>
         </template>
         <template v-if="paths.length >= 1">
-            <el-button type="primary" plain size="small" @click="handleBuild" :loading="projects.building"><el-icon><Pointer /></el-icon>打包fpk</el-button>
-            <el-button type="success" plain size="small" @click="handleGuide" :loading="projects.building"><el-icon><Files /></el-icon>快速编辑</el-button>     
-            <el-button type="warning" plain size="small" @click="handleIcon" :loading="projects.building"><el-icon><Picture /></el-icon>图标设计</el-button>     
-            <el-button type="info" plain size="small" @click="handleEnv" :loading="projects.building"><el-icon><MessageBox /></el-icon>环境变量</el-button> 
+            <el-button type="primary" plain size="small" @click="handleBuild"><el-icon><Pointer /></el-icon>打包fpk</el-button>
+            <el-button type="success" plain size="small" @click="handleGuide"><el-icon><Files /></el-icon>快速编辑</el-button>     
+            <el-button type="warning" plain size="small" @click="handleIcon"><el-icon><Picture /></el-icon>图标设计</el-button>     
+            <el-button type="info" plain size="small" @click="handleEnv"><el-icon><MessageBox /></el-icon>环境变量</el-button> 
         </template>
             
-        <Create v-model="projects.showCreate" v-if="projects.showCreate"></Create>
-        <UploadFile v-model="projects.showUpload" v-if="projects.showUpload"></UploadFile>
+        <Create v-model="projects.editor.create" v-if="projects.editor.create"></Create>
+        <UploadFile v-model="projects.editor.upload" v-if="projects.editor.upload"></UploadFile>
     </div>
 </template>
 
@@ -21,40 +21,38 @@ import { Upload,Plus,Files, Pointer, Picture, MessageBox } from '@element-plus/i
 import { computed } from 'vue';
 import { useProjects } from '../list';
 import Create from './Create.vue';
-import { useLogger } from '../../logger';
 import UploadFile from './Upload.vue';
 export default {
     components: {
         Upload,Pointer,Plus,Files,Create,UploadFile,Picture,MessageBox
     },
     setup () {
-        const logger = useLogger();
         const projects = useProjects();
         const paths = computed(()=>projects.value.page.path.split('/').filter(item=>item && item!='.'));
         const handleCreate = ()=>{
-            projects.value.showCreate = true;
+            projects.value.editor.create = true;
         }
         const handleBuild = ()=>{
             const name = projects.value.page.path.split('/').filter(item=>item && item!='.')[0];
-            projects.value.current.path =`./${name}/fnpack`;
-            projects.value.current.remark = '打包下载';
-            projects.value.current.show = true;
+            projects.value.editor.path =`./${name}/fnpack`;
+            projects.value.editor.remark = '打包下载';
+            projects.value.editor.show = true;
         }
         const handleGuide = ()=>{
-            projects.value.current.guide = true;
+            projects.value.editor.guide = true;
         }
         const handleUpload = (mime)=>{
-            projects.value.showUpload = true;
-            projects.value.uploadMime = mime;
+            projects.value.editor.upload = true;
+            projects.value.editor.mime = mime;
         }
         const handleIcon = ()=>{
-            projects.value.showPaint = true;
+            projects.value.editor.paint = true;
         }
         const handleEnv = ()=>{
             const name = projects.value.page.path.split('/').filter(item=>item && item!='.')[0];
-            projects.value.current.path =`./${name}/env`;
-            projects.value.current.remark = '环境变量';
-            projects.value.current.show = true;
+            projects.value.editor.path =`./${name}/env`;
+            projects.value.editor.remark = '环境变量';
+            projects.value.editor.show = true;
         }
 
         return {paths,projects,handleCreate,handleBuild,handleGuide,handleUpload,handleIcon,handleEnv}

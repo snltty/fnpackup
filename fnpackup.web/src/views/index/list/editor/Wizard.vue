@@ -22,11 +22,6 @@
                         </el-form-item>
                     </template>
                 </div>
-                <el-form-item label-width="0">
-                    <div class="t-c w-100">
-                        <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">保存修改</el-button>
-                    </div>
-                </el-form-item>
             </el-form>
         </el-tab-pane>
     </el-tabs>
@@ -35,7 +30,6 @@
 <script>
 import {reactive } from 'vue';
 import { useLogger } from '../../logger';
-import { useProjects } from '../list';
 import {Edit,CircleCloseFilled,CirclePlusFilled} from '@element-plus/icons-vue'
 import { ElMessageBox } from 'element-plus';
 import WizardText from './WizardText.vue';
@@ -45,12 +39,11 @@ import WizardTips from './WizardTips.vue';
 import WizardValidate from './WizardValidate.vue';
 import WizardPlusField from './WizardPlusField.vue';
 export default {
-    props: ['type'],
+    props: ['type','path','content'],
     components: { Edit,CircleCloseFilled,CirclePlusFilled,WizardValidate,WizardPlusField },
     setup (props,{emit}) {
 
         const logger = useLogger();
-        const projects = useProjects();
 
         const validateTypes = [
             {label: '必填',value: 'required',default:{_required:true}},
@@ -78,7 +71,7 @@ export default {
             return json;
         },{}));
 
-        const _default = JSON.parse(projects.value.current.content == '[]' ? JSON.stringify([{'stepTitle':'欢迎使用','items':[]}]) : projects.value.current.content);
+        const _default = JSON.parse(props.content == '[]' ? JSON.stringify([{'stepTitle':'欢迎使用','items':[]}]) : props.content);
         
         _default.forEach((step,index)=>{
             step._id = index;
@@ -99,7 +92,6 @@ export default {
                 }
             });
         });
-        console.log(_default);
         const state = reactive({
             step:_default.length > 0 ? _default[0]._id : '',
             steps:_default,
@@ -181,45 +173,55 @@ export default {
                 delete item[c];
             });
         }
-        const handleSubmit = () => {
-            const arr = JSON.parse(JSON.stringify(state.steps));
-            arr.forEach(step=>{
+        const getContent = () => {
+            return new Promise((resolve,reject)=>{ 
+                const arr = JSON.parse(JSON.stringify(state.steps));
+                arr.forEach(step=>{
 
-                step._plus_field.forEach(item=>{
-                    step[item.field] = item.value;
-                });
-                //删除步骤的辅助字段
-                deleteField(step);
-
-                const items = step.items;
-                delete step.items;
-                step.items = items;
-                step.items.forEach(item=>{
-                    //删除字段的辅助字段，每个字段类型有一个单独的初始值辅助字段
-                    types.forEach(type=>{
-                        delete item[type.field];
+                    step._plus_field.forEach(item=>{
+                        step[item.field] = item.value;
                     });
-                    const type = types.filter(c=>c.value == item.type)[0]
-                    item[type.field] = item[`_${item.type}`];
-                    deleteField(item);
+                    //删除步骤的辅助字段
+                    deleteField(step);
 
-                    //删除验证的辅助字段，并将对应不同类型的辅助字段的值还原到真正字段
-                    //比如{required:true,_requred:true,message:'',_required_message:'111'}->{required:true,message:'11'}
-                    item.rules = item.rules.reduce((arr,rule)=>{
-                        const keys = Object.keys(validateTypes.filter(c=>c.value == rule._type)[0].default);
-                        arr.push(Object.assign(keys.reduce((json,value)=>{
-                            json[value.replace(/_/g,'')] = rule[value];
-                            return json;
-                        },{}),{'message':rule[`_${rule._type}_message`]}));
-                        return arr;
-                    },[]);
+                    const items = step.items;
+                    delete step.items;
+                    step.items = items;
+                    step.items.forEach(item=>{
+                        //删除字段的辅助字段，每个字段类型有一个单独的初始值辅助字段
+                        types.forEach(type=>{
+                            delete item[type.field];
+                        });
+                        const type = types.filter(c=>c.value == item.type)[0]
+                        item[type.field] = item[`_${item.type}`];
+                        deleteField(item);
+
+                        //删除验证的辅助字段，并将对应不同类型的辅助字段的值还原到真正字段
+                        //比如{required:true,_requred:true,message:'',_required_message:'111'}->{required:true,message:'11'}
+                        item.rules = item.rules.reduce((arr,rule)=>{
+                            const keys = Object.keys(validateTypes.filter(c=>c.value == rule._type)[0].default);
+                            arr.push(Object.assign(keys.reduce((json,value)=>{
+                                json[value.replace(/_/g,'')] = rule[value];
+                                return json;
+                            },{}),{'message':rule[`_${rule._type}_message`]}));
+                            return arr;
+                        },[]);
+                    });
                 });
-            });
-            emit('save',JSON.stringify(arr,null,2));
+                const content = JSON.stringify(arr,null,2);
+                resolve({
+                    path:props.path,
+                    content:content,
+                    delete:{
+                        value:content=='[]',
+                        f:true
+                    }
+                });
+            })
         }
 
 
-        return {state,choiceComponent,handleStepEdit,handleDelField,handleAddField,handleSubmit}
+        return {state,choiceComponent,handleStepEdit,handleDelField,handleAddField,getContent}
     }
 }
 </script>
@@ -229,7 +231,7 @@ export default {
     
     .fields{
         border:1px solid var(--main-border-color);
-        margin:1rem 0;
+        margin:1rem 0 0 0;
     }
     
     .field-item{

@@ -5,11 +5,6 @@
                 <div class="fields flex-1 scrollbar mgb-1">
                     <UIConfigItem :item="value"></UIConfigItem>
                 </div>
-                <el-form-item label-width="0">
-                    <div class="t-c w-100">
-                        <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">保存修改</el-button>
-                    </div>
-                </el-form-item>
             </el-form>
         </el-tab-pane>
     </el-tabs>
@@ -18,20 +13,18 @@
 <script>
 import {reactive } from 'vue';
 import { useLogger } from '../../logger';
-import { useProjects } from '../list';
 import {Edit,CircleCloseFilled,CirclePlusFilled} from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import UIConfigItem from './UIConfigItem.vue';
-import { fetchApi } from '@/api/api';
 export default {
     match:/\/ui\/config$/,
     width:550,
-    height:660,
+    height:600,
     components: { Edit,CircleCloseFilled,CirclePlusFilled ,UIConfigItem},
+    props:['path','content'],
     setup (props,{emit}) {
 
         const logger = useLogger();
-        const projects = useProjects();
 
         const resetForm = (item) => { 
             const json = JSON.parse(JSON.stringify(item));
@@ -45,7 +38,7 @@ export default {
             },json),{protocol:'http'});
         }
 
-        const configJson = JSON.parse(projects.value.current.content);
+        const configJson = JSON.parse(props.content);
         const urlJson = configJson['.url'];
         for(let j in urlJson){
             urlJson[j]._key = j;
@@ -61,37 +54,21 @@ export default {
             loading:false
         });
 
-        const handleSubmit = ()=>{
-            const json = JSON.parse(JSON.stringify(configJson));
-            json['.url'] = Object.values(json['.url']).reduce((json,item)=>{
-                json[item._key] = item;
-                delete item._key;
-                delete item._id;
-                return json;
-            },{});
-            const content = JSON.stringify(json,null,2);
-            state.loading = true;
-            fetchApi(`/files/write`,{
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({
-                    path:projects.value.current.path,
+        const getContent = ()=>{
+            return new Promise((resolve,reject)=>{ 
+                const json = JSON.parse(JSON.stringify(configJson));
+                json['.url'] = Object.values(json['.url']).reduce((json,item)=>{
+                    json[item._key] = item;
+                    delete item._key;
+                    delete item._id;
+                    return json;
+                },{});
+                const content = JSON.stringify(json,null,2);
+                resolve({
+                    path:props.path,
                     content:content
-                })
-            }).then(res => res.text()).then(res => {
-                state.loading = false;
-                if(res){
-                    logger.value.error(res);
-                }else{
-                    state.show = false;
-                    ElMessage.success('保存成功');
-                    logger.value.success(`保存成功`);
-                    projects.value.load();
-                }
-            }).catch((e)=>{
-                state.loading = false;
-                logger.value.error(`${e}`);
-            })
+                });
+            });
         }
     
         const handleEdit = (_id,action) => {
@@ -143,7 +120,7 @@ export default {
             }
         }
 
-        return {state,handleEdit,handleSubmit}
+        return {state,handleEdit,getContent}
     }
 }
 </script>

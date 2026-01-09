@@ -1,9 +1,9 @@
 <template>
     <div class="icon-wrap">
-        <el-tabs v-model="current" type="border-card" class="icon-tab" @tab-change="handleChange">
-            <template v-for="item in options">
-                <el-tab-pane :label="item.label" :name="item.value" v-loading="projects.current.loading" class="h-100">
-                    <Icon v-if="current==item.value"></Icon>
+        <el-tabs v-model="state.type" type="border-card" class="icon-tab">
+            <template v-for="item in state.types">
+                <el-tab-pane :label="item.label" :name="item.value" class="h-100">
+                    <Icon :path="item.path"></Icon>
                 </el-tab-pane>
             </template>
         </el-tabs>
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { onMounted,  ref } from 'vue';
+import { reactive } from 'vue';
 import { useProjects } from '../list';
 import Icon from './Icon.vue';
 
@@ -20,36 +20,25 @@ export default {
     width:500,
     height:560,
     components:{Icon},
-    setup () {
+    props:['path'],
+    setup (props) {
         const projects = useProjects();
 
         const names = [
-            /\/ui/.test(projects.value.current.path)?'icon_256.png':'ICON_256.PNG',
-            /\/ui/.test(projects.value.current.path)?'icon_64.png':'ICON.PNG',
+            /\/ui/.test(props.path)?'icon_256.png':'ICON_256.PNG',
+            /\/ui/.test(props.path)?'icon_64.png':'ICON.PNG',
         ];
-        const prefix = /\.PNG$/.test(projects.value.current.path) ? '应用':'入口';
+        const prefix = /\.PNG$/.test(props.path) ? '应用':'入口';
+        const paths =  props.path.split('/');
 
-        const paths = (/\/cmd$/.test(projects.value.current.path) 
-        ?`${projects.value.current.path}/${names[0]}`
-        :projects.value.current.path).split('/');
-
-        const current = ref('');
-        
-        const options = [
-            {label:`${prefix}大图标`,value:names[0]},
-            {label:`${prefix}小图标`,value:names[1]}
-        ]
-        const handleChange = (type) => {
-            current.value = type;
-            projects.value.current.remark = options.reduce((json,item)=>{ json[item.value]=item.label; return json;  },{})[type];
-            paths[paths.length-1] = type;
-            projects.value.current.path = paths.join('/');
-        };
-        onMounted(()=>{ 
-            handleChange(paths[paths.length-1]);
+        const state = reactive({
+            type:paths[paths.length-1],
+            types: [
+                {label:`${prefix}大图标`,value:names[0],path:`${paths.filter((c,i)=>i<paths.length-1).join('/')}/${names[0]}`},
+                {label:`${prefix}小图标`,value:names[1],path:`${paths.filter((c,i)=>i<paths.length-1).join('/')}/${names[1]}`}
+            ]
         });
-
-        return {projects,current,options,handleChange}
+        return {projects,state}
     }
 }
 </script>

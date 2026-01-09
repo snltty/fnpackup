@@ -1,6 +1,6 @@
 <template>
-    <el-dialog v-model="projects.showPaint" title="图标设计器"  width="510" top="1vh"
-    :close-on-click-modal="false" :close-on-press-escape="false" draggable>
+    <el-dialog v-model="state.show" title="图标设计器"  width="510" top="1vh"
+    :close-on-click-modal="false" :close-on-press-escape="false" draggable class="paint-dialog">
         <div class="paint-wrap flex flex-nowrap">       
             <div v-if="state.svg" class="svg-wrap"  ref="wrap" @click="handleWrapClick"
             :class="{line:state.svg.setting.cline.show}" :style="{'--line-color':state.svg.setting.cline.color}">
@@ -250,7 +250,7 @@
 </template>
 
 <script>
-import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useProjects } from '../list';
 import { ArrowDown, DeleteFilled } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
@@ -258,11 +258,12 @@ import { fetchApi, xhrApi } from '@/api/api';
 import { useLogger } from '../../logger';
 export default {
     components: {DeleteFilled,ArrowDown},
-    setup () {
+    props: ['modelValue'],
+    setup (props,{emit}) {
         const logger = useLogger();
         const projects = useProjects();
 
-        const root = projects.value.page.path.split('/').filter((c,i)=>i<=1).join('/');
+        const root = projects.value.page.root.join('/');
         const path = `${root}/building/icon_design.json`;
         const appname = projects.value.page.path.split('/')[1];
         const defaultImg = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNzY3MjA4MDEwMjg5IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjUgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjE5NDIiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTEyLjUiIGhlaWdodD0iNTEyIj48cGF0aCBkPSJNNTEyIDBDMzc4LjE5NzMzMyAwIDI1Ny4wMjQgMTkuMiAxNjUuNTQ2NjY3IDUyLjQ4Yy00NS44MjQgMTYuNjQtODQuMzA5MzMzIDM2LjYwOC0xMTMuOTIgNjIuMDM3MzMzQzIyLjE4NjY2NyAxMzkuOTQ2NjY3IDAgMTczLjkwOTMzMyAwIDIxMy4zMzMzMzNjMCAzOS40MjQgMjIuMTAxMzMzIDczLjM4NjY2NyA1MS42MjY2NjcgOTguODE2IDI5LjYxMDY2NyAyNS40MjkzMzMgNjguMDk2IDQ1LjM5NzMzMyAxMTMuODM0NjY2IDYyLjAzNzMzNCA1Ljk3MzMzMyAyLjEzMzMzMyAxMy4xNDEzMzMgMy43NTQ2NjcgMTkuMzcwNjY3IDUuODAyNjY2QTg5LjM0NCA4OS4zNDQgMCAwIDAgMTcwLjY2NjY2NyA0MjYuNjY2NjY3YzAgMzQuOTg2NjY3IDIxLjE2MjY2NyA2My4zMTczMzMgNDYuNTA2NjY2IDgzLjM3MDY2NiAxNS43ODY2NjcgMTIuMzczMzMzIDM0Ljk4NjY2NyAyMi41MjggNTUuNjM3MzM0IDMxLjgyOTMzNEMyNjIuNTcwNjY3IDU1OC4yNTA2NjcgMjU2IDU3Ni44NTMzMzMgMjU2IDU5Ny4zMzMzMzNjMCAzMS4xNDY2NjcgMTUuMjc0NjY3IDU4Ljk2NTMzMyAzNS44NCA3OS44NzIgMjAuNTY1MzMzIDIwLjgyMTMzMyA0Ni45MzMzMzMgMzYuNjkzMzMzIDc3LjQ4MjY2NyA0OS44MzQ2NjcgNC41MjI2NjcgMS44NzczMzMgOS44MTMzMzMgMy4zMjggMTQuNTA2NjY2IDUuMTJDMzU5LjUwOTMzMyA3NTEuNDQ1MzMzIDM0MS4zMzMzMzMgNzc3LjM4NjY2NyAzNDEuMzMzMzMzIDgxMC42NjY2NjdjMCAyOC41MDEzMzMgMTMuODI0IDUxLjIgMzIuODUzMzM0IDY5LjM3NkMzNTYuNTIyNjY3IDg5Mi41ODY2NjcgMzQxLjMzMzMzMyA5MTEuNzAxMzMzIDM0MS4zMzMzMzMgOTM4LjY2NjY2N2MwIDM0LjgxNiAyNS4yNTg2NjcgNTYuNzQ2NjY3IDQ4LjQ2OTMzNCA2OC4yNjY2NjYgMjMuMjEwNjY3IDExLjY5MDY2NyA1MC4xNzYgMTcuMDY2NjY3IDc5LjUzMDY2NiAxNy4wNjY2NjcgMjkuMzU0NjY3IDAgNTYuMzItNS4zNzYgNzkuNTMwNjY3LTE3LjA2NjY2NyAyMy4yMTA2NjctMTEuNTIgNDguNDY5MzMzLTMzLjQ1MDY2NyA0OC40NjkzMzMtNjguMjY2NjY2IDAtMS41MzYtMC43NjgtMi42NDUzMzMtMC44NTMzMzMtNC4xODEzMzQgMzYuMDk2LTQuMDEwNjY3IDcwLjE0NC0xMS4zNDkzMzMgOTguMDQ4LTI1LjM0NCAzOC42NTYtMTkuMjg1MzMzIDczLjQ3Mi01MS44ODI2NjcgNzMuNDcyLTk4LjQ3NDY2NmE0Mi42NjY2NjcgNDIuNjY2NjY3IDAgMSAwLTg1LjMzMzMzMyAwYzAgMC41MTItMy4yNDI2NjcgMTAuNTgxMzMzLTI2LjM2OCAyMi4xODY2NjYtMjMuMDQgMTEuNTItNjAuMjQ1MzMzIDIwLjQ4LTEwMS42MzIgMjAuNDgtNDEuMzg2NjY3IDAtNzguNTA2NjY3LTguOTYtMTAxLjYzMi0yMC40OEM0MjkuOTA5MzMzIDgyMS4yNDggNDI2LjY2NjY2NyA4MTEuMTc4NjY3IDQyNi42NjY2NjcgODEwLjY2NjY2N2MwLTAuNTEyIDMuMjQyNjY3LTEwLjU4MTMzMyAyNi4zNjgtMjIuMTg2NjY3IDIzLjA0LTExLjUyIDYwLjI0NTMzMy0yMC40OCAxMDEuNjMyLTIwLjQ4YTQyLjY2NjY2NyA0Mi42NjY2NjcgMCAwIDAgMTEuMDkzMzMzLTEuMzY1MzMzQzU3Ni40MjY2NjcgNzY3LjE0NjY2NyA1ODYuNjY2NjY3IDc2OCA1OTcuMzMzMzMzIDc2OGM3MS45MzYgMCAxNDEuMDU2LTcuOTM2IDE5OS4xNjgtMjMuODkzMzMzIDU4LjAyNjY2Ny0xNS44NzIgMTA3LjUyLTM3LjI5MDY2NyAxMzUuNTA5MzM0LTgxLjA2NjY2N2E0Mi42NjY2NjcgNDIuNjY2NjY3IDAgMCAwLTcyLjAyMTMzNC00Ni4wOGMtNi42NTYgMTAuNDEwNjY3LTM3LjgwMjY2NyAzMS42NTg2NjctODYuMDE2IDQ0Ljg4NTMzM0M3MjUuNzYgNjc0Ljk4NjY2NyA2NjIuODY5MzMzIDY4Mi42NjY2NjcgNTk3LjMzMzMzMyA2ODIuNjY2NjY3Yy03Ny41NjggMC0xNDcuNTQxMzMzLTEzLjkwOTMzMy0xOTQuMzA0LTMzLjk2MjY2N2ExNjQuNzc4NjY3IDE2NC43Nzg2NjcgMCAwIDEtNTAuNTE3MzMzLTMxLjU3MzMzM0MzNDIuODY5MzMzIDYwNy40MDI2NjcgMzQxLjMzMzMzMyA2MDEuNiAzNDEuMzMzMzMzIDU5Ny4zMzMzMzNjMC01LjAzNDY2NyA1LjEyLTE0LjQyMTMzMyAxOS42MjY2NjctMjYuMzY4QzQyOC43MTQ2NjcgNTg3LjYwNTMzMyA1MDkuNDQgNTk3LjMzMzMzMyA1OTcuMzMzMzMzIDU5Ny4zMzMzMzNjOTIuNzU3MzMzIDAgMTgwLjkwNjY2Ny03LjMzODY2NyAyNTMuMzU0NjY3LTIyLjUyOCA3Mi41MzMzMzMtMTUuMTg5MzMzIDEzMS4wNzItMzMuMzY1MzMzIDE2NS4xMi04MC40NjkzMzNhNDIuNjY2NjY3IDQyLjY2NjY2NyAwIDEgMC02OC45NDkzMzMtNTAuMDA1MzMzYy02LjU3MDY2NyA5LjA0NTMzMy00OS40OTMzMzMgMzMuNTM2LTExMy42NjQgNDYuOTMzMzMzQzc2OS4wMjQgNTA0LjgzMiA2ODUuNTY4IDUxMiA1OTcuMzMzMzMzIDUxMmMtMTAyLjE0NCAwLTE5NC42NDUzMzMtMTQuMjUwNjY3LTI1Ny45NjI2NjYtMzUuMzI4LTMxLjY1ODY2Ny0xMC41ODEzMzMtNTUuODkzMzMzLTIzLjA0LTY5LjM3Ni0zMy43MDY2NjdDMjU2LjUxMiA0MzIuMzg0IDI1NiA0MjcuMDA4IDI1NiA0MjYuNjY2NjY3YzAtMC41MTIgMi4zMDQtOS4xMzA2NjcgMjIuODY5MzMzLTIyLjUyOEMzNDkuMDEzMzMzIDQxOC4yMTg2NjcgNDI3LjQzNDY2NyA0MjYuNjY2NjY3IDUxMiA0MjYuNjY2NjY3YzEzMy44MDI2NjcgMCAyNTQuOTc2LTE5LjIgMzQ2LjQ1MzMzMy01Mi40OCA0NS44MjQtMTYuNjQgODQuMzA5MzMzLTM2LjYwOCAxMTMuOTItNjIuMDM3MzM0QzEwMDEuODEzMzMzIDI4Ni43MiAxMDI0IDI1Mi43NTczMzMgMTAyNCAyMTMuMzMzMzMzYzAtMzkuNDI0LTIyLjEwMTMzMy03My4zODY2NjctNTEuNjI2NjY3LTk4LjgxNi0yOS42MTA2NjctMjUuNDI5MzMzLTY4LjA5Ni00NS4zOTczMzMtMTEzLjgzNDY2Ni02Mi4wMzczMzNDNzY2Ljk3NiAxOS4yIDY0NS44MDI2NjcgMCA1MTIgMHogbTAgODUuMzMzMzMzYzEyNS40NCAwIDIzOC45MzMzMzMgMTkuMDI5MzMzIDMxNy4zNTQ2NjcgNDcuNTMwNjY3IDM5LjE2OCAxNC4yNTA2NjcgNjkuMzc2IDMxLjA2MTMzMyA4Ny4yOTYgNDYuNTA2NjY3IDE3LjkyIDE1LjM2IDIyLjAxNiAyNi4yODI2NjcgMjIuMDE2IDMzLjk2MjY2NiAwIDcuNjgtNC4wOTYgMTguNjAyNjY3LTIyLjAxNiAzMy45NjI2NjctMTcuOTIgMTUuNDQ1MzMzLTQ4LjEyOCAzMi4yNTYtODcuMjk2IDQ2LjUwNjY2N0M3NTAuOTMzMzMzIDMyMi4zMDQgNjM3LjM1NDY2NyAzNDEuMzMzMzMzIDUxMiAzNDEuMzMzMzMzYy0xMjUuNDQgMC0yMzguOTMzMzMzLTE5LjAyOTMzMy0zMTcuMzU0NjY3LTQ3LjUzMDY2Ni0zOS4xNjgtMTQuMjUwNjY3LTY5LjM3Ni0zMS4wNjEzMzMtODcuMjk2LTQ2LjUwNjY2N0M4OS40MjkzMzMgMjMxLjkzNiA4NS4zMzMzMzMgMjIxLjAxMzMzMyA4NS4zMzMzMzMgMjEzLjMzMzMzM2MwLTcuNjggNC4wOTYtMTguNjAyNjY3IDIyLjAxNi0zMy45NjI2NjYgMTcuOTItMTUuNDQ1MzMzIDQ4LjEyOC0zMi4yNTYgODcuMjk2LTQ2LjUwNjY2N0MyNzMuMDY2NjY3IDEwNC4zNjI2NjcgMzg2LjY0NTMzMyA4NS4zMzMzMzMgNTEyIDg1LjMzMzMzM3oiIGZpbGw9IiNmZmZmZmYiIHAtaWQ9IjE5NDMiPjwvcGF0aD48L3N2Zz4=';
@@ -332,6 +333,7 @@ export default {
         }
 
         const state = reactive({
+            show:true,
             timer:0,
             drag:{
                 element:null,
@@ -388,6 +390,14 @@ export default {
 
             svg: null
         });
+        watch(()=>state.show,(val)=>{ 
+            if(!val) { 
+                setTimeout(()=>{ 
+                    emit('update:modelValue', val);
+                },300);
+            }
+        });
+
 
         const wrap = ref(null);
         const handleWrapClick = (e)=>{ 
@@ -779,15 +789,6 @@ export default {
 }
 </script>
 
-<style lang="stylus">
-.editor-dialog{
-    max-width: 80%;
-    max-height: 90%;
-    .el-dialog__body{
-        height:100%;
-    }
-}
-</style>
 <style lang="stylus" scoped>
 input[type=file]
     opacity: 0;

@@ -13,29 +13,19 @@
             <el-form-item label="应用用户组名" prop="groupname">
                 <el-input v-model="state.ruleForm.groupname" />
             </el-form-item>
-            <el-form-item>
-                <el-button plain @click="handleCancel" :loading="state.loading">取消</el-button>
-                <el-button plain type="primary" @click="handleSubmit" :loading="state.loading">确定保存</el-button>
-            </el-form-item>
         </el-form>
     </div>
 </template>
 
 <script>
 import { reactive, ref } from 'vue';
-import { useProjects } from '../list';
-import { useLogger } from '../../logger';
-import { fetchApi } from '@/api/api';
-import { ElMessage } from 'element-plus';
-
 export default {
     match:/privilege$/,
     width:400,
-    height:300,
-    setup () {
-        const logger = useLogger();
-        const projects = useProjects();
-        const json = Object.assign({username:'',groupname:''},JSON.parse(projects.value.current.content));
+    height:'auto',
+    props:['path','content'],
+    setup (props) {
+        const json = Object.assign({username:'',groupname:''},JSON.parse(props.content));
         const state = reactive({
             ruleForm: json,
             rules: {},
@@ -43,42 +33,17 @@ export default {
         });
 
         const ruleFormRef = ref(null);
-        const handleCancel = ()=>{
-            projects.value.current.show = false;
-        }
-        const handleSubmit = ()=>{
-            ruleFormRef.value.validate(valid => {
-                if (valid) {
-                    
-                    const content = JSON.stringify(state.ruleForm,null,2);
-                    state.loading = true;
-                    fetchApi(`/files/write`,{
-                        method:'POST',
-                        headers:{'Content-Type':'application/json'},
-                        body:JSON.stringify({
-                            path:projects.value.current.path,
-                            content:content
-                        })
-                    }).then(res => res.text()).then(res => {
-                        state.loading = false;
-                        if(res){
-                            logger.value.error(res);
-                        }else{
-                            state.show = false;
-                            ElMessage.success('保存成功');
-                            logger.value.success(`保存成功`);
-                            projects.value.load();
-                        }
-                    }).catch((e)=>{
-                        state.loading = false;
-                        logger.value.error(`${e}`);
-                    })
-                }
-            })
+        const getContent = ()=>{
+            return new Promise((resolve,reject)=>{ 
+                resolve({
+                    path:props.path,
+                    content:JSON.stringify(state.ruleForm,null,2)
+                });
+            }); 
         }
 
         return {
-            state,ruleFormRef,handleCancel,handleSubmit
+            state,ruleFormRef,getContent
         }
     }
 }
@@ -87,5 +52,7 @@ export default {
 <style lang="stylus" scoped>
 .privilege-wrap{
     padding:2rem;
+    border:1px solid var(--main-border-color);
+    border-radius:5px;
 }
 </style>

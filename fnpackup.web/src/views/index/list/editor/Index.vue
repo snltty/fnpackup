@@ -1,45 +1,47 @@
 <template>
-    <el-dialog v-model="projects.current.show" :title="`编辑器[${projects.current.remark}]`" 
-    :width="`${projects.current.width}px`" top="1vh" :style="{height:projects.current.height || '90%'}"
-    :close-on-click-modal="false" :close-on-press-escape="false"  draggable class="editor-dialog">
-        <template v-if="projects.current.show">
-            <div style="height:calc(100% - 4rem)" class="scrollbar">
-                <Editor plusHeight="110"></Editor>
-            </div>
+    <el-dialog v-model="state.show" :title="`编辑器[${projects.editor.remark}]`" 
+    :width="`${projects.editor.width}px`" :style="`height:${projects.editor.height || '90%'};`"
+    :close-on-click-modal="false" :close-on-press-escape="false"  top="1vh"  draggable class="editor-dialog">
+        <template v-if="state.show">
+            <Editor :path="projects.editor.path"></Editor>
         </template>
     </el-dialog>
 </template>
 
 <script>
-import {watch } from 'vue';
+import {reactive,watch } from 'vue';
 import { useProjects } from '../list';
 import Editor from './Editor.vue';
 export default {
     components:{Editor},
-    setup () {
+    props:['modelValue'],
+    setup (props,{emit}) {
 
         const projects = useProjects();
-        watch(() => projects.value.current.show, (val) => {
+        const state = reactive({
+            show:true,
+        });
+        watch(() => state.show, (val) => {
             if (!val) {
                 setTimeout(() => {
-                    projects.value.current.path = '';
-                    projects.value.current.content =  '';
-                    projects.value.current.remark =  '';
+                    emit('update:modelValue', val);
                 }, 300);
             }
         });
 
-        return {projects}
+        return {projects,state}
     }
 }
 </script>
 
 <style lang="stylus">
+.el-overlay-dialog{
+    overflow: hidden !important;
+}
 .editor-dialog{
     max-width: 80%;
-    max-height: 90%;
     .el-dialog__body{
-        height:100%;
+        height:calc(100% - 4rem);
     }
 }
 </style>

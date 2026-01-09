@@ -1,9 +1,9 @@
 <template>
     <div class="command-wrap">
-        <el-tabs v-model="current" type="border-card" class="command-tab" @tab-change="handleChange">
-            <template v-for="item in options">
-                <el-tab-pane :label="item.label" :name="item.value" v-loading="projects.current.loading" class="h-100">
-                    <Source v-if="projects.current.content && current==item.value"></Source>
+        <el-tabs v-model="state.type" type="border-card" class="command-tab" @tab-change="handleChange">
+            <template v-for="item in state.types">
+                <el-tab-pane :label="item.label" :name="item.value" class="h-100">
+                    <Source v-if="state.contents[item.value]" :content="state.contents[item.value]" :path="`${state.root}/${item.value}`" :ref="`source-${item.value}`"></Source>
                 </el-tab-pane>
             </template>
         </el-tabs>
@@ -11,68 +11,80 @@
 </template>
 
 <script>
-import { onMounted,  ref } from 'vue';
+import { getCurrentInstance, onMounted,  reactive } from 'vue';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
-import { fetchApi } from '@/api/api';
+import { fetchRead } from '@/api/api';
 import Source from './Source.vue';
-
 export default {
     match:/\/cmd/,
     width:900,
     components:{Source},
-    setup () {
+    props:['path'],
+    setup (props) {
         const logger = useLogger();
         const projects = useProjects();
+        const $this = getCurrentInstance();
 
-        const paths = (/\/cmd$/.test(projects.value.current.path) 
-        ?`${projects.value.current.path}/install_init`
-        :projects.value.current.path).split('/');
+        const paths =  (/\/cmd$/.test(props.path) ? `${props.path}/install_init` : props.path).split('/');
+        const root = paths.filter((c,i)=>i<paths.length-1).join('/');
+        const state = reactive({
+            paths:paths,
+            root: root,
 
-        const current = ref('');
-        const options = [
-            {label:'安装初始化',value:'install_init'},
-            {label:'安装回调',value:'install_callback'},
-            {label:'卸载初始化',value:'uninstall_init'},
-            {label:'卸载回调',value:'uninstall_callback'},
-            {label:'更新初始化',value:'upgrade_init'},
-            {label:'更新回调',value:'upgrade_callback'},
-            {label:'主脚本',value:'main'},
-            {label:'配置初始化',value:'config_init'},
-            {label:'配置回调',value:'config_callback'},
-        ]
+            type:'',
+            types:[
+                {label:'主脚本',value:'main'},
+                {label:'安装',value:'install_init'},
+                {label:'安装回调',value:'install_callback'},
+                {label:'卸载',value:'uninstall_init'},
+                {label:'卸载回调',value:'uninstall_callback'},
+                {label:'更新',value:'upgrade_init'},
+                {label:'更新回调',value:'upgrade_callback'},
+                {label:'配置',value:'config_init'},
+                {label:'配置回调',value:'config_callback'},
+            ],
+            loading:false,
+            contents:{}
+        });
         const handleChange = (type) => {
-            current.value = type;
-            projects.value.current.remark = options.reduce((json,item)=>{ json[item.value]=item.label; return json;  },{})[type];
-            paths[paths.length-1] = type;
-            projects.value.current.path = paths.join('/');
-            getContent();
+            state.type = type;
+            if(!state.contents[type]){
+                loadContent(type);
+            }
         };
 
-        const getContent = ()=>{
+        const loadContent = (type)=>{
             return new Promise((resolve,reject)=>{ 
-                projects.value.current.loading = true;
-                projects.value.current.content = '';
-                fetchApi(`/files/read`,{
-                    params:{path:paths.join('/')},
-                    method:'GET',
-                    headers:{'Content-Type':'application/json'},
-                }).then(res => res.text()).then(res => {
-                    projects.value.current.loading = false;
-                    projects.value.current.content = res || '[]';
+                state.loading = true;
+                fetchRead(`${state.root}/${type}`)
+                .then(res => res.text()).then(res => {
+                    state.loading = false;
+                    state.contents[type] = res || '[]';
                     resolve();
                 }).catch((e)=>{
-                    projects.value.current.loading = false;
+                    state.loading = false;
                     logger.value.error(`${e}`);
                     reject();
                 });
             });
         }
+        const getContent = ()=>{
+            return new Promise((resolve,reject)=>{ 
+                const _ref = $this.refs[`source-${state.type}`];
+                if(_ref){
+                    return _ref[0].getContent().then(resolve);
+                }else{
+                    resolve();
+                }
+            });
+        }
+
         onMounted(()=>{ 
-            handleChange(paths[paths.length-1]);
+            handleChange(state.paths[state.paths.length-1]);
         });
 
-        return {projects,current,options,handleChange}
+        return {projects,state,handleChange,getContent}
     }
 }
 </script>

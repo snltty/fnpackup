@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="state.show" :title="projects.uploadMime == '.fpk'?'导入fpk应用':'上传文件到当前目录'" width="340" :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
+    <el-dialog v-model="state.show" :title="projects.editor.mime == '.fpk'?'导入fpk应用':'上传文件到当前目录'" width="340" :close-on-click-modal="false" :close-on-press-escape="false"  draggable>
         <div class="upload-wrap" ref="drag">
             <div class="inner"> 
                 <template v-if="state.loading">
@@ -9,19 +9,19 @@
                     <p>
                         <el-button plain @click="triggerSelectFile"><el-icon><Document /></el-icon>上传文件</el-button>
                     </p>
-                    <p v-if="projects.uploadMime != '.fpk'">
+                    <p v-if="projects.editor.mime != '.fpk'">
                         <el-button plain @click="triggerSelectFolder"><el-icon><Folder /></el-icon>上传文件夹</el-button>
                     </p>
-                    <p v-if="projects.uploadMime != '.fpk'">点击选择或拖拽文件/文件夹到此处</p>
-                    <p v-if="projects.uploadMime != '.fpk'">上传单个.fpk文件视为导入应用</p>
-                    <p v-if="projects.uploadMime == '.fpk'">上传单个.fpk文件导入应用</p>
+                    <p v-if="projects.editor.mime != '.fpk'">点击选择或拖拽文件/文件夹到此处</p>
+                    <p v-if="projects.editor.mime != '.fpk'">上传单个.fpk文件视为导入应用</p>
+                    <p v-if="projects.editor.mime == '.fpk'">上传单个.fpk文件导入应用</p>
                 </template>
             </div>
             <div class="drag" v-if="state.draging"></div>
         </div>
     </el-dialog>
-    <input multiple type="file" ref="input" @change="onFileChange" :accept="projects.uploadMime"></input>
-    <input webkitdirectory directory multiple type="file" ref="input1" @change="onFileChange" :accept="projects.uploadMime"></input>
+    <input multiple type="file" ref="input" @change="onFileChange" :accept="projects.editor.mime"></input>
+    <input webkitdirectory directory multiple type="file" ref="input1" @change="onFileChange" :accept="projects.editor.mime"></input>
 </template>
 
 <script>

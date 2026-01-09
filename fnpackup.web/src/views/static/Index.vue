@@ -5,20 +5,22 @@
                 <el-button plain type="primary" size="small" :loading="state.loading" @click="handleSearch"><el-icon><Refresh></Refresh></el-icon>重载托管和刷新列表</el-button>
                 <span class="tips">每60s自动重载一次，也可以手动重载</span>
             </div>
-            <div class="flex-1">
-                <el-table :data="state.list" stripe size="small" height="98%" v-loading="state.loading">
-                    <el-table-column prop="name" label="名称">
-                        <template #default="scope">
-                            <div class="flex">
-                                <span>{{scope.row.name}}</span>
-                                <router-link :to="{name:'StaticView',query:{name:scope.row.name}}" class="mgl-2 a-line">内嵌打开</router-link>
-                                <a :href="`${state.baseUrl}/${scope.row.name}/?t=${Date.now()}`" target="_blank" class="mgl-1 a-line">新窗口打开</a>
-                            </div>
-                            
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="root" label="根目录"></el-table-column>
-                </el-table>
+            <div class="flex-1 relative">
+                <div class="absolute">
+                    <el-table :data="state.list" stripe size="small" height="98%" v-loading="state.loading">
+                        <el-table-column prop="name" label="名称">
+                            <template #default="scope">
+                                <div class="flex">
+                                    <span>{{scope.row.name}}</span>
+                                    <router-link :to="{name:'StaticView',query:{name:scope.row.name}}" class="mgl-2 a-line">内嵌打开</router-link>
+                                    <a :href="`${state.baseUrl}/${scope.row.name}/?t=${Date.now()}`" target="_blank" class="mgl-1 a-line">新窗口打开</a>
+                                </div>
+                                
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="root" label="根目录"></el-table-column>
+                    </el-table>
+                </div>
             </div>
         </div>
     </div>

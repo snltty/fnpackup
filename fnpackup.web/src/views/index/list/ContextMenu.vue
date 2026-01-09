@@ -63,7 +63,7 @@ export default {
             projects.value.load();
         }
         const handleCreate = ()=>{
-            projects.value.showCreate = true;
+            projects.value.editor.create = true;
         }
 
         const handleBack = ()=>{
@@ -75,8 +75,8 @@ export default {
             projects.value.load();
         }
         const handleUpload = (mime)=>{
-            projects.value.showUpload = true;
-            projects.value.uploadMime = mime;
+            projects.value.editor.upload = true;
+            projects.value.editor.mime = mime;
         }
         const handleDownload = ()=>{
             let href = process.env.NODE_ENV === 'development' 
@@ -186,9 +186,9 @@ export default {
         }
 
         const handleSource = ()=>{
-            projects.value.current.path = `${projects.value.page.path}/${projects.value.contextMenu.row.name}`;
-            projects.value.current.remark = projects.value.contextMenu.row.remark;
-            projects.value.current.source = true;
+            projects.value.editor.path = `${projects.value.page.path}/${projects.value.contextMenu.row.name}`;
+            projects.value.editor.remark = projects.value.contextMenu.row.remark;
+            projects.value.editor.source = true;
         }
 
         onMounted(()=>{

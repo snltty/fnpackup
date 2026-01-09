@@ -39,7 +39,7 @@
                 <el-checkbox label="打包后下载" v-model="state.download" />
             </el-descriptions-item>
             <el-descriptions-item>
-                <el-button class="mgl-1" plain type="primary" @click="handleBuild" :loading="projects.building">开始打包</el-button>
+                <el-button class="mgl-1" plain type="primary" @click="handleBuild" :loading="state.loading">开始打包</el-button>
             </el-descriptions-item>
         </el-descriptions>
     </div>
@@ -55,7 +55,7 @@ import { onMounted, reactive } from 'vue';
 export default {
     match:/fnpack$/,
     width:500,
-    height:400,
+    height:'auto',
     setup () {
         
         const logger = useLogger();
@@ -63,6 +63,7 @@ export default {
         const name = projects.value.page.path.split('/').filter(item=>item && item!='.')[0];
 
         const state = reactive({
+            loading:false,
             platform:false,
             platformNames:[],
             platforms:[],
@@ -123,7 +124,7 @@ export default {
                 logger.value.error('请选择平台');
                 return false;
             }
-            projects.value.building = true;
+            state.loading = true;
             logger.value.debug('开始打包...');
             fetchApi(`/files/build`,{
                 params:{name:name,platform:state.platform ? state.platforms.join(','):'',server:state.server},
@@ -159,8 +160,7 @@ export default {
                 logger.value.error(`${e}`);
                 ElMessage.error('打包失败');
             }).finally(()=>{
-                projects.value.building = false;
-                projects.value.current.show = false;
+                state.loading = false;
             });
         }
 
