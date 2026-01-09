@@ -231,6 +231,11 @@ namespace fnpackup.Controllers
             {
                 return $"Access to the path [{Path.GetFullPath(path)}] is denied";
             }
+            if (Directory.Exists(Path.GetDirectoryName(path)) == false)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+            }
+
             await System.IO.File.WriteAllTextAsync(path, info.Content.Replace("\r\n", "\n")).ConfigureAwait(false);
             return string.Empty;
         }
@@ -368,6 +373,11 @@ namespace fnpackup.Controllers
         public async Task<List<BuildResultInfo>> Build(string name, string platform = "", string server = "app/server")
         {
             Dictionary<string, string> manifest = await GetManifest(name).ConfigureAwait(false);
+            if (manifest.ContainsKey("platform") == false)
+            {
+                return new List<BuildResultInfo> { new BuildResultInfo { FileName = string.Empty, Msg = "请将manifest中的arch转为platform" } };
+            }
+
             Backup(name);
 
             List<BuildResultInfo> result = new List<BuildResultInfo>();
@@ -408,7 +418,7 @@ namespace fnpackup.Controllers
             System.IO.File.Move(Path.Join(root, name, $"{name}.fpk"), Path.Join(root, name, $"{newName}.fpk"), true);
             return new BuildResultInfo { FileName = $"{newName}.fpk", Msg = msg };
         }
-        private void CopyPlatform(string name,string platform,string dist)
+        private void CopyPlatform(string name, string platform, string dist)
         {
             string platformDir = Path.Join(root, name, "building", "platform", platform);
             if (DirAreEmoty(platformDir) == false)
@@ -421,6 +431,10 @@ namespace fnpackup.Controllers
         {
             if (System.IO.File.Exists(Path.Join(root, name, "building", "manifest")) == false)
             {
+                if (Directory.Exists(Path.Join(root, name, "building")) == false)
+                {
+                    Directory.CreateDirectory(Path.Join(root, name, "building"));
+                }
                 System.IO.File.Copy(Path.Join(root, name, "manifest"), Path.Join(root, name, "building", "manifest"));
             }
         }
