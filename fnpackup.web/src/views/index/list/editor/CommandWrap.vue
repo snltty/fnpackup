@@ -2,8 +2,16 @@
     <div class="command-wrap">
         <el-tabs v-model="state.type" type="border-card" class="command-tab" @tab-change="handleChange">
             <template v-for="item in state.types">
-                <el-tab-pane :label="item.label" :name="item.value" class="h-100">
-                    <Source v-if="state.contents[item.value]" :content="state.contents[item.value]" :path="`${state.root}/${item.value}`" :ref="`source-${item.value}`"></Source>
+                <el-tab-pane :label="item.label" :name="item.key" class="h-100">
+                    <template #label>
+                        <template v-if="state.changeds[item.key]">
+                            <div class="red">{{ item.label }} <strong >*</strong> </div>
+                        </template>
+                        <template v-else>
+                            <span>{{ item.label }}</span>
+                        </template>
+                    </template>
+                    <Source v-if="state.contents[item.key]" :content="state.contents[item.key]" :path="`${state.root}/${item.key}`" :ref="`source-${item.key}`"></Source>
                 </el-tab-pane>
             </template>
         </el-tabs>
@@ -11,7 +19,7 @@
 </template>
 
 <script>
-import { getCurrentInstance, onMounted,  reactive } from 'vue';
+import { getCurrentInstance, onMounted,  onUnmounted,  reactive } from 'vue';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
 import { fetchRead } from '@/api/api';
@@ -20,7 +28,7 @@ export default {
     match:/\/cmd/,
     width:900,
     components:{Source},
-    props:['path'],
+    props:['path','content'],
     setup (props) {
         const logger = useLogger();
         const projects = useProjects();
@@ -34,24 +42,31 @@ export default {
 
             type:'',
             types:[
-                {label:'主脚本',value:'main'},
-                {label:'安装',value:'install_init'},
-                {label:'安装回调',value:'install_callback'},
-                {label:'卸载',value:'uninstall_init'},
-                {label:'卸载回调',value:'uninstall_callback'},
-                {label:'更新',value:'upgrade_init'},
-                {label:'更新回调',value:'upgrade_callback'},
-                {label:'配置',value:'config_init'},
-                {label:'配置回调',value:'config_callback'},
+                {label:'主脚本',key:'main'},
+                {label:'安装',key:'install_init'},
+                {label:'安装回调',key:'install_callback'},
+                {label:'卸载',key:'uninstall_init'},
+                {label:'卸载回调',key:'uninstall_callback'},
+                {label:'更新',key:'upgrade_init'},
+                {label:'更新回调',key:'upgrade_callback'},
+                {label:'配置',key:'config_init'},
+                {label:'配置回调',key:'config_callback'},
             ],
             loading:false,
-            contents:{}
+            contents:{},
+            changeds:{},
+            showChangeTimer:0
         });
+
+        const doLayout = ()=>{ 
+            projects.value.editor.remark = state.types.find(c=>c.key==state.type).label;
+        }
         const handleChange = (type) => {
             state.type = type;
             if(!state.contents[type]){
                 loadContent(type);
             }
+            doLayout();
         };
 
         const loadContent = (type)=>{
@@ -69,29 +84,62 @@ export default {
                 });
             });
         }
+
+        const setChangedContent = (type,content)=>{
+            state.contents[type] = content;
+        }
         const getContent = ()=>{
-            return new Promise((resolve,reject)=>{ 
-                const _ref = $this.refs[`source-${state.type}`];
+            return new Promise((resolve,reject)=>{
+                const key = state.type;
+                const _ref = $this.refs[`source-${key}`];
                 if(_ref){
-                    return _ref[0].getContent().then(resolve);
+                    _ref[0].getContent().then((res)=>{
+                        resolve({
+                            path:res.path,
+                            content:res.content,
+                            changed_key:key,
+                            changed:Object.values(state.changeds).some(c=>c)
+                        });
+                    });
                 }else{
-                    resolve();
+                    resolve({
+                        path:props.path,
+                        content:state.contents[key] || '--',
+                        changed:Object.values(state.changeds).some(c=>c)
+                    });
                 }
             });
+        }
+        const saveBtnTimer = ()=>{
+            clearTimeout(state.showChangeTimer);
+            state.showChangeTimer = setTimeout(()=>{
+                const key = state.type;
+                if($this.refs[`source-${key}`]){
+                    const getContent = $this.refs[`source-${key}`][0].getContent;
+                    getContent().then((res)=>{
+                        state.changeds[key] = res.content != state.contents[key];
+                    });
+                }
+                saveBtnTimer();
+            },500);
         }
 
         onMounted(()=>{ 
             handleChange(state.paths[state.paths.length-1]);
+            saveBtnTimer();
+        });
+        onUnmounted(()=>{
+            clearTimeout(state.showChangeTimer);
         });
 
-        return {projects,state,handleChange,getContent}
+        return {projects,state,handleChange,getContent,setChangedContent}
     }
 }
 </script>
 
 <style lang="stylus" scoped>
 .command-wrap{
-    height:80vh;
+    height:100%;
 
     .command-tab{
         height:100%;

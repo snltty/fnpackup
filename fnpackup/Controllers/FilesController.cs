@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Compression;
 using System.Reflection;
@@ -414,6 +413,10 @@ namespace fnpackup.Controllers
             {
                 return new BuildResultInfo { FileName = manifest["platform"], Msg = error };
             }
+            if (msg.Contains("Packing successfully") == false)
+            {
+                return new BuildResultInfo { FileName = manifest["platform"], Msg = msg };
+            }
             string newName = $"{name}-{manifest["version"]}-{manifest["platform"]}";
             System.IO.File.Move(Path.Join(root, name, $"{name}.fpk"), Path.Join(root, name, $"{newName}.fpk"), true);
             return new BuildResultInfo { FileName = $"{newName}.fpk", Msg = msg };
@@ -421,7 +424,7 @@ namespace fnpackup.Controllers
         private void CopyPlatform(string name, string platform, string dist)
         {
             string platformDir = Path.Join(root, name, "building", "platform", platform);
-            if (DirAreEmoty(platformDir) == false)
+            if (DirAreEmpty(platformDir) == false)
             {
                 ClearFile(Path.Join(root, name, dist));
                 CopyDir(platformDir, Path.Join(root, name, dist));
@@ -438,7 +441,7 @@ namespace fnpackup.Controllers
                 System.IO.File.Copy(Path.Join(root, name, "manifest"), Path.Join(root, name, "building", "manifest"));
             }
         }
-        private bool DirAreEmoty(string path)
+        private bool DirAreEmpty(string path)
         {
             return Directory.Exists(path) == false || (Directory.GetFiles(path).Length == 0 && Directory.GetDirectories(path).Length == 0);
         }
@@ -480,11 +483,22 @@ namespace fnpackup.Controllers
         private async Task<Dictionary<string, string>> GetManifest(string name)
         {
             string str = await System.IO.File.ReadAllTextAsync(Path.Join(root, name, "manifest")).ConfigureAwait(false);
-            return str.Split(Environment.NewLine).Select(c => c.Split('=')).ToDictionary(k => k[0].Trim(), v => v.Length > 1 ? v[1].Trim() : string.Empty);
+            return str.Split("\n").Select(c =>
+            {
+                int index = c.IndexOf('=');
+                string key = string.Empty,value = string.Empty;
+                if(index > 0)
+                {
+                    key = c.Substring(0, index);
+                    value = c.Substring(index + 1);
+                }
+                return new string[] { key, value };
+
+            }).ToDictionary(k => k[0].Trim(), v => v.Length > 1 ? v[1].Trim() : string.Empty);
         }
         private async Task WritePlatform(string name, Dictionary<string, string> dic)
         {
-            string content = string.Join(Environment.NewLine, dic.Where(c => string.IsNullOrWhiteSpace(c.Key) == false).Select(c => $"{c.Key}={c.Value}"));
+            string content = string.Join("\n", dic.Where(c => string.IsNullOrWhiteSpace(c.Key) == false).Select(c => $"{c.Key}={c.Value}"));
             await System.IO.File.WriteAllTextAsync(Path.Join(root, name, "manifest"), content).ConfigureAwait(false);
         }
 

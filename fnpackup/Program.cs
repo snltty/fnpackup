@@ -62,7 +62,6 @@ namespace fnpackup
         public static WebApplication UseDynamicStaticFile(this WebApplication app)
         {
             app.UseForwardedHeaders();
-
             DynamicFileProvider dfp = app.Services.GetService<DynamicFileProvider>();
             dfp.SetDefault(Path.Combine(app.Environment.ContentRootPath, "web"));
             FileServerOptions options = new FileServerOptions
@@ -156,7 +155,7 @@ namespace fnpackup
                 {
                     string manifest = Path.Join(dir, "manifest");
                     string path = File.Exists(manifest) == false ? string.Empty : File.ReadAllText(manifest)
-                     .Split(Environment.NewLine)
+                     .Split("\n")
                      .Select(line =>
                      {
                          string key = string.Empty, value = string.Empty;

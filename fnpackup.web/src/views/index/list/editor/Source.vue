@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import {  nextTick, onMounted, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror'
 import { json } from '@codemirror/lang-json'
 import { yaml } from '@codemirror/lang-yaml'
@@ -23,6 +23,7 @@ import { oneDark } from '@codemirror/theme-one-dark'
 export default {
     match:/.*/,
     width:600,
+    height:'auto',
     components: { Codemirror },
     props:['content','path'],
     setup (props) {

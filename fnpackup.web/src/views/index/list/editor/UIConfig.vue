@@ -19,7 +19,7 @@ import UIConfigItem from './UIConfigItem.vue';
 export default {
     match:/\/ui\/config$/,
     width:550,
-    height:600,
+    height:660,
     components: { Edit,CircleCloseFilled,CirclePlusFilled ,UIConfigItem},
     props:['path','content'],
     setup (props,{emit}) {

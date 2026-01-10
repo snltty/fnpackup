@@ -465,6 +465,7 @@ export default {
             input.value.value = '';
 
             const image = new Image();
+            image.crossOrigin = 'anonymous';
             image.src = URL.createObjectURL(files[0]);
             image.onload = async () => { 
                 const reader = new FileReader();
@@ -623,6 +624,7 @@ export default {
         const toFile = (src,size,name) => { 
             return new Promise(async (resolve,reject)=>{
                 const image = new Image();
+                image.crossOrigin = 'anonymous';
                 image.onload = async () => {
                     const dpr = window.devicePixelRatio || 1;
                     const canvas = document.createElement('canvas');

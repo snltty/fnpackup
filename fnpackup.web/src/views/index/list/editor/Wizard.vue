@@ -175,7 +175,7 @@ export default {
         }
         const getContent = () => {
             return new Promise((resolve,reject)=>{ 
-                const arr = JSON.parse(JSON.stringify(state.steps));
+                let arr = JSON.parse(JSON.stringify(state.steps));
                 arr.forEach(step=>{
 
                     step._plus_field.forEach(item=>{
@@ -208,7 +208,11 @@ export default {
                         },[]);
                     });
                 });
+                if(arr.length == 1 && arr[0].items.length == 0){
+                    arr = [];
+                }
                 const content = JSON.stringify(arr,null,2);
+                
                 resolve({
                     path:props.path,
                     content:content,

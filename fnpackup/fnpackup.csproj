@@ -8,14 +8,14 @@
 		<Authors>snltty</Authors>
 		<Company>snltty</Company>
 		<PackageReleaseNotes>fnpackup</PackageReleaseNotes>
-		<Version>0.0.8</Version>
-		<AssemblyVersion>0.0.8</AssemblyVersion>
-		<FileVersion>0.0.8</FileVersion>
-		<Description>1. 一些累计更新，一些BUG修复
-2. 一些bug修复，目录跳转什么的
-3. 一键打包多平台</Description>
+		<Version>0.0.9</Version>
+		<AssemblyVersion>0.0.9</AssemblyVersion>
+		<FileVersion>0.0.9</FileVersion>
+		<Description>1. 一些累计更新，写了一些bug
+2. ui优化，错位什么的
+3. 展示可用环境变量
+4. 重构组件，增加修改未保存提醒</Description>
 		<Copyright>snltty</Copyright>
-
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 		<ApplicationIcon>ico.ico</ApplicationIcon>
 		<IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>

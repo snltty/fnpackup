@@ -64,7 +64,7 @@ import { useProjects } from '../list';
 export default {
     match:/(ICON|icon).*(PNG|png)$/,
     width:500,
-    props:['path'],
+    props:['path','content'],
     setup (props) {
 
        
@@ -182,6 +182,7 @@ export default {
                 : `/files/img?path=${props.path}&t=${state.version}`;
 
             const image = new Image();
+            image.crossOrigin = 'anonymous';
             image.src = url;
             image.onload = async () => { 
                 state.size = Math.min(image.width, image.height);
@@ -210,6 +211,7 @@ export default {
                     size,size
                 );
                 const img = new Image();
+                img.crossOrigin = 'anonymous';
                 img.src = canvas.toDataURL('image/png', 1);
                 img.onload = () => { 
                     resolve(img);
@@ -219,6 +221,7 @@ export default {
         }  
         const toImage = async (file) => { 
             const image = new Image();
+            image.crossOrigin = 'anonymous';
             image.src = URL.createObjectURL(file);
             image.onload = async () => { 
                 let img = image.width != image.height? await clipSize(image,state.size) : await toSize(image,state.size);
@@ -235,6 +238,7 @@ export default {
         const toFile = (src,size,name) => { 
             return new Promise(async (resolve,reject)=>{
                 const image = new Image();
+                image.crossOrigin = 'anonymous';
                 image.onload = async () => {
                     const dpr = window.devicePixelRatio || 1;
                     const canvas = document.createElement('canvas');
@@ -288,6 +292,7 @@ export default {
                     size,size
                 );
                 const img = new Image();
+                img.crossOrigin = 'anonymous';
                 img.src = canvas.toDataURL('image/png', 1);
                 img.onload = () => { 
                     resolve(img);
@@ -345,6 +350,7 @@ export default {
                 ctx.globalCompositeOperation = 'source-over';
 
                 const img = new Image();
+                img.crossOrigin = 'anonymous';
                 img.src = canvas.toDataURL('image/png', 1);
                 img.onload = () => { 
                     resolve(img);

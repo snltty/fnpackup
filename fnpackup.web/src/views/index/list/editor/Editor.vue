@@ -13,6 +13,7 @@ import { fetchRead } from '@/api/api';
 import Manifest from './Manifest.vue';
 import IconWrap from './IconWrap.vue';
 import Privilege from './Privilege.vue';
+import Resource from './Resource.vue';
 import UiConfig from './UIConfig.vue';
 import WizardWrap from './WizardWrap.vue';
 import CommandWrap from './CommandWrap.vue';
@@ -27,6 +28,7 @@ export default {
             Manifest,
             IconWrap,
             Privilege,
+            Resource,
             UiConfig,
             WizardWrap,
             CommandWrap,
@@ -44,22 +46,7 @@ export default {
             loading:false
         });
 
-        const doLayout = ()=>{ 
-            if(!state.component){
-                return;
-            }
-            projects.value.editor.width = state.component.width;
-            if(state.component.height !== undefined){
-                if(state.component.height == 'auto'){
-                    projects.value.editor.height = 'auto';
-                }
-                else{
-                    projects.value.editor.height = `${state.component.height}px`;
-                }
-            }else{
-                projects.value.editor.height = '';
-            }
-        }
+       
         const resetComponent = ()=>{
             const path = `${state.path}`.split('/').filter(c=>c).join('/');
             state.component = markRaw(components.filter(c=>c.match.test(path))[0]);
@@ -83,6 +70,30 @@ export default {
         }
 
         const dom = ref(null);
+        const doLayout = ()=>{ 
+            if(!state.component){
+                return;
+            }
+            projects.value.editor.width = state.component.width;
+            if(state.component.height !== undefined){
+                if(state.component.height == 'auto'){
+                    projects.value.editor.height = 'auto';
+                }
+                else{
+                    projects.value.editor.height = `${state.component.height}px`;
+                }
+            }else{
+                projects.value.editor.height = '';
+            }
+            if(dom.value && dom.value.doLayout){
+                dom.value.doLayout();
+            }
+        }
+        const setChangedContent = (type,content)=>{
+            if(dom.value){
+                dom.value.setChangedContent(type,content);
+            }
+        }
         const getContent = ()=>{
             return new Promise((resolve,reject)=>{ 
                 if(!dom.value || !dom.value.getContent) resolve();
@@ -96,7 +107,7 @@ export default {
             });
         });
 
-        return {state,projects,dom,getContent,doLayout}
+        return {state,projects,dom,getContent,setChangedContent,doLayout}
     }
 }
 </script>

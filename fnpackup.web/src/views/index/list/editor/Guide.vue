@@ -30,8 +30,8 @@
 import {getCurrentInstance, nextTick, onMounted, onUnmounted, reactive, watch } from 'vue';
 import { useProjects } from '../list';
 import Editor from './Editor.vue';
-import { fetchApi, fetchWrite } from '@/api/api';
-import { ElMessage } from 'element-plus';
+import { fetchApi, fetchDelete, fetchWrite } from '@/api/api';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { useLogger } from '../../logger';
 export default {
     components:{Editor},
@@ -97,28 +97,59 @@ export default {
         }
 
         const handleCancel = () => {
-            state.show = false;
+            if(state.changeds[state.key]){
+                ElMessageBox.confirm('存在尚未保存的修改，是否保存？', '提示', {
+                    confirmButtonText: '保存关闭',
+                    cancelButtonText: '直接关闭',
+                    type: 'warning',
+                    draggable:true,
+                    customStyle: {
+                        'vertical-align':'unset'
+                    },
+                })
+                .then(()=>{
+                    handleSave().then(()=>{
+                        state.show = false;
+                    });
+                }).catch(()=>{
+                    state.show = false;
+                });
+            }else{
+                state.show = false;
+            }
         }
         const handleSave = () => {
-            state.loading = true;
-            const getContent = $this.refs[`editor-${state.key}`][0].getContent;
-            getContent().then((res)=>{   
-                fetchWrite(res.path,res.content)
-                .then(c=>c.text())
-                .then((msg)=>{
-                    if(msg){
-                        ElMessage.error('保存失败');
-                        logger.value.error(msg);
-                    }else{
-                        state.contents[state.key] = res.content;
-                        ElMessage.success('保存成功');
-                        logger.value.success(`[${res.path}]保存成功`);
-                    }
-                }).catch(()=>{
-                }).finally(()=>{
-                    state.loading = false;
+            return new Promise((resolve,reject)=>{
+                state.loading = true;
+                const _ref = $this.refs[`editor-${state.key}`][0];
+                const getContent = _ref.getContent;
+                const setChangedContent = _ref.setChangedContent;
+                getContent().then((res)=>{  
+                    fetchWrite(res.path,res.content)
+                    .then(c=>c.text())
+                    .then((msg)=>{
+                        if(msg){
+                            ElMessage.error('保存失败');
+                            logger.value.error(msg);
+                            reject();
+                        }else{
+                            state.contents[state.key] = res.content;
+                            ElMessage.success('保存成功');
+                            logger.value.success(`[${res.path}]保存成功`);
+                            if(setChangedContent && res.changed_key){
+                                setChangedContent(res.changed_key,res.content);
+                            }
+                            projects.value.load();
+                            resolve();
+                        }
+                    }).catch(()=>{
+                        reject();
+                        ElMessage.error('操作失败');
+                    }).finally(()=>{
+                        state.loading = false;
+                    });
                 });
-            });
+            })
         }
 
         const saveBtnTimer = ()=>{
@@ -130,11 +161,14 @@ export default {
                     getContent().then((res)=>{
                         state.showSave = !!res;
                         if(state.showSave){
-                            console.log(res);
                             if(!state.contents[key]){
                                 state.contents[key] = res.content;
                             }else{
-                                state.changeds[key] = res.content != state.contents[key];
+                                if(res.changed !== undefined){
+                                    state.changeds[key] = res.changed;
+                                }else{
+                                    state.changeds[key] = res.content != state.contents[key];
+                                }
                             }
                         }
                     });
