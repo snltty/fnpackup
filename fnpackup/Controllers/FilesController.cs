@@ -73,6 +73,16 @@ namespace fnpackup.Controllers
             }
 
             path = Path.Join(root, path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return new FilePageInfo
+                {
+                    P = p,
+                    Ps = ps,
+                    Count = 0,
+                };
+            }
+
             if (Directory.Exists(path) == false)
             {
                 return new FilePageInfo
@@ -92,6 +102,7 @@ namespace fnpackup.Controllers
                 Count = list.Count(),
                 List = list.Skip((p - 1) * ps).Take(ps).Select(c => new FileInfo
                 {
+                    Size = c is System.IO.FileInfo fi ? fi.Length : 0,
                     Name = c.Name,
                     If = c is System.IO.FileInfo,
                     Lwt = c.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -486,8 +497,8 @@ namespace fnpackup.Controllers
             return str.Split("\n").Select(c =>
             {
                 int index = c.IndexOf('=');
-                string key = string.Empty,value = string.Empty;
-                if(index > 0)
+                string key = string.Empty, value = string.Empty;
+                if (index > 0)
                 {
                     key = c.Substring(0, index);
                     value = c.Substring(index + 1);
@@ -620,6 +631,8 @@ namespace fnpackup.Controllers
         public string Ct { get; set; }
         public string Lwt { get; set; }
         public bool Docker { get; set; }
+
+        public long Size { get; set; }
     }
 
     public sealed class FileExistsInfo

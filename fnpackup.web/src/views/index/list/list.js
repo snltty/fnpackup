@@ -53,6 +53,19 @@ const documents = [
     {match:/(ICON|icon).*(PNG|png)$/,url:'https://developer.fnnas.com/docs/core-concepts/icon'},
 ]
 
+const sizeFormat = (size) => {
+    if(size < 1024){
+        return `${size}B`;
+    }
+    if(size < 1024*1024){
+        return `${(size/1024).toFixed(2)}KB`;
+    }
+    if(size < 1024*1024*1024){
+        return `${(size/(1024*1024)).toFixed(2)}MB`;
+    }
+    return `${(size/(1024*1024*1024)).toFixed(2)}GB`;
+}
+
 const projectsSymbol = Symbol();
 export const provideProjects = () => {
 
@@ -107,18 +120,13 @@ export const provideProjects = () => {
                 return;
             }
             
-            localStorage.setItem('projects_path', this.page.path);
-
             const arr = this.page.path.split('/');
             this.page.root = arr.length > 1 ? arr.filter((c,i)=>i<=1) : '';
             this.page.name = arr[1] || '';
 
+            localStorage.setItem('projects_path', this.page.path);
             fetchApi(`/files/get`,{
-                params:{
-                    path:this.page.path,
-                    p:this.page.p,
-                    ps:this.page.ps
-                },
+                params:{ path:this.page.path,p:this.page.p,ps:this.page.ps},
                 method:'GET',
                 headers:{'Content-Type':'application/json'}
             })
@@ -139,7 +147,7 @@ export const provideProjects = () => {
                     c.remark = paths.filter((item,index)=>index>1).join('/');
                     c.doc = (documents.filter(d=>d.match.test(c.remark))[0] || {url:''}).url;
                     c.remark = remarks[c.remark] || c.remark;
-                    
+                    c.size = c.if ? sizeFormat(c.size) : '';
                 })
                 this.page.list = json.list;
                 logger.value.success(`[${this.page.path}]文件列表加载成功，${this.page.list.length}/${this.page.count}`);
