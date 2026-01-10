@@ -1,5 +1,5 @@
 <template>
-    <div class="resource-wrap">
+    <div class="resource-wrap h-100 scrollbar">
         <el-form ref="ruleFormRef"  :model="state.ruleForm" :rules="state.rules" label-width="110">
             <ResourceDocker v-if="state.docker" :data="state.ruleForm['docker-project']['projects']"></ResourceDocker>
             <ResourceShare :data="state.ruleForm['data-share']['shares']"></ResourceShare>
@@ -18,7 +18,6 @@ import { fetchApi } from '@/api/api';
 export default {
     match:/resource$/,
     width:600,
-    height:'auto',
     props:['path','content'],
     components:{ResourceDocker,ResourceShare,ResourceLinker},
     setup (props) {
@@ -106,5 +105,6 @@ export default {
     padding:2rem;
     border:1px solid var(--main-border-color);
     border-radius:5px;
+    box-sizing:border-box;
 }
 </style>
