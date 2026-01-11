@@ -22,8 +22,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
 export default {
     match:/.*/,
-    width:600,
-    height:'auto',
+    width:800,
     components: { Codemirror },
     props:['content','path'],
     setup (props) {

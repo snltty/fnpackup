@@ -1,8 +1,9 @@
 <template>
-    <el-dialog v-model="state.show" :title="`源码编辑器[${projects.editor.remark}]`" width="50%" top="1vh" 
+    <el-dialog v-model="state.show" :title="`源码编辑器[${projects.editor.remark}]`" width="50%"
+     top="1vh" 
     :close-on-click-modal="false" :close-on-press-escape="false"  draggable class="source-dialog">
         <template v-if="state.show">
-            <template v-if="state.content">
+            <template v-if="state.content !== undefined">
                 <Source :path="state.path" :content="state.content" ref="source"></Source>
                 <div class="t-c mgt-1">
                     <el-button type="primary" @click="handleSave" :loading="state.loading">确定保存</el-button>
@@ -29,7 +30,7 @@ export default {
         const state = reactive({
             show: true,
             path: projects.value.editor.path,
-            content: '',
+            content: undefined,
             loading: false
         });
         watch(()=>state.show,(val)=>{

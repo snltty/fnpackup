@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using System.Collections.Frozen;
-using System.IO;
 using System.Net;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace fnpackup
