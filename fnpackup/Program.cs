@@ -153,12 +153,13 @@ namespace fnpackup
 
                 return Directory.GetDirectories(root).Select(dir =>
                 {
-                    Console.WriteLine($"Searching {dir}");
+                    
                     string manifest = Path.Join(dir, "manifest");
                     string path = File.Exists(manifest) == false ? string.Empty : File.ReadAllText(manifest)
                      .Split("\n")
                      .Select(line =>
                      {
+                         Console.WriteLine($"Searching {dir}->{line}");
                          string key = string.Empty, value = string.Empty;
                          if (string.IsNullOrWhiteSpace(line) == false)
                          {
@@ -169,10 +170,11 @@ namespace fnpackup
                                  value = line.Substring(index + 1).Trim();
                              }
                          }
+                         Console.WriteLine($"Searching {dir}->{key}->{value}");
                          return (key, value);
                      })
                      .Where(c => c.key == "fnpackup").Select(c => c.value).FirstOrDefault();
-
+                    Console.WriteLine($"Searching {dir}->{path}");
                     return (dir, path);
 
                 }).Where(c => string.IsNullOrWhiteSpace(c.path) == false).Select(c => new FileProviderInfo
