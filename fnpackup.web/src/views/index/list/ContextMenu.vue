@@ -48,7 +48,7 @@ import { useProjects } from './list';
 import { computed, onMounted } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { useLogger } from '../logger';
-import { fetchApi } from '@/api/api';
+import { fetchFileCreate, fetchFileDelete, fetchFileRename } from '@/api/api';
 export default {
     components: {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen,Plus,Back,ArrowRight,More,Edit},
     setup () {
@@ -58,7 +58,7 @@ export default {
 
         const canSource = computed(()=>projects.value.contextMenu.row && projects.value.contextMenu.row.if);
         const canRename = computed(()=>!!projects.value.contextMenu.row);
-        const hasInProject = computed(()=>projects.value.page.path != '.');
+        const hasInProject = computed(()=>projects.value.page.path != './');
         const handleRefresh = ()=>{
             projects.value.load();
         }
@@ -71,7 +71,7 @@ export default {
             projects.value.load();
         }
         const handleHome = ()=>{
-            projects.value.page.path = '.';
+            projects.value.page.path = './';
             projects.value.load();
         }
         const handleUpload = (mime)=>{
@@ -80,8 +80,8 @@ export default {
         }
         const handleDownload = ()=>{
             let href = process.env.NODE_ENV === 'development' 
-            ? `http://localhost:1069/files/download?path=${projects.value.page.path}`
-            : `/files/download?path=${projects.value.page.path}`;
+            ? `http://localhost:1069/file/download?path=${projects.value.page.path}`
+            : `/file/download?path=${projects.value.page.path}`;
             if(projects.value.contextMenu.row){
                 href = `${href}/${projects.value.contextMenu.row.name}`;
             }
@@ -103,11 +103,8 @@ export default {
                 if(!value) {
                     return;
                 }
-                fetchApi(`/files/createfile`,{
-                    params:{path:`${projects.value.page.path}/${value}`,f:isFile},
-                    method:'POST',
-                    headers:{'Content-Type':'application/json'},
-                }).then(res=>res.text()).then((res)=>{
+                fetchFileCreate(`${projects.value.page.path}/${value}`,isFile)
+                .then((res)=>{
                     if(res){
                         logger.value.error(res);
                     }else{
@@ -132,15 +129,9 @@ export default {
                 if(!value) {
                     return;
                 }
-                fetchApi(`/files/renamefile`,{
-                    params:{
-                        path:`${projects.value.page.path}/${projects.value.contextMenu.row.name}`,
-                        path1:`${projects.value.page.path}/${value}`,
-                        f:projects.value.contextMenu.row.if
-                    },
-                    method:'POST',
-                    headers:{'Content-Type':'application/json'},
-                }).then(res=>res.text()).then((res)=>{
+                fetchFileRename(`${projects.value.page.path}/${projects.value.contextMenu.row.name}`,
+                `${projects.value.page.path}/${value}`,
+                projects.value.contextMenu.row.if).then((res)=>{
                     if(res){
                         logger.value.error(res);
                     }else{
@@ -164,15 +155,8 @@ export default {
                     'vertical-align':'unset'
                 },
             }).then(() => {
-                fetchApi(`/files/delfile`,{
-                    params:{
-                        path:`${projects.value.page.path}/${projects.value.contextMenu.row.name}`,
-                        f:projects.value.contextMenu.row.if
-                    },
-                    method:'POST',
-                    headers:{'Content-Type':'application/json'},
-                })
-                .then(res=>res.text()).then((res)=>{
+                fetchFileDelete(`${projects.value.page.path}/${projects.value.contextMenu.row.name}`,projects.value.contextMenu.row.if)
+                .then((res)=>{
                     if(res){
                         logger.value.error(res);
                     }else{

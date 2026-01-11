@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Compression;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -7,13 +8,12 @@ using System.Text.Json;
 namespace fnpackup.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
-    public class FilesController : BaseController
+    public class ProjectController : BaseController
     {
         private readonly string root = "./projects";
 
         private readonly IHttpClientFactory httpClientFactory;
-        public FilesController(IHttpClientFactory httpClientFactory)
+        public ProjectController(IHttpClientFactory httpClientFactory)
         {
             this.httpClientFactory = httpClientFactory;
 
@@ -24,6 +24,7 @@ namespace fnpackup.Controllers
         }
 
         [HttpGet]
+        [Route("/system/version")]
         public string Version()
         {
             return $"v{string.Join(".", Assembly.GetExecutingAssembly().GetName().Version.ToString().Split('.').Take(3))}";
@@ -31,6 +32,7 @@ namespace fnpackup.Controllers
 
 
         [HttpPost]
+        [Route("/project/create")]
         public string Create([FromBody] ProjectCreateInfo info)
         {
             StringBuilder sb = new StringBuilder($"create {info.Name}");
@@ -61,336 +63,17 @@ namespace fnpackup.Controllers
             return result;
         }
         [HttpGet]
-        public FilePageInfo Get(string path = "", int p = 1, int ps = 20)
+        [Route("/project/exists")]
+        public async Task<FileExistsInfo> Exists(string name)
         {
-            return SearchProjects(path, p, ps);
-        }
-        private FilePageInfo SearchProjects(string path = "", int p = 1, int ps = 20)
-        {
-            if (Directory.Exists(root) == false)
+            return new FileExistsInfo
             {
-                Directory.CreateDirectory(root);
-            }
-
-            path = Path.Join(root, path);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
-            {
-                return new FilePageInfo
-                {
-                    P = p,
-                    Ps = ps,
-                    Count = 0,
-                };
-            }
-
-            if (Directory.Exists(path) == false)
-            {
-                return new FilePageInfo
-                {
-                    P = p,
-                    Ps = ps,
-                    Count = -1,
-                };
-            }
-
-            string fullPath = Path.GetFullPath(root);
-            var list = new DirectoryInfo(path).GetFileSystemInfos().OrderBy(item => item is System.IO.FileInfo).ThenBy(item => item.Name);
-            return new FilePageInfo
-            {
-                P = p,
-                Ps = ps,
-                Count = list.Count(),
-                List = list.Skip((p - 1) * ps).Take(ps).Select(c => new FileInfo
-                {
-                    Size = c is System.IO.FileInfo fi ? fi.Length : 0,
-                    Name = c.Name,
-                    If = c is System.IO.FileInfo,
-                    Lwt = c.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                    Ct = c.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                    Docker = System.IO.File.Exists(Path.Join(fullPath, c.FullName.Replace(fullPath, "").Split(Path.DirectorySeparatorChar)[1], "app/docker/docker-compose.yaml"))
-                }).ToList()
+                Docker = System.IO.Directory.Exists(Path.Join(root, name, "app", "docker")),
+                UI = System.IO.Directory.Exists(Path.Join(root, name, "app", "ui")),
             };
         }
-
         [HttpPost]
-        public async Task<string> CreateFile(string path, bool f = true)
-        {
-            path = Path.Join(root, path);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
-            {
-                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
-            }
-            if (f)
-            {
-                using var fs = System.IO.File.Create(path);
-            }
-            else
-            {
-                System.IO.Directory.CreateDirectory(path);
-            }
-            return string.Empty;
-        }
-        [HttpPost]
-        public async Task<string> DelFile(string path, bool f = true)
-        {
-            path = Path.Join(root, path);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
-            {
-                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
-            }
-            if (f)
-            {
-                System.IO.File.Delete(path);
-            }
-            else
-            {
-                System.IO.Directory.Delete(path, true);
-            }
-            return string.Empty;
-        }
-        [HttpPost]
-        public async Task<string> RenameFile(string path, string path1, bool f = true)
-        {
-            path = Path.Join(root, path);
-            path1 = Path.Join(root, path1);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
-            {
-                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
-            }
-            if (Path.GetFullPath(path1).StartsWith(Path.GetFullPath(root)) == false)
-            {
-                return $"Access to the path [{Path.GetFullPath(path1)}] is denied";
-            }
-            if (f)
-            {
-                System.IO.File.Move(path, path1, true);
-            }
-            else
-            {
-                System.IO.Directory.Move(path, path1);
-            }
-            return string.Empty;
-        }
-        [HttpPost]
-        public async Task<string> CopyFile(string path, string path1, bool f = true)
-        {
-            path = Path.Join(root, path);
-            path1 = Path.Join(root, path1);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
-            {
-                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
-            }
-            if (Path.GetFullPath(path1).StartsWith(Path.GetFullPath(root)) == false)
-            {
-                return $"Access to the path [{Path.GetFullPath(path1)}] is denied";
-            }
-            if (f)
-            {
-                System.IO.File.Copy(path, path1, true);
-            }
-            else
-            {
-                string error = string.Empty;
-                if (OperatingSystem.IsWindows())
-                {
-                    CommandHelper.Execute("cmd.exe", string.Empty, [
-                    $"xcopy \"{path}\" \"{path1}\" /E /I /H /Y",
-                    ], root, out error);
-                }
-                else if (OperatingSystem.IsLinux())
-                {
-                    CommandHelper.Execute("/bin/bash", string.Empty, [
-                    $"cp -rf \"{path}/.\" \"{path1}\"",
-                    ], root, out error);
-                }
-                if (string.IsNullOrWhiteSpace(error) == false)
-                {
-                    return error;
-                }
-            }
-            return string.Empty;
-        }
-        [HttpGet]
-        public async Task<string> Read(string path)
-        {
-            path = Path.Join(root, path);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false || System.IO.File.Exists(path) == false)
-            {
-                return string.Empty;
-            }
-
-            return await System.IO.File.ReadAllTextAsync(path).ConfigureAwait(false);
-        }
-        [HttpGet]
-        public async Task<IActionResult> Img(string path)
-        {
-            path = Path.Join(root, path);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false || System.IO.File.Exists(path) == false)
-            {
-                return null;
-            }
-
-            return File(await System.IO.File.ReadAllBytesAsync(path).ConfigureAwait(false), "image/png");
-        }
-
-        [HttpPost]
-        public async Task<string> Write(FileWriteInfo info)
-        {
-            string path = Path.Join(root, info.Path);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
-            {
-                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
-            }
-            if (Directory.Exists(Path.GetDirectoryName(path)) == false)
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
-            }
-
-            await System.IO.File.WriteAllTextAsync(path, info.Content.Replace("\r\n", "\n")).ConfigureAwait(false);
-            return string.Empty;
-        }
-
-        [HttpPost]
-        [DisableRequestSizeLimit]
-        [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue, ValueLengthLimit = int.MaxValue)]
-        public async Task<List<string>> Upload([FromQuery] string path, List<IFormFile> files)
-        {
-            path = Path.Join(root, path);
-            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
-            {
-                return [$"Access to the path [{Path.GetFullPath(path)}] is denied"];
-            }
-
-            if (files == null || files.Count == 0)
-            {
-                return ["请选择文件"];
-            }
-
-            foreach (var file in files)
-            {
-                var filePath = System.IO.File.Exists(path) ? path : Path.Combine(path, file.FileName);
-                if (files.Count == 1 && Path.GetExtension(filePath) == ".fpk")
-                {
-                    await DecompressFpk(file);
-                }
-                else
-                {
-                    if (Directory.Exists(Path.GetDirectoryName(filePath)) == false)
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-                    }
-
-                    if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
-
-                    using var stream = new FileStream(filePath, FileMode.Create);
-                    await file.CopyToAsync(stream);
-                }
-            }
-
-            return [];
-        }
-        private async Task DecompressFpk(IFormFile file)
-        {
-
-            string dir = Path.Join(root, Path.GetFileNameWithoutExtension(file.FileName));
-            string path = Path.Join(dir, Path.GetFileName(file.FileName));
-            if (Directory.Exists(dir))
-            {
-                return;
-            }
-            Directory.CreateDirectory(dir);
-
-            try
-            {
-                if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
-                using var stream = new FileStream(path, FileMode.Create);
-                await file.CopyToAsync(stream);
-
-                CommandHelper.Execute($"tar", $" -xvf {Path.GetFileName(file.FileName)}", [], dir, out string error);
-                Directory.CreateDirectory(Path.Join(dir, "app"));
-                CommandHelper.Execute($"tar", $" -xzvf app.tgz -C app", [], dir, out error);
-            }
-            catch (Exception)
-            {
-                if (Directory.Exists(dir))
-                {
-                    Directory.Delete(dir, true);
-                }
-            }
-            finally
-            {
-                if (System.IO.File.Exists(Path.Join(dir, "app.tgz")))
-                {
-                    System.IO.File.Delete(Path.Join(dir, "app.tgz"));
-                }
-                if (System.IO.File.Exists(path))
-                {
-                    System.IO.File.Delete(path);
-                }
-            }
-            try
-            {
-                Dictionary<string, string> manifest = await GetManifest(Path.GetFileNameWithoutExtension(file.FileName)).ConfigureAwait(false);
-                if (manifest.TryGetValue("appname", out string appname) && appname != Path.GetFileNameWithoutExtension(file.FileName))
-                {
-                    string newDir = Path.Join(root, appname);
-                    Directory.Move(dir, newDir);
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Download(string path)
-        {
-            path = Path.Join(root, path);
-            if (System.IO.File.Exists(path))
-            {
-                var stream = new FileStream(path, FileMode.Open);
-                return File(stream, "application/octet-stream", Path.GetFileName(path));
-            }
-            if (Directory.Exists(path) == false)
-            {
-                return Content("文件或文件夹不存在，如果是fpk，那可能项目文件夹名与实际appname不一致", "text/plain");
-            }
-
-
-            using (var memoryStream = new MemoryStream())
-            {
-                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                {
-                    var files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
-
-                    foreach (var file in files)
-                    {
-                        var relativePath = Path.GetRelativePath(path, file);
-                        var entry = archive.CreateEntry(relativePath, CompressionLevel.Fastest);
-                        using (var entryStream = entry.Open())
-                        {
-                            using (var fileStream = System.IO.File.OpenRead(file))
-                            {
-                                await fileStream.CopyToAsync(entryStream);
-                            }
-                        }
-                    }
-                }
-
-                memoryStream.Seek(0, SeekOrigin.Begin);
-
-                string filename = Path.GetFileName(path);
-                if (string.IsNullOrWhiteSpace(filename) || filename == ".")
-                {
-                    filename = $"fnpackup-{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}";
-                }
-                return File(memoryStream.ToArray(),
-                    "application/zip",
-                    $"{filename}.zip");
-            }
-        }
-
-        [HttpPost]
+        [Route("/project/build")]
         public async Task<List<BuildResultInfo>> Build(string name, string platform = "", string server = "app/server")
         {
             Dictionary<string, string> manifest = await GetManifest(name).ConfigureAwait(false);
@@ -427,6 +110,19 @@ namespace fnpackup.Controllers
             }
             return result;
 
+        }
+        [HttpPost]
+        [Route("/platform/empty")]
+        public async Task<bool> PlatformEmpty(string name, string platform)
+        {
+            string platformDir = Path.Join(root, name, "building", "platform", platform);
+            if (Directory.Exists(platformDir) == false)
+            {
+                return true;
+            }
+
+            ClearFile(platformDir);
+            return DirAreEmpty(platformDir);
         }
         private BuildResultInfo BuildRename(string name, Dictionary<string, string> manifest)
         {
@@ -525,22 +221,353 @@ namespace fnpackup.Controllers
         }
 
 
+
         [HttpGet]
-        public async Task<FileExistsInfo> Exists(string name)
+        [Route("/file/list")]
+        public FilePageInfo Get(string path = "", int p = 1, int ps = 20)
         {
-            return new FileExistsInfo
+            return SearchProjects(path, p, ps);
+        }
+        private FilePageInfo SearchProjects(string path = "", int p = 1, int ps = 20)
+        {
+            if (Directory.Exists(root) == false)
             {
-                Docker = System.IO.Directory.Exists(Path.Join(root, name, "app", "docker")),
-                UI = System.IO.Directory.Exists(Path.Join(root, name, "app", "ui")),
+                Directory.CreateDirectory(root);
+            }
+
+            path = Path.Join(root, path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return new FilePageInfo
+                {
+                    P = p,
+                    Ps = ps,
+                    Count = 0,
+                };
+            }
+
+            if (Directory.Exists(path) == false)
+            {
+                return new FilePageInfo
+                {
+                    P = p,
+                    Ps = ps,
+                    Count = -1,
+                };
+            }
+
+            string fullPath = Path.GetFullPath(root);
+            var list = new DirectoryInfo(path).GetFileSystemInfos().OrderBy(item => item is System.IO.FileInfo).ThenBy(item => item.Name);
+            return new FilePageInfo
+            {
+                P = p,
+                Ps = ps,
+                Count = list.Count(),
+                List = list.Skip((p - 1) * ps).Take(ps).Select(c => new FileInfo
+                {
+                    Size = c is System.IO.FileInfo fi ? fi.Length : 0,
+                    Name = c.Name,
+                    If = c is System.IO.FileInfo,
+                    Lwt = c.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    Ct = c.CreationTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    Docker = System.IO.File.Exists(Path.Join(fullPath, c.FullName.Replace(fullPath, "").Split(Path.DirectorySeparatorChar)[1], "app/docker/docker-compose.yaml"))
+                }).ToList()
             };
         }
 
+        [HttpPost]
+        [Route("/file/create")]
+        public async Task<string> CreateFile(string path, bool f = true)
+        {
+            path = Path.Join(root, path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
+            }
+            if (f)
+            {
+                using var fs = System.IO.File.Create(path);
+            }
+            else
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
+            return string.Empty;
+        }
+        [HttpPost]
+        [Route("/file/delete")]
+        public async Task<string> DelFile(string path, bool f = true)
+        {
+            path = Path.Join(root, path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
+            }
+            if (f)
+            {
+                System.IO.File.Delete(path);
+            }
+            else
+            {
+                System.IO.Directory.Delete(path, true);
+            }
+            return string.Empty;
+        }
+        [HttpPost]
+        [Route("/file/rename")]
+        public async Task<string> RenameFile(string path, string path1, bool f = true)
+        {
+            path = Path.Join(root, path);
+            path1 = Path.Join(root, path1);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
+            }
+            if (Path.GetFullPath(path1).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path1)}] is denied";
+            }
+            if (f)
+            {
+                System.IO.File.Move(path, path1, true);
+            }
+            else
+            {
+                System.IO.Directory.Move(path, path1);
+            }
+            return string.Empty;
+        }
+        [HttpPost]
+        [Route("/file/copy")]
+        public async Task<string> CopyFile(string path, string path1, bool f = true)
+        {
+            path = Path.Join(root, path);
+            path1 = Path.Join(root, path1);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
+            }
+            if (Path.GetFullPath(path1).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path1)}] is denied";
+            }
+            if (f)
+            {
+                System.IO.File.Copy(path, path1, true);
+            }
+            else
+            {
+                string error = string.Empty;
+                if (OperatingSystem.IsWindows())
+                {
+                    CommandHelper.Execute("cmd.exe", string.Empty, [
+                    $"xcopy \"{path}\" \"{path1}\" /E /I /H /Y",
+                    ], root, out error);
+                }
+                else if (OperatingSystem.IsLinux())
+                {
+                    CommandHelper.Execute("/bin/bash", string.Empty, [
+                    $"cp -rf \"{path}/.\" \"{path1}\"",
+                    ], root, out error);
+                }
+                if (string.IsNullOrWhiteSpace(error) == false)
+                {
+                    return error;
+                }
+            }
+            return string.Empty;
+        }
         [HttpGet]
+        [Route("/file/read")]
+        public async Task<string> Read(string path)
+        {
+            path = Path.Join(root, path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false || System.IO.File.Exists(path) == false)
+            {
+                return string.Empty;
+            }
+
+            return await System.IO.File.ReadAllTextAsync(path).ConfigureAwait(false);
+        }
+        [HttpPost]
+        [Route("/file/write")]
+        public async Task<string> Write(FileWriteInfo info)
+        {
+            string path = Path.Join(root, info.Path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return $"Access to the path [{Path.GetFullPath(path)}] is denied";
+            }
+            if (Directory.Exists(Path.GetDirectoryName(path)) == false)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+            }
+
+            await System.IO.File.WriteAllTextAsync(path, info.Content.Replace("\r\n", "\n")).ConfigureAwait(false);
+            return string.Empty;
+        }
+        [HttpGet]
+        [Route("/file/img")]
+        public async Task<IActionResult> Img(string path)
+        {
+            path = Path.Join(root, path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false || System.IO.File.Exists(path) == false)
+            {
+                return null;
+            }
+
+            return File(await System.IO.File.ReadAllBytesAsync(path).ConfigureAwait(false), "image/png");
+        }
+
+        [HttpPost]
+        [DisableRequestSizeLimit]
+        [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue, ValueLengthLimit = int.MaxValue)]
+        [Route("/file/upload")]
+        public async Task<List<string>> Upload([FromQuery] string path, [FromQuery] string fpk, List<IFormFile> files)
+        {
+            path = Path.Join(root, path);
+            if (Path.GetFullPath(path).StartsWith(Path.GetFullPath(root)) == false)
+            {
+                return [$"Access to the path [{Path.GetFullPath(path)}] is denied"];
+            }
+
+            if (files == null || files.Count == 0)
+            {
+                return ["请选择文件"];
+            }
+
+            foreach (var file in files)
+            {
+                var filePath = System.IO.File.Exists(path) ? path : Path.Combine(path, file.FileName);
+                if ( Path.GetExtension(filePath) == ".fpk" && string.IsNullOrWhiteSpace(fpk) == false)
+                {
+                    await DecompressFpk(file);
+                }
+                else
+                {
+                    if (Directory.Exists(Path.GetDirectoryName(filePath)) == false)
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    }
+
+                    if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+
+                    using var stream = new FileStream(filePath, FileMode.Create);
+                    await file.CopyToAsync(stream);
+                }
+            }
+
+            return [];
+        }
+        private async Task DecompressFpk(IFormFile file)
+        {
+
+            string dir = Path.Join(root, Path.GetFileNameWithoutExtension(file.FileName));
+            string path = Path.Join(dir, Path.GetFileName(file.FileName));
+            if (Directory.Exists(dir))
+            {
+                return;
+            }
+            Directory.CreateDirectory(dir);
+
+            try
+            {
+                if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+                using var stream = new FileStream(path, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                CommandHelper.Execute($"tar", $" -xvf {Path.GetFileName(file.FileName)}", [], dir, out string error);
+                Directory.CreateDirectory(Path.Join(dir, "app"));
+                CommandHelper.Execute($"tar", $" -xzvf app.tgz -C app", [], dir, out error);
+            }
+            catch (Exception)
+            {
+                if (Directory.Exists(dir))
+                {
+                    Directory.Delete(dir, true);
+                }
+            }
+            finally
+            {
+                if (System.IO.File.Exists(Path.Join(dir, "app.tgz")))
+                {
+                    System.IO.File.Delete(Path.Join(dir, "app.tgz"));
+                }
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+            }
+            try
+            {
+                Dictionary<string, string> manifest = await GetManifest(Path.GetFileNameWithoutExtension(file.FileName)).ConfigureAwait(false);
+                if (manifest.TryGetValue("appname", out string appname) && appname != Path.GetFileNameWithoutExtension(file.FileName))
+                {
+                    string newDir = Path.Join(root, appname);
+                    Directory.Move(dir, newDir);
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        [HttpGet]
+        [Route("/file/download")]
+        public async Task<IActionResult> Download(string path)
+        {
+            path = Path.Join(root, path);
+            if (System.IO.File.Exists(path))
+            {
+                var stream = new FileStream(path, FileMode.Open);
+                return File(stream, "application/octet-stream", Path.GetFileName(path));
+            }
+            if (Directory.Exists(path) == false)
+            {
+                return Content("文件或文件夹不存在，如果是fpk，那可能项目文件夹名与实际appname不一致", "text/plain");
+            }
+
+
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                {
+                    var files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+
+                    foreach (var file in files)
+                    {
+                        var relativePath = Path.GetRelativePath(path, file);
+                        var entry = archive.CreateEntry(relativePath, CompressionLevel.Fastest);
+                        using (var entryStream = entry.Open())
+                        {
+                            using (var fileStream = System.IO.File.OpenRead(file))
+                            {
+                                await fileStream.CopyToAsync(entryStream);
+                            }
+                        }
+                    }
+                }
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+
+                string filename = Path.GetFileName(path);
+                if (string.IsNullOrWhiteSpace(filename) || filename == ".")
+                {
+                    filename = $"fnpackup-{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}";
+                }
+                return File(memoryStream.ToArray(),
+                    "application/zip",
+                    $"{filename}.zip");
+            }
+        }
+
+        [HttpGet]
+        [Route("/app/list")]
         public async Task<AppCenterRespInfo> AppCenter(string name)
         {
             try
             {
-                string host = $"{(Request.Host.Host == "localhost" ? "192.168.191.192" : Request.Host.Host)}:5666";
+                string host = $"{(Request.Host.Host == "localhost" ? "192.168.191.192" : IPAddress.Loopback)}:5666";
                 string token = $"trim {(string.IsNullOrWhiteSpace(Request.Cookies["fnos-token"]) ? "R5RmaRm5TmkSWpRYP5EaW4LRz+236ZrBjKUMWPTxaXY=" : Request.Cookies["fnos-token"])}";
 
                 string[] names = (name ?? string.Empty).Split(':');

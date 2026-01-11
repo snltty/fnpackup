@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace fnpackup.Controllers
 {
     [ApiController]
-    [Route("[controller]/[action]")]
     public class StaticController : BaseController
     {
         private readonly DynamicFileProvider dynamicFileProvider;

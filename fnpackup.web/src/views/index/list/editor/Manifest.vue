@@ -76,7 +76,7 @@
 <script>
 import { onMounted, reactive, ref } from 'vue';
 import { useProjects } from '../list';
-import { fetchApi } from '@/api/api';
+import { fetchAppCenter, fetchFileRead } from '@/api/api';
 import { useLogger } from '../../logger';
 import {  QuestionFilled } from '@element-plus/icons-vue';
 
@@ -145,11 +145,8 @@ export default {
             {name: 'ctl_stop', label: '显示启动/停止功能', type: 'checkbox',default:true},
             {name: 'install_type', label: '安装类型', type: 'select',options:[{label: '应用用户', value: ' '},{label: 'root用户', value: 'root'}],default:' '},
             {name: 'install_dep_apps', label: '依赖应用列表', type: 'select',options:[],create:true,remote:true,remoteFn:(query)=>{
-                fetchApi('/files/appcenter',{
-                    params:{name:query || ''},
-                    method:'GET',
-                    headers:{'Content-Type':'application/json'},
-                }).then(res => res.json()).then(res => {
+                fetchAppCenter(query)
+                .then(res => {
                     if(res.code == 0){
                         fieldsArray.value[fieldsArray.value.findIndex(c=>c.name == 'install_dep_apps')].options = res.data.list.map(c=>{
                             return {label:c.name,value:c.appName};
@@ -159,7 +156,7 @@ export default {
                     logger.value.error(res.msg);
                 });
             },default:''},
-            {name: 'desktop_uidir', label: 'UI组件目录路径', type: 'input',default:'ui',rules:[{required: true, message: '请填写UI组件目录路径', trigger: 'blur'}]},
+            {name: 'desktop_uidir', label: 'UI组件目录路径', type: 'input',default:'ui'},
             {name: 'desktop_applaunchname', label: '应用中心启动入口',  type: 'select',options:[],default:''},
             {name: 'service_port', label: '占用端口', type: 'input',default:''},
             {name: 'checkport', label: '检查端口占用', type: 'checkbox',default:true},
@@ -201,11 +198,9 @@ export default {
         }
 
         const readUiEndpoint = ()=>{
-            fetchApi('/files/read',{
-                params:{path:`${projects.value.page.path.split('/')[1]}/app/${state.ruleForm.desktop_uidir}/config`},
-                method:'GET',
-                headers:{'Content-Type':'application/json'},
-            }).then(res => res.json()).then(res => { 
+            fetchFileRead(`${projects.value.page.path.split('/')[1]}/app/${state.ruleForm.desktop_uidir}/config`)
+            .then(res => {
+                res = JSON.parse(res); 
                 fieldsArray.value.filter(c=>c.name == 'desktop_applaunchname')[0].options = Object.keys(res['.url']).map(c=>{
                     return {label:c,value:c}
                 });
@@ -262,11 +257,8 @@ export default {
         onMounted(()=>{
             readUiEndpoint();
 
-            fetchApi('/files/appcenter',{
-                params:{names:state.ruleForm.install_dep_apps},
-                method:'GET',
-                headers:{'Content-Type':'application/json'},
-            }).then(res => res.json()).then(res => {
+            fetchAppCenter(state.ruleForm.install_dep_apps)
+            .then(res => {
                 if(res.code == 0){
                     fieldsArray.value[fieldsArray.value.findIndex(c=>c.name == 'install_dep_apps')].options = res.data.list.map(c=>{
                         return {label:c.name,value:c.appName};

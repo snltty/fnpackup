@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { fetchApi } from '@/api/api';
+import { fetchSystemVersion } from '@/api/api';
 import { Moon, Sunny } from '@element-plus/icons-vue';
 import { computed, onMounted, reactive} from 'vue';
 import { useRouter } from 'vue-router';
@@ -55,7 +55,7 @@ export default {
 
         onMounted(()=>{
             setMode();
-            fetchApi('/files/version').then(c=>c.text()).then(res=>{
+            fetchSystemVersion().then(res=>{
                 state.version = res;
             })
         })

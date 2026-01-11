@@ -31,7 +31,7 @@ import { reactive, ref, watch } from 'vue';
 import {Plus,Refresh} from '@element-plus/icons-vue'
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
-import { fetchApi } from '@/api/api';
+import { fetchProjectCreate } from '@/api/api';
 export default {
     props: ['modelValue'],
     emits: ['update:modelValue'],
@@ -67,11 +67,8 @@ export default {
             ruleFormRef.value.validate(valid => {
                 if (valid) {
                     state.loading = true;
-                    fetchApi(`/files/create`,{
-                        method:'POST',
-                        headers:{'Content-Type':'application/json'},
-                        body:JSON.stringify(state.createForm)
-                    }).then(res => res.text()).then(res => {
+                    fetchProjectCreate(state.createForm)
+                    .then(res => {
                         state.loading = false;
                         if(res && res.indexOf('Success! Created')<0){
                             logger.value.error(res);

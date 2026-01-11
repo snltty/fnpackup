@@ -14,7 +14,7 @@ import ResourceDocker from './ResourceDocker.vue';
 import ResourceShare from './ResourceShare.vue';
 import ResourceLinker from './ResourceLinker.vue';
 import { useProjects } from '../list';
-import { fetchApi } from '@/api/api';
+import { fetchProjectExists } from '@/api/api';
 export default {
     match:/resource$/,
     width:600,
@@ -80,11 +80,8 @@ export default {
         }
 
         const getExists = () => {
-            fetchApi(`/files/exists`,{
-                params:{name:root[1]},
-                method:'GET',
-                headers:{'Content-Type':'application/json'},
-            }).then(res => res.json()).then(res => {
+            fetchProjectExists(root[1])
+            .then(res => {
                 state.docker = res.docker;
             });
         }

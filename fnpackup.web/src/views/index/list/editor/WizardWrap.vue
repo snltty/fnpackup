@@ -21,7 +21,7 @@ import { getCurrentInstance, onMounted,  onUnmounted,  reactive } from 'vue';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
 import Wizard from './Wizard.vue';
-import {fetchRead } from '@/api/api';
+import {fetchFileRead } from '@/api/api';
 
 export default {
     match:/\/wizard/,
@@ -66,7 +66,8 @@ export default {
             return new Promise((resolve,reject)=>{ 
                 state.loading = true;
                 state.paths[state.paths.length-1] = type;
-                fetchRead(state.paths.join('/')).then(res => res.text()).then(res => {
+                fetchFileRead(state.paths.join('/'))
+                .then(res => {
                     state.loading = false;
                     state.contents[type] = res || '[]'; 
                     resolve();

@@ -22,7 +22,7 @@
 import { getCurrentInstance, onMounted,  onUnmounted,  reactive } from 'vue';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
-import { fetchRead } from '@/api/api';
+import { fetchFileRead } from '@/api/api';
 import Source from './Source.vue';
 export default {
     match:/\/cmd/,
@@ -72,8 +72,8 @@ export default {
         const loadContent = (type)=>{
             return new Promise((resolve,reject)=>{ 
                 state.loading = true;
-                fetchRead(`${state.root}/${type}`)
-                .then(res => res.text()).then(res => {
+                fetchFileRead(`${state.root}/${type}`)
+                .then(res => {
                     state.loading = false;
                     state.contents[type] = res || '[]';
                     resolve();

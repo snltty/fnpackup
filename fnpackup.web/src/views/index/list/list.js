@@ -1,6 +1,6 @@
 import { inject, provide, ref, watch } from "vue";
 import { useLogger } from "../logger";
-import { fetchApi } from "@/api/api";
+import { fetchFileList } from "@/api/api";
 
 
 const remarks = {
@@ -125,12 +125,7 @@ export const provideProjects = () => {
             this.page.name = arr[1] || '';
 
             localStorage.setItem('projects_path', this.page.path);
-            fetchApi(`/files/get`,{
-                params:{ path:this.page.path,p:this.page.p,ps:this.page.ps},
-                method:'GET',
-                headers:{'Content-Type':'application/json'}
-            })
-            .then(res=>res.json())
+            fetchFileList(this.page.path,this.page.p,this.page.ps)
             .then(json=>{
 
                 if(json.count === -1 && this.page.path !== './'){

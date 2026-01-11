@@ -50,27 +50,124 @@ export const xhrApi = (url,params,data,progressFn) => {
     });
 }
 
-export const fetchRead = (path) => {
-    return fetchApi(`/files/read`,{
+export const fetchSystemVersion = () => {
+    return fetchApi('/system/version',{
+        method:'GET',
+        headers:{'Content-Type':'application/json'}
+    }).then(c=>c.text());
+}
+
+export const fetchProjectCreate = (data) => { 
+    return fetchApi(`/project/create`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(data)
+    }).then(res => res.text());
+}
+export const fetchProjectExists = (name) => { 
+    return fetchApi(`/project/exists`,{
+        params:{name:name},
+        method:'GET',
+        headers:{'Content-Type':'application/json'},
+    }).then(res => res.json());
+}
+export const fetchProjectBuild = (name,platform,server) => { 
+    return fetchApi(`/project/build`,{
+        params:{name:name,platform:platform,server:server},
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+    }).then(res => res.json());
+}
+
+
+export const fetchFileList = (path,p,ps) => { 
+    return fetchApi(`/file/list`,{
+        params:{
+            path:path,
+            p:p,
+            ps:ps
+        },
+        method:'GET',
+        headers:{'Content-Type':'application/json'},
+    }).then(res=>res.json());
+}
+export const fetchFileCreate = (path,f)=>{
+    fetchApi(`/file/create`,{
+        params:{path:path,f:f},
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+    }).then(res=>res.text());
+}
+export const fetchFileRename = (path,path1,f) => { 
+    return fetchApi(`/file/rename`,{
+        params:{
+            path:path,
+            path1:path1,
+            f:f
+        },
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+    }).then(res=>res.text());
+}
+export const fetchFileDelete = (path,f) => { 
+    return fetchApi(`/file/delete`,{
+        params:{
+            path:path,
+            f:f
+        },
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+    }).then(res=>res.text());
+}
+export const fetchFileRead = (path) => {
+    return fetchApi(`/file/read`,{
         params:{path:path},
         method:'GET',
         headers:{'Content-Type':'application/json'},
-    });
+    }).then(res => res.text());
 }
-export const fetchWrite = (path,content) => { 
-    return fetchApi(`/files/write`,{
+export const fetchFileWrite = (path,content) => { 
+    return fetchApi(`/file/write`,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
             path:path,
             content:content
         })
-    });
+    }).then(c=>c.text());
 }
-export const fetchDelete = (path,f) => { 
-    return fetchApi(`/files/delfile`,{
-        params:{ path:path, f:f},
+export const fetchFileUpload = (path,fpk,formData,progressFn) => { 
+    return xhrApi(`/file/upload`,{path:path,fpk:fpk},formData,progressFn);
+}
+
+
+export const fetchPlatform = (name,platform) => { 
+    return fetchApi(`/platform/empty`,{
+        params:{name:name,platform:platform},
         method:'POST',
         headers:{'Content-Type':'application/json'}
+    }).then(c=>c.text());
+}
+
+
+export const fetchAppCenter = (name) => { 
+    return fetchApi('/app/list',{
+        params:{name:name || ''},
+        method:'GET',
+        headers:{'Content-Type':'application/json'},
+    }).then(res => res.json());
+}
+
+
+export const fetchStaticList = () => { 
+    return fetchApi('/static/list',{
+        method:'GET',
+        headers:{'Content-Type':'application/json'},
+    }).then(res => res.json());
+}
+export const fetchStaticSearch = () => { 
+    return fetchApi('/static/search',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
     });
 }

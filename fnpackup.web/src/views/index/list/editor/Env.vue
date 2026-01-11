@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { fetchApi } from '@/api/api';
+import { fetchFileRead } from '@/api/api';
 import { onMounted, reactive } from 'vue';
 import { useProjects } from '../list';
 
@@ -227,11 +227,8 @@ export default {
         });
 
         const getManifest = () => {
-            fetchApi(`/files/read`,{
-                params:{path:`./${name}/manifest`},
-                method:'GET',
-                headers:{'Content-Type':'application/json'},
-            }).then(res=>res.text()).then((res)=>{
+            fetchFileRead(`./${name}/manifest`)
+            .then((res)=>{
                 state.manifest = res.split('\n').reduce((arr,item)=>{
                     const index = item.indexOf('=');
                     if(index>0){
@@ -245,12 +242,9 @@ export default {
         }
         const getWizard = (filename,title) => {
             return new Promise((resolve,reject)=>{
-                fetchApi(`/files/read`,{
-                    params:{path:`./${name}/wizard/${filename}`},
-                    method:'GET',
-                    headers:{'Content-Type':'application/json'},
-                }).then(res=>res.json()).then((res)=>{
-                    resolve(res.map(c=>{
+                fetchFileRead(`./${name}/wizard/${filename}`)
+                .then((res)=>{
+                    resolve(JSON.parse(res).map(c=>{
                         return {title:`${title}-${c.stepTitle}`,items:c.items.map(c=>{
                             return {
                                 label:c.label,

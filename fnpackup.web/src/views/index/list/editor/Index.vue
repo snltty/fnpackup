@@ -28,7 +28,7 @@
 import {getCurrentInstance, onMounted, onUnmounted, reactive,watch } from 'vue';
 import { useProjects } from '../list';
 import Editor from './Editor.vue';
-import { fetchWrite } from '@/api/api';
+import { fetchFileWrite } from '@/api/api';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useLogger } from '../../logger';
 export default {
@@ -85,8 +85,7 @@ export default {
                 const setChangedContent = _ref.setChangedContent;
 
                 getContent().then((res)=>{   
-                    fetchWrite(res.path,res.content)
-                    .then(c=>c.text())
+                    fetchFileWrite(res.path,res.content)
                     .then((msg)=>{
                         if(msg){
                             ElMessage.error('保存失败');

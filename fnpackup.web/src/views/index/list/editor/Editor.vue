@@ -9,7 +9,7 @@ import { markRaw, nextTick, onMounted, reactive, ref } from 'vue';
 import Source from './Source.vue';
 import { useProjects } from '../list';
 import { useLogger } from '../../logger';
-import { fetchRead } from '@/api/api';
+import { fetchFileRead } from '@/api/api';
 import Manifest from './Manifest.vue';
 import IconWrap from './IconWrap.vue';
 import Privilege from './Privilege.vue';
@@ -56,8 +56,8 @@ export default {
         const loadContent = ()=>{
             return new Promise((resolve,reject)=>{ 
                 state.loading = true;
-                fetchRead(state.path)
-                .then(res => res.text()).then(res => {
+                fetchFileRead(state.path)
+                .then(res => {
                     state.loading = false;
                     state.content = res;
                     resolve();

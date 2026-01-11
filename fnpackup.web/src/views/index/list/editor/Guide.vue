@@ -30,7 +30,7 @@
 import {getCurrentInstance, nextTick, onMounted, onUnmounted, reactive, watch } from 'vue';
 import { useProjects } from '../list';
 import Editor from './Editor.vue';
-import { fetchApi, fetchDelete, fetchWrite } from '@/api/api';
+import { fetchFileWrite, fetchProjectExists } from '@/api/api';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useLogger } from '../../logger';
 export default {
@@ -75,11 +75,8 @@ export default {
         });
 
         const getExists = () => {
-            fetchApi(`/files/exists`,{
-                params:{name:root[1]},
-                method:'GET',
-                headers:{'Content-Type':'application/json'},
-            }).then(res => res.json()).then(res => {
+            fetchProjectExists(root[1])
+            .then(res => {
                 for(let j in res){
                     state.tabs.filter(c=>c.exists_key == j).forEach(c=>{
                         c.exists = res[j];
@@ -125,8 +122,7 @@ export default {
                 const getContent = _ref.getContent;
                 const setChangedContent = _ref.setChangedContent;
                 getContent().then((res)=>{  
-                    fetchWrite(res.path,res.content)
-                    .then(c=>c.text())
+                    fetchFileWrite(res.path,res.content)
                     .then((msg)=>{
                         if(msg){
                             ElMessage.error('保存失败');

@@ -58,7 +58,7 @@
 import { nextTick, onMounted, reactive, ref } from 'vue';
 import { useLogger } from '../../logger';
 import { ElMessage, ElNotification } from 'element-plus';
-import { xhrApi } from '@/api/api';
+import { fetchFileUpload, xhrApi } from '@/api/api';
 import { useProjects } from '../list';
 
 export default {
@@ -138,7 +138,7 @@ export default {
                 formData.append('files', file);
 
                 state.process.progress = `0%`;
-                xhrApi(`/files/upload`,{path:fileObj.path},formData,(progress)=>{
+                fetchFileUpload(fileObj.path,'',formData,(progress)=>{
                     state.process.progress = `${progress.toFixed(2)}%`;
                 }).then((res)=>{
                     if(res.length > 0){
@@ -178,8 +178,8 @@ export default {
 
         const loadIcon = () => { 
             const url = process.env.NODE_ENV==='development' 
-                ? `http://localhost:1069/files/img?path=${props.path}&t=${state.version}`
-                : `/files/img?path=${props.path}&t=${state.version}`;
+                ? `http://localhost:1069/file/img?path=${props.path}&t=${state.version}`
+                : `/file/img?path=${props.path}&t=${state.version}`;
 
             const image = new Image();
             image.crossOrigin = 'anonymous';

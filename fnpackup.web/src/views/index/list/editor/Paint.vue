@@ -254,7 +254,7 @@ import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useProjects } from '../list';
 import { ArrowDown, DeleteFilled } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
-import { fetchApi, xhrApi } from '@/api/api';
+import { fetchFileRead, fetchFileUpload, fetchFileWrite, xhrApi } from '@/api/api';
 import { useLogger } from '../../logger';
 export default {
     components: {DeleteFilled,ArrowDown},
@@ -581,11 +581,8 @@ export default {
 
         const loadSvg = ()=>{ 
             state.loading = true;
-            fetchApi(`/files/read`,{
-                params:{path:path},
-                method:'GET',
-                headers:{'Content-Type':'application/json'},
-            }).then(c=>c.text()).then((res)=>{
+            fetchFileRead(path)
+            .then((res)=>{
                 state.svg = JSON.parse(res || JSON.stringify(defaultSvg)); 
             }).catch((e)=>{
                 logger.value.error(`${e}`);
@@ -599,14 +596,8 @@ export default {
         }
         const handleSaveSvg = ()=>{ 
             state.loading = true;
-            fetchApi(`/files/write`,{
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({
-                    path:path,
-                    content:JSON.stringify(state.svg,null,2)
-                })
-            }).then(res => res.text()).then(res => {
+            fetchFileWrite(path,JSON.stringify(state.svg,null,2))
+            .then(res => {
                 if(res){
                     logger.value.error(res);
                 }else{
@@ -696,7 +687,7 @@ export default {
                 formData.append('files', file);
 
                 state.process.progress = `0%`;
-                xhrApi(`/files/upload`,{path:fileObj.path},formData,(progress)=>{
+                fetchFileUpload(fileObj.path,'',formData,(progress)=>{
                     state.process.progress = `${progress.toFixed(2)}%`;
                 }).then((res)=>{
                     if(res.length > 0){

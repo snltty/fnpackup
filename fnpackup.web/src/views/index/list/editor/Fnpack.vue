@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { fetchApi } from '@/api/api';
+import { fetchFileList, fetchFileRead, fetchFileWrite, fetchProjectBuild } from '@/api/api';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
 import { ElMessage, ElNotification } from 'element-plus';
@@ -73,8 +73,8 @@ export default {
 
         const download = (projectName,name)=>{
             let href = process.env.NODE_ENV === 'development' 
-            ? `http://localhost:1069/files/download?path=./${projectName}/${name}`
-            : `/files/download?path=./${projectName}/${name}`;
+            ? `http://localhost:1069/file/download?path=./${projectName}/${name}`
+            : `/file/download?path=./${projectName}/${name}`;
             const a = document.createElement('a');
             a.target='_blank';
             a.href = href;
@@ -84,10 +84,9 @@ export default {
         }
         const loadSettings = ()=>{
             return new Promise((resolve,reject)=>{ 
-                fetchApi(`/files/read`,{
-                    params:{path:`./${name}/building/settings.json`},
-                    method:'GET',
-                }).then(res=>res.json()).then(res=>{
+                fetchFileRead(`./${name}/building/settings.json`)
+                .then(res=>{
+                    res = JSON.parse(res);
                     if(res){
                         state.platform = res.platform || false;
                         state.server = res.server || 'app/server/';
@@ -102,19 +101,12 @@ export default {
             
         }
         const saveSettings = ()=>{
-            fetchApi(`/files/write`,{
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({
-                    path:`./${name}/building/settings.json`,
-                    content:JSON.stringify({
-                        platform:state.platform || false,
-                        server:state.server || 'app/server/',
-                        download:state.download || false,
-                        platforms:state.platforms || []
-                    },null,2)
-                })
-            }).then(()=>{}).catch(()=>{});
+            fetchFileWrite(`./${name}/building/settings.json`,JSON.stringify({
+                platform:state.platform || false,
+                server:state.server || 'app/server/',
+                download:state.download || false,
+                platforms:state.platforms || []
+            },null,2)).then(()=>{}).catch(()=>{});
         }
 
         const handleBuild = async ()=>{
@@ -126,11 +118,8 @@ export default {
             }
             state.loading = true;
             logger.value.debug('开始打包...');
-            fetchApi(`/files/build`,{
-                params:{name:name,platform:state.platform ? state.platforms.join(','):'',server:state.server},
-                method:'POST',
-                headers:{'Content-Type':'application/json'},
-            }).then(res=>res.json()).then(async (res)=>{
+            fetchProjectBuild(name,state.platform ? state.platforms.join(','):'',state.server)
+            .then(async (res)=>{
                 res.forEach(c=>{
                     if(c.msg.indexOf('Packing successfully')>=0){
                         logger.value.success(c.msg);
@@ -165,11 +154,7 @@ export default {
         }
 
         const loadPlatforms = ()=>{
-            fetchApi(`/files/get`,{
-                params:{path:`./${name}/building/platform/`,p:1,ps:100},
-                method:'GET',
-                headers:{'Content-Type':'application/json'},
-            }).then(res=>res.json())
+            fetchFileList(`./${name}/building/platform/`,1,100)
             .then((res)=>{
                 state.platformNames = res.list.filter(c=>c.if==false).map(c=>c.name);
                 if(state.platforms.length == 0){

@@ -17,7 +17,7 @@
 import {onMounted, reactive, ref, watch } from 'vue';
 import { useProjects } from '../list';
 import Source from './Source.vue';
-import { fetchRead, fetchWrite } from '@/api/api';
+import { fetchFileRead, fetchFileWrite } from '@/api/api';
 import { useLogger } from '../../logger';
 import { ElMessage } from 'element-plus';
 export default {
@@ -45,8 +45,8 @@ export default {
         const handleSave = ()=>{
             source.value.getContent().then((res)=>{
                 state.loading = true;
-                fetchWrite(res.path,res.content)
-                .then(res => res.text()).then(res => {
+                fetchFileWrite(res.path,res.content)
+                .then(res => {
                     state.loading = false;
                     if(res){
                         logger.value.error(res);
@@ -66,8 +66,8 @@ export default {
         const loadContent = ()=>{
             return new Promise((resolve,reject)=>{ 
                 state.loading = true;
-                fetchRead(state.path)
-                .then(res => res.text()).then(res => {
+                fetchFileRead(state.path)
+                .then(res => {
                     state.loading = false;
                     state.content = res;
                     resolve();

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { fetchApi } from '@/api/api';
+import {fetchStaticList, fetchStaticSearch } from '@/api/api';
 import { Refresh } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { onMounted, reactive} from 'vue';
@@ -44,7 +44,7 @@ export default {
         const getList = () => { 
             return new Promise((resolve,reject)=>{ 
                 state.loading = true;
-                fetchApi('/static/list',{method:'get'}).then(c=>c.json())
+                fetchStaticList()
                 .then(res=>{
                     state.list = res;
                 }).finally(()=>{
@@ -56,7 +56,7 @@ export default {
         const search = () => { 
             return new Promise((resolve,reject)=>{ 
                 state.loading = true;
-                fetchApi('/static/search',{method:'post'}).then(res=>{
+                fetchStaticSearch().then(res=>{
 
                 }).finally(()=>{
                     state.loading = false;

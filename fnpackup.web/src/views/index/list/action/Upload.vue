@@ -13,8 +13,7 @@
                         <el-button plain @click="triggerSelectFolder"><el-icon><Folder /></el-icon>上传文件夹</el-button>
                     </p>
                     <p v-if="projects.editor.mime != '.fpk'">点击选择或拖拽文件/文件夹到此处</p>
-                    <p v-if="projects.editor.mime != '.fpk'">上传单个.fpk文件视为导入应用</p>
-                    <p v-if="projects.editor.mime == '.fpk'">上传单个.fpk文件导入应用</p>
+                    <p v-if="projects.editor.mime == '.fpk'">上传.fpk文件导入应用</p>
                 </template>
             </div>
             <div class="drag" v-if="state.draging"></div>
@@ -29,7 +28,7 @@ import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 import {Plus,Refresh,Document,Folder} from '@element-plus/icons-vue'
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
-import {xhrApi} from '@/api/api'
+import {fetchFileUpload, xhrApi} from '@/api/api'
 import { ElMessage, ElNotification } from 'element-plus';
 export default {
     props: ['modelValue'],
@@ -85,7 +84,7 @@ export default {
                 const formData = new FormData();
                 formData.append('files', fileObj.file);
                 state.process.progress = `0%`;
-                xhrApi(`/files/upload`,{path:fileObj.path},formData,(progress)=>{
+                fetchFileUpload(fileObj.path,projects.value.editor.mime == '.fpk' ? 'true':'',formData,(progress)=>{
                     state.process.progress = `${progress.toFixed(2)}%`;
                 }).then((res)=>{
                     if(res.length > 0){
