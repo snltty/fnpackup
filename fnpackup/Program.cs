@@ -184,8 +184,9 @@ namespace fnpackup
                     FileProvider = new PhysicalFileProvider(Path.Join(c.dir, "target", c.path))
                 }).ToList();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
             }
             return [];
         }
