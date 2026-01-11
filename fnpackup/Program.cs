@@ -153,6 +153,7 @@ namespace fnpackup
 
                 return Directory.GetDirectories(root).Select(dir =>
                 {
+                    Console.WriteLine($"Searching {dir}");
                     string manifest = Path.Join(dir, "manifest");
                     string path = File.Exists(manifest) == false ? string.Empty : File.ReadAllText(manifest)
                      .Split("\n")
@@ -166,7 +167,6 @@ namespace fnpackup
                              {
                                  key = line.Substring(0, index).Trim();
                                  value = line.Substring(index + 1).Trim();
-
                              }
                          }
                          return (key, value);
