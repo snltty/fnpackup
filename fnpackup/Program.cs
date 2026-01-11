@@ -178,12 +178,13 @@ namespace fnpackup
 
                 });
 
-                return dirs.Where(c => string.IsNullOrWhiteSpace(c.path) == false).Select(c => new FileProviderInfo
-                {
-                    Name = Path.GetFileName(c.dir),
-                    Root = Path.Join(c.dir, "target", c.path),
-                    FileProvider = new PhysicalFileProvider(Path.Join(c.dir, "target", c.path))
-                }).ToList();
+                return dirs.Where(c => string.IsNullOrWhiteSpace(c.path) == false && Directory.Exists(Path.Join(c.dir, "target", c.path)))
+                    .Select(c => new FileProviderInfo
+                    {
+                        Name = Path.GetFileName(c.dir),
+                        Root = Path.Join(c.dir, "target", c.path),
+                        FileProvider = new PhysicalFileProvider(Path.Join(c.dir, "target", c.path))
+                    }).ToList();
             }
             catch (Exception ex)
             {
