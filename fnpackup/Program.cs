@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using System.Collections.Frozen;
+using System.IO;
 using System.Net;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace fnpackup
@@ -151,15 +153,14 @@ namespace fnpackup
                     return [];
                 }
 
-                return Directory.GetDirectories(root).Select(dir =>
+                var dirs = Directory.GetDirectories(root).Select(dir =>
                 {
-                    
+
                     string manifest = Path.Join(dir, "manifest");
                     string path = File.Exists(manifest) == false ? string.Empty : File.ReadAllText(manifest)
                      .Split("\n")
                      .Select(line =>
                      {
-                         Console.WriteLine($"Searching {dir}->{line}");
                          string key = string.Empty, value = string.Empty;
                          if (string.IsNullOrWhiteSpace(line) == false)
                          {
@@ -170,14 +171,14 @@ namespace fnpackup
                                  value = line.Substring(index + 1).Trim();
                              }
                          }
-                         Console.WriteLine($"Searching {dir}->{key}->{value}");
                          return (key, value);
                      })
                      .Where(c => c.key == "fnpackup").Select(c => c.value).FirstOrDefault();
-                    Console.WriteLine($"Searching {dir}->{path}");
                     return (dir, path);
 
-                }).Where(c => string.IsNullOrWhiteSpace(c.path) == false).Select(c => new FileProviderInfo
+                });
+
+                return dirs.Where(c => string.IsNullOrWhiteSpace(c.path) == false).Select(c => new FileProviderInfo
                 {
                     Name = Path.GetFileName(c.dir),
                     Root = Path.Join(c.dir, "target", c.path),
@@ -186,7 +187,7 @@ namespace fnpackup
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex);
             }
             return [];
         }
