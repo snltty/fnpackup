@@ -76,7 +76,7 @@
 <script>
 import { onMounted, reactive, ref } from 'vue';
 import { useProjects } from '../list';
-import { fetchAppCenter, fetchFileRead } from '@/api/api';
+import { fetchAppCenter, fetchFileRead, fetchProjectExists } from '@/api/api';
 import { useLogger } from '../../logger';
 import {  QuestionFilled } from '@element-plus/icons-vue';
 
@@ -200,6 +200,7 @@ export default {
         const readUiEndpoint = ()=>{
             fetchFileRead(`${projects.value.page.path.split('/')[1]}/app/${state.ruleForm.desktop_uidir}/config`)
             .then(res => {
+                if(!res) return;
                 res = JSON.parse(res); 
                 fieldsArray.value.filter(c=>c.name == 'desktop_applaunchname')[0].options = Object.keys(res['.url']).map(c=>{
                     return {label:c,value:c}
@@ -256,7 +257,7 @@ export default {
 
         onMounted(()=>{
             readUiEndpoint();
-
+            
             fetchAppCenter(state.ruleForm.install_dep_apps)
             .then(res => {
                 if(res.code == 0){
@@ -266,6 +267,13 @@ export default {
                     return;
                 }
                 logger.value.error(res.msg);
+            });
+            
+            fetchProjectExists().then(res=>{
+                if(res.ui == false){
+                    state.ruleForm.desktop_uidir = contentJson.desktop_uidir || '';
+                    state.ruleForm.desktop_applaunchname = contentJson.desktop_applaunchname || '';
+                }
             });
         })
     

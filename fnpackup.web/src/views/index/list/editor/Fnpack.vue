@@ -1,6 +1,6 @@
 <template>
     <div class="fnpack-wrap h-100">
-        <el-descriptions :column="1" size="small" border class="w-100" :label-width="80">
+        <el-descriptions :column="1" size="small" border class="w-100" :label-width="70">
             <el-descriptions-item label="发布模式">
                 <el-switch v-model="state.platform" active-text="多平台" inactive-text="单平台"/>
             </el-descriptions-item>
@@ -20,10 +20,12 @@
                 <el-descriptions-item label="目标路径">
                     <el-input v-model="state.server"></el-input>
                 </el-descriptions-item>
-                <el-descriptions-item label="说明">
+                <el-descriptions-item label="多平台">
                     <div>
                         <p>
-                            新建对应平台的文件夹，如 building/platform/arm、building/platform/x86，打包时会先清空[{{state.server}}]，再复制对应目录下的文件到[{{state.server}}]，如果文件夹为空则不清空不复制，仅打包
+                            在building/platform下新建x86、arm等对应文件夹<br/>
+                            打包时会先清空[{{state.server}}]，再复制文件到[{{state.server}}]<br/>
+                            如果文件夹为空则不清空不复制，仅打包
                         </p>
                     </div>
                 </el-descriptions-item>
@@ -35,11 +37,12 @@
                     </div>
                 </el-descriptions-item>
             </template>
-            <el-descriptions-item label="下载">
-                <el-checkbox label="打包后下载" v-model="state.download" />
-            </el-descriptions-item>
             <el-descriptions-item>
-                <el-button class="mgl-1" plain type="primary" @click="handleBuild" :loading="state.loading">开始打包</el-button>
+                <div class="flex">
+                    <el-button plain type="primary" @click="handleBuild" :loading="state.loading">开始打包</el-button>
+                    <span class="flex-1"></span>
+                    <el-checkbox label="打包后下载" v-model="state.download" />
+                </div>
             </el-descriptions-item>
         </el-descriptions>
     </div>
