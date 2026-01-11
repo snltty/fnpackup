@@ -309,7 +309,6 @@ namespace fnpackup.Controllers
                 CommandHelper.Execute($"tar", $" -xvf {Path.GetFileName(file.FileName)}", [], dir, out string error);
                 Directory.CreateDirectory(Path.Join(dir, "app"));
                 CommandHelper.Execute($"tar", $" -xzvf app.tgz -C app", [], dir, out error);
-
             }
             catch (Exception)
             {
@@ -328,6 +327,18 @@ namespace fnpackup.Controllers
                 {
                     System.IO.File.Delete(path);
                 }
+            }
+            try
+            {
+                Dictionary<string, string> manifest = await GetManifest(Path.GetFileNameWithoutExtension(file.FileName)).ConfigureAwait(false);
+                if (manifest.TryGetValue("appname", out string appname) && appname != Path.GetFileNameWithoutExtension(file.FileName))
+                {
+                    string newDir = Path.Join(root, appname);
+                    Directory.Move(dir, newDir);
+                }
+            }
+            catch (Exception)
+            {
             }
         }
 
