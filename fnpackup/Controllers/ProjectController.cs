@@ -570,6 +570,8 @@ namespace fnpackup.Controllers
                 string token = $"trim {Request.Cookies["fnos-token"]}";
                 string cookie = Request.Headers["Cookie"];
 
+                Console.WriteLine(host);
+
                 string[] names = (name ?? string.Empty).Split(':');
                 if (names.Length > 1)
                 {
