@@ -582,11 +582,11 @@ namespace fnpackup.Controllers
                 return new AppCenterRespInfo
                 {
                     Code = 1,
-                    Msg = ex.Message
+                    Msg = $"{ex}"
                 };
             }
         }
-        private async Task<AppCenterRespInfo> Search(string host, string token,string cookie, string[] names)
+        private async Task<AppCenterRespInfo> Search(string host, string token, string cookie, string[] names)
         {
             AppCenterRespInfo finalResp = new AppCenterRespInfo
             {
@@ -607,7 +607,7 @@ namespace fnpackup.Controllers
             }
             return finalResp;
         }
-        private async Task<AppCenterRespInfo> Search(string host, string token,string cookie, string name)
+        private async Task<AppCenterRespInfo> Search(string host, string token, string cookie, string name)
         {
             using var client = httpClientFactory.CreateClient();
 
@@ -616,9 +616,15 @@ namespace fnpackup.Controllers
             {
                 url = $"{host}app-center/v1/app/search?keyword={name}&language=zh";
             }
+
+            Console.WriteLine(url);
+            Console.WriteLine(token);
+            Console.WriteLine(cookie);
+
             client.DefaultRequestHeaders.Add("Authorization", token);
             client.DefaultRequestHeaders.Add("Referer", host);
-            client.DefaultRequestHeaders.Add("Cookie", cookie);
+            if (string.IsNullOrWhiteSpace(cookie) == false)
+                client.DefaultRequestHeaders.Add("Cookie", cookie);
             client.DefaultRequestHeaders.Add("User-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36");
             HttpResponseMessage resp = await client.GetAsync(url);
 
