@@ -11,11 +11,8 @@ namespace fnpackup.Controllers
     {
         private readonly string root = "./projects";
 
-        private readonly IHttpClientFactory httpClientFactory;
-        public ProjectController(IHttpClientFactory httpClientFactory)
+        public ProjectController()
         {
-            this.httpClientFactory = httpClientFactory;
-
             if (Directory.Exists(root) == false)
             {
                 Directory.CreateDirectory(root);
@@ -609,7 +606,7 @@ namespace fnpackup.Controllers
         }
         private async Task<AppCenterRespInfo> Search(string host, string token, string cookie, string name)
         {
-            using var client = httpClientFactory.CreateClient();
+            using HttpClient client = new HttpClient();
 
             string url = $"{host}app-center/v1/app/list?language=zh";
             if (string.IsNullOrWhiteSpace(name) == false)
