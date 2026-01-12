@@ -439,7 +439,7 @@ namespace fnpackup.Controllers
             foreach (var file in files)
             {
                 var filePath = System.IO.File.Exists(path) ? path : Path.Combine(path, file.FileName);
-                if ( Path.GetExtension(filePath) == ".fpk" && string.IsNullOrWhiteSpace(fpk) == false)
+                if (Path.GetExtension(filePath) == ".fpk" && string.IsNullOrWhiteSpace(fpk) == false)
                 {
                     await DecompressFpk(file);
                 }
@@ -567,8 +567,8 @@ namespace fnpackup.Controllers
         {
             try
             {
-                string host = $"{(Request.Host.Host == "localhost" ? "192.168.191.192" : IPAddress.Loopback)}:5666";
-                string token = $"trim {(string.IsNullOrWhiteSpace(Request.Cookies["fnos-token"]) ? "R5RmaRm5TmkSWpRYP5EaW4LRz+236ZrBjKUMWPTxaXY=" : Request.Cookies["fnos-token"])}";
+                string host = Request.Headers["Referer"];
+                string token = $"trim {Request.Cookies["fnos-token"]}";
 
                 string[] names = (name ?? string.Empty).Split(':');
                 if (names.Length > 1)
@@ -611,10 +611,10 @@ namespace fnpackup.Controllers
         {
             using var client = httpClientFactory.CreateClient();
 
-            string url = $"http://{host}/app-center/v1/app/list?language=zh";
+            string url = $"{host}app-center/v1/app/list?language=zh";
             if (string.IsNullOrWhiteSpace(name) == false)
             {
-                url = $"http://{host}/app-center/v1/app/search?keyword={name}&language=zh";
+                url = $"{host}app-center/v1/app/search?keyword={name}&language=zh";
             }
             client.DefaultRequestHeaders.Add("Authorization", token);
             HttpResponseMessage resp = await client.GetAsync(url);
