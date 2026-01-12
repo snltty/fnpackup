@@ -43,6 +43,7 @@ snltty/fnpackup
 ## [📦]使用方法
 
 ### [💼]打包fpk
+
 1. **创建应用**：在应用列表目录，选择创建应用，或导入已有的.fpk文件
 2. **进入应用**：双击应用文件夹
 3. **上传程序**：原生应用上传你的程序到`app/server`中，Docker应用直接编辑`app/docker/docker-compose.yaml`
@@ -51,7 +52,7 @@ snltty/fnpackup
 
 ### [🌍]静态托管
 
-如果你有一些静态网页，或纯静态内容的fpk，专门写一个HTTP/cgi服务,都实在太麻烦了，本程序帮你托管。
+如果你有一些静态网页，或纯静态内容的fpk，专门写一个HTTP/cgi服务实在太麻烦了，可以交给在线fpk托管。
 
 使用`http://{appname}.domain.com:1069`或`http://ip:1069/{appname}`访问。
 
