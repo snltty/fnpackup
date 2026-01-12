@@ -617,13 +617,9 @@ namespace fnpackup.Controllers
                 url = $"{host}app-center/v1/app/search?keyword={name}&language=zh";
             }
 
-            Console.WriteLine(url);
-
             client.DefaultRequestHeaders.Add("Authorization", token);
-            //client.DefaultRequestHeaders.Add("Referer", host);
-            if (string.IsNullOrWhiteSpace(cookie) == false)
-                client.DefaultRequestHeaders.Add("Cookie", cookie);
-            client.DefaultRequestHeaders.Add("User-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36");
+            if (url.Contains("fnos.net"))
+                client.DefaultRequestHeaders.Add("Cookie", "mode=relay; language=zh");
             HttpResponseMessage resp = await client.GetAsync(url);
 
             if (resp.StatusCode != System.Net.HttpStatusCode.OK)
