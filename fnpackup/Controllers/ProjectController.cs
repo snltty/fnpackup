@@ -566,11 +566,7 @@ namespace fnpackup.Controllers
         {
             try
             {
-                string host = Request.Headers["Referer"];
-
-                host = host.Replace(":1069/", ":5666/");
-                host = host.Replace("fnpackup-docker.", "");
-
+                string host = Request.Headers["Referer"].ToString().Replace(":1069/", ":5666/").Replace("fnpackup-docker.", "");
                 string token = $"trim {Request.Cookies["fnos-token"]}";
                 string cookie = Request.Headers["Cookie"];
 
