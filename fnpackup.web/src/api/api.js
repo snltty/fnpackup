@@ -91,7 +91,7 @@ export const fetchFileList = (path,p,ps) => {
     }).then(res=>res.json());
 }
 export const fetchFileCreate = (path,f)=>{
-    fetchApi(`/file/create`,{
+    return fetchApi(`/file/create`,{
         params:{path:path,f:f},
         method:'POST',
         headers:{'Content-Type':'application/json'},
