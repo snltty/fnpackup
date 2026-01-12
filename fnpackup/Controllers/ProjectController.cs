@@ -567,6 +567,10 @@ namespace fnpackup.Controllers
             try
             {
                 string host = Request.Headers["Referer"];
+
+                host = host.Replace(":1069/", ":5666/");
+                host = host.Replace("fnpackup-docker.", "");
+
                 string token = $"trim {Request.Cookies["fnos-token"]}";
                 string cookie = Request.Headers["Cookie"];
 
@@ -616,10 +620,6 @@ namespace fnpackup.Controllers
             {
                 url = $"{host}app-center/v1/app/search?keyword={name}&language=zh";
             }
-
-            Console.WriteLine(url);
-            Console.WriteLine(token);
-            Console.WriteLine(cookie);
 
             client.DefaultRequestHeaders.Add("Authorization", token);
             client.DefaultRequestHeaders.Add("Referer", host);
