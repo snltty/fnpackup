@@ -559,13 +559,22 @@ namespace fnpackup.Controllers
 
         [HttpGet]
         [Route("/app/list")]
-        public async Task<AppCenterRespInfo> AppCenter(string name)
+        public async Task<AppCenterRespInfo> AppCenter(string name, string token = "")
         {
             try
             {
                 string host = Request.Headers["Referer"].ToString().Replace(":1069/", ":5666/").Replace("fnpackup-docker.", "");
-                string token = $"trim {Request.Cookies["fnos-token"]}";
                 string cookie = Request.Headers["Cookie"];
+                token = string.IsNullOrWhiteSpace(Request.Cookies["fnos-token"]) ? token : Request.Cookies["fnos-token"];
+
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return new AppCenterRespInfo
+                    {
+                        Code = 1,
+                        Msg = "未能获取到飞牛token，无法查询应用列表"
+                    };
+                }
 
                 string[] names = (name ?? string.Empty).Split(':');
                 if (names.Length > 1)
@@ -613,17 +622,13 @@ namespace fnpackup.Controllers
             {
                 url = $"{host}app-center/v1/app/search?keyword={name}&language=zh";
             }
-            Console.WriteLine(url);
-            client.DefaultRequestHeaders.Add("Authorization", token);
-            Console.WriteLine(token);
+            client.DefaultRequestHeaders.Add("Authorization", $"trim {token}");
             if (url.Contains("fnos.net"))
             {
                 client.DefaultRequestHeaders.Add("Cookie", "mode=relay; language=zh");
-                Console.WriteLine("mode=relay; language=zh");
             }
 
             HttpResponseMessage resp = await client.GetAsync(url);
-
             if (resp.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 return new AppCenterRespInfo
