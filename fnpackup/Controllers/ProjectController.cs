@@ -570,8 +570,6 @@ namespace fnpackup.Controllers
                 string token = $"trim {Request.Cookies["fnos-token"]}";
                 string cookie = Request.Headers["Cookie"];
 
-                Console.WriteLine(host);
-
                 string[] names = (name ?? string.Empty).Split(':');
                 if (names.Length > 1)
                 {
@@ -619,8 +617,10 @@ namespace fnpackup.Controllers
                 url = $"{host}app-center/v1/app/search?keyword={name}&language=zh";
             }
 
+            Console.WriteLine(url);
+
             client.DefaultRequestHeaders.Add("Authorization", token);
-            client.DefaultRequestHeaders.Add("Referer", host);
+            //client.DefaultRequestHeaders.Add("Referer", host);
             if (string.IsNullOrWhiteSpace(cookie) == false)
                 client.DefaultRequestHeaders.Add("Cookie", cookie);
             client.DefaultRequestHeaders.Add("User-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36");
