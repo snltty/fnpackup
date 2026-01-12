@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Compression;
-using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -569,13 +568,14 @@ namespace fnpackup.Controllers
             {
                 string host = Request.Headers["Referer"];
                 string token = $"trim {Request.Cookies["fnos-token"]}";
+                string cookie = Request.Headers["Cookie"];
 
                 string[] names = (name ?? string.Empty).Split(':');
                 if (names.Length > 1)
                 {
-                    return await Search(host, token, names);
+                    return await Search(host, token, cookie, names);
                 }
-                return await Search(host, token, name);
+                return await Search(host, token, cookie, name);
             }
             catch (Exception ex)
             {
@@ -586,7 +586,7 @@ namespace fnpackup.Controllers
                 };
             }
         }
-        private async Task<AppCenterRespInfo> Search(string host, string token, string[] names)
+        private async Task<AppCenterRespInfo> Search(string host, string token,string cookie, string[] names)
         {
             AppCenterRespInfo finalResp = new AppCenterRespInfo
             {
@@ -599,7 +599,7 @@ namespace fnpackup.Controllers
             };
             foreach (var name in names)
             {
-                var resp = await Search(host, token, name);
+                var resp = await Search(host, token, cookie, name);
                 if (resp.Code != 0)
                 {
                     finalResp.Data.List.AddRange(resp.Data.List);
@@ -607,7 +607,7 @@ namespace fnpackup.Controllers
             }
             return finalResp;
         }
-        private async Task<AppCenterRespInfo> Search(string host, string token, string name)
+        private async Task<AppCenterRespInfo> Search(string host, string token,string cookie, string name)
         {
             using var client = httpClientFactory.CreateClient();
 
@@ -617,6 +617,9 @@ namespace fnpackup.Controllers
                 url = $"{host}app-center/v1/app/search?keyword={name}&language=zh";
             }
             client.DefaultRequestHeaders.Add("Authorization", token);
+            client.DefaultRequestHeaders.Add("Referer", host);
+            client.DefaultRequestHeaders.Add("Cookie", cookie);
+            client.DefaultRequestHeaders.Add("User-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36");
             HttpResponseMessage resp = await client.GetAsync(url);
 
             if (resp.StatusCode != System.Net.HttpStatusCode.OK)
