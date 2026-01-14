@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+</head>
+<body>
+    <script>
+      const theme = {
+        '10':'light',
+        '20':'dark'
+      }[localStorage.getItem('fnos-theme-mode')] || '';
+      const cookies = document.cookie.split(' ').map(c=>c.split('=')).reduce((json,item)=>{
+          json[item[0]] = item.filter((c,i)=>i>0).join('=');
+          return json;
+      },{});
+
+      let newUrl = `${window.location.protocol}//${window.location.hostname}:1069`;
+      if(window.location.hostname.endsWith('fnos.net')){
+        newUrl = `${window.location.protocol}//fnpackup-docker.${window.location.hostname}`
+      }
+      window.location = `${newUrl}/#/?fnos-theme=${theme}&fnos-token=${cookies['fnos-token']}`;
+    </script>
+</body>
+</html>

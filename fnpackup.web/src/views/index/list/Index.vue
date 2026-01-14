@@ -10,6 +10,7 @@
     <Guide v-if="projects.editor.guide" v-model="projects.editor.guide"></Guide>
     <SourceWrap v-if="projects.editor.source" v-model="projects.editor.source"></SourceWrap>
     <Paint v-if="projects.editor.paint" v-model="projects.editor.paint"></Paint>
+    <Fnpacking v-if="projects.editor.fnpacking" v-model="projects.editor.fnpacking"></Fnpacking>
 </template>
 
 <script>
@@ -21,8 +22,9 @@ import Editor from './editor/Index.vue';
 import Guide from './editor/Guide.vue';
 import SourceWrap from './editor/SourceWrap.vue';
 import Paint from './editor/Paint.vue';
+import Fnpacking from './editor/Fnpacking.vue';
 export default {
-    components: { Path, Actions,Table,Editor,Guide,SourceWrap,Paint },
+    components: { Path, Actions,Table,Editor,Guide,SourceWrap,Paint,Fnpacking },
     setup () {
         
         const {projects} = provideProjects();

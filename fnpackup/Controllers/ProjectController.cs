@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text;
@@ -10,6 +11,9 @@ namespace fnpackup.Controllers
     public class ProjectController : BaseController
     {
         private readonly string root = "./projects";
+
+        private TaskCompletionSource tcs;
+        private ConcurrentQueue<string> queue = new();
 
         public ProjectController()
         {
@@ -26,7 +30,21 @@ namespace fnpackup.Controllers
             return $"v{string.Join(".", Assembly.GetExecutingAssembly().GetName().Version.ToString().Split('.').Take(3))}";
         }
 
-
+        [HttpPost]
+        [Route("/project/build")]
+        public async Task<string> Build(string name, string shell)
+        {
+            if (tcs != null && tcs.Task.IsCompleted == false)
+            {
+                return queue.TryDequeue(out string msg) ? msg : "已有构建任务在执行中，请稍后再试";
+            }
+            tcs = CommandHelper.ExecuteAsync(shell, Path.Join(root, name, "building"), (msg) =>
+            {
+                Console.WriteLine(msg);
+                //queue.Enqueue(msg);
+            });
+            return string.Empty;
+        }
         [HttpPost]
         [Route("/project/create")]
         public string Create([FromBody] ProjectCreateInfo info)
@@ -69,21 +87,21 @@ namespace fnpackup.Controllers
             };
         }
         [HttpPost]
-        [Route("/project/build")]
-        public async Task<List<BuildResultInfo>> Build(string name, string platform = "", string server = "app/server")
+        [Route("/project/pack")]
+        public async Task<List<PackResultInfo>> Pack(string name, string platform = "", string server = "app/server")
         {
             Dictionary<string, string> manifest = await GetManifest(name).ConfigureAwait(false);
             if (manifest.ContainsKey("platform") == false)
             {
-                return new List<BuildResultInfo> { new BuildResultInfo { FileName = string.Empty, Msg = "请将manifest中的arch转为platform" } };
+                return new List<PackResultInfo> { new PackResultInfo { FileName = string.Empty, Msg = "请将manifest中的arch转为platform" } };
             }
 
             Backup(name);
 
-            List<BuildResultInfo> result = new List<BuildResultInfo>();
+            List<PackResultInfo> result = new List<PackResultInfo>();
             if (string.IsNullOrWhiteSpace(platform))
             {
-                result.Add(BuildRename(name, manifest));
+                result.Add(PackRename(name, manifest));
             }
             else
             {
@@ -96,7 +114,7 @@ namespace fnpackup.Controllers
 
                         CopyPlatform(name, item, server);
 
-                        result.Add(BuildRename(name, manifest));
+                        result.Add(PackRename(name, manifest));
                     }
                     catch (Exception ex)
                     {
@@ -120,20 +138,20 @@ namespace fnpackup.Controllers
             ClearFile(platformDir);
             return DirAreEmpty(platformDir);
         }
-        private BuildResultInfo BuildRename(string name, Dictionary<string, string> manifest)
+        private PackResultInfo PackRename(string name, Dictionary<string, string> manifest)
         {
             string msg = CommandHelper.Execute($"fnpack", $" build", [], Path.Join(root, name), out string error);
             if (string.IsNullOrWhiteSpace(error) == false)
             {
-                return new BuildResultInfo { FileName = manifest["platform"], Msg = error };
+                return new PackResultInfo { FileName = manifest["platform"], Msg = error };
             }
             if (msg.Contains("Packing successfully") == false)
             {
-                return new BuildResultInfo { FileName = manifest["platform"], Msg = msg };
+                return new PackResultInfo { FileName = manifest["platform"], Msg = msg };
             }
             string newName = $"{name}-{manifest["version"]}-{manifest["platform"]}";
             System.IO.File.Move(Path.Join(root, name, $"{name}.fpk"), Path.Join(root, name, $"{newName}.fpk"), true);
-            return new BuildResultInfo { FileName = $"{newName}.fpk", Msg = msg };
+            return new PackResultInfo { FileName = $"{newName}.fpk", Msg = msg };
         }
         private void CopyPlatform(string name, string platform, string dist)
         {
@@ -215,7 +233,6 @@ namespace fnpackup.Controllers
             string content = string.Join("\n", dic.Where(c => string.IsNullOrWhiteSpace(c.Key) == false).Select(c => $"{c.Key}={c.Value}"));
             await System.IO.File.WriteAllTextAsync(Path.Join(root, name, "manifest"), content).ConfigureAwait(false);
         }
-
 
 
         [HttpGet]
@@ -559,13 +576,12 @@ namespace fnpackup.Controllers
 
         [HttpGet]
         [Route("/app/list")]
-        public async Task<AppCenterRespInfo> AppCenter(string name, string token = "")
+        public async Task<AppCenterRespInfo> AppCenter(string name)
         {
             try
             {
-                string host = Request.Headers["Referer"].ToString().Replace(":1069/", ":5666/").Replace("fnpackup-docker.", "");
-                string cookie = Request.Headers["Cookie"];
-                token = string.IsNullOrWhiteSpace(Request.Cookies["fnos-token"]) ? token : Request.Cookies["fnos-token"];
+                string host = "http://localhost:5666/";
+                string token = Request.Cookies["fnos-token"];
 
                 if (string.IsNullOrWhiteSpace(token))
                 {
@@ -579,9 +595,9 @@ namespace fnpackup.Controllers
                 string[] names = (name ?? string.Empty).Split(':');
                 if (names.Length > 1)
                 {
-                    return await Search(host, token, cookie, names);
+                    return await Search(host, token, names);
                 }
-                return await Search(host, token, cookie, name);
+                return await Search(host, token, name);
             }
             catch (Exception ex)
             {
@@ -592,7 +608,7 @@ namespace fnpackup.Controllers
                 };
             }
         }
-        private async Task<AppCenterRespInfo> Search(string host, string token, string cookie, string[] names)
+        private async Task<AppCenterRespInfo> Search(string host, string token, string[] names)
         {
             AppCenterRespInfo finalResp = new AppCenterRespInfo
             {
@@ -605,7 +621,7 @@ namespace fnpackup.Controllers
             };
             foreach (var name in names)
             {
-                var resp = await Search(host, token, cookie, name);
+                var resp = await Search(host, token,  name);
                 if (resp.Code != 0)
                 {
                     finalResp.Data.List.AddRange(resp.Data.List);
@@ -613,7 +629,7 @@ namespace fnpackup.Controllers
             }
             return finalResp;
         }
-        private async Task<AppCenterRespInfo> Search(string host, string token, string cookie, string name)
+        private async Task<AppCenterRespInfo> Search(string host, string token, string name)
         {
             using HttpClient client = new HttpClient();
 
@@ -623,10 +639,6 @@ namespace fnpackup.Controllers
                 url = $"{host}app-center/v1/app/search?keyword={name}&language=zh";
             }
             client.DefaultRequestHeaders.Add("Authorization", $"trim {token}");
-            if (url.Contains("fnos.net"))
-            {
-                client.DefaultRequestHeaders.Add("Cookie", "mode=relay; language=zh");
-            }
 
             HttpResponseMessage resp = await client.GetAsync(url);
             if (resp.StatusCode != System.Net.HttpStatusCode.OK)
@@ -647,7 +659,7 @@ namespace fnpackup.Controllers
         }
     }
 
-    public sealed class BuildResultInfo
+    public sealed class PackResultInfo
     {
         public string FileName { get; set; }
         public string Msg { get; set; }

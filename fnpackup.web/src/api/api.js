@@ -70,12 +70,19 @@ export const fetchProjectExists = () => {
         headers:{'Content-Type':'application/json'},
     }).then(res => res.json());
 }
-export const fetchProjectBuild = (name,platform,server) => { 
-    return fetchApi(`/project/build`,{
+export const fetchProjectPack = (name,platform,server) => { 
+    return fetchApi(`/project/pack`,{
         params:{name:name,platform:platform,server:server},
         method:'POST',
         headers:{'Content-Type':'application/json'},
     }).then(res => res.json());
+}
+export const fetchProjectBuild = (name,shell) => { 
+    return fetchApi(`/project/build`,{
+        params:{name:name,shell:shell},
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+    }).then(res=>res.text());
 }
 
 

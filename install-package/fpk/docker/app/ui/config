@@ -5,8 +5,8 @@
             "icon": "images/icon_{0}.png",
             "type": "iframe",
             "protocol": "http",
-            "port": "1069",
-            "url": "/",
+            "port": "",
+            "url": "/cgi/ThirdParty/cgitest/index.cgi/",
             "allUsers": false
         }
     }

@@ -12,6 +12,9 @@
                 <a href="javascript:;" @click="handleHome"><el-icon><Back/></el-icon>回应用列表</a>
             </div>
         </a>
+        <template v-if="canRun">
+            <a href="javascript:;" @click="handleRun"><el-icon><VideoPlay/></el-icon>运行</a>
+        </template>
         <template v-if="hasInProject">
             <a href="javascript:;" @click="handleUpload('*/*')"><el-icon><Upload/></el-icon>上传</a>
         </template>
@@ -43,14 +46,14 @@
 </template>
 
 <script>
-import {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen, Plus, Back, ArrowRight, More, Edit} from '@element-plus/icons-vue'
+import {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen, Plus, Back, ArrowRight, More, Edit, VideoPlay} from '@element-plus/icons-vue'
 import { useProjects } from './list';
 import { computed, onMounted } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { useLogger } from '../logger';
-import { fetchFileCreate, fetchFileDelete, fetchFileRename } from '@/api/api';
+import { fetchFileCreate, fetchFileDelete, fetchFileRename, fetchProjectBuild } from '@/api/api';
 export default {
-    components: {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen,Plus,Back,ArrowRight,More,Edit},
+    components: {Refresh,Upload,Download,DocumentAdd,FolderAdd,Delete,EditPen,Plus,Back,ArrowRight,More,Edit,VideoPlay},
     setup () {
 
         const logger = useLogger();
@@ -59,6 +62,17 @@ export default {
         const canSource = computed(()=>projects.value.contextMenu.row && projects.value.contextMenu.row.if);
         const canRename = computed(()=>!!projects.value.contextMenu.row);
         const hasInProject = computed(()=>projects.value.page.path != './');
+        const canRun = computed(()=>{
+            return false;
+            /*
+            return projects.value.contextMenu.row 
+            && projects.value.contextMenu.row.if
+            && projects.value.page.path.split('/').length == 3
+            && projects.value.page.path.endsWith('building')
+            && ['.ps1','.sh','.bat'].filter(c=>projects.value.contextMenu.row.name.endsWith(c)).length > 0
+            */
+        });
+
         const handleRefresh = ()=>{
             projects.value.load();
         }
@@ -169,6 +183,12 @@ export default {
             })
         }
 
+        const handleRun = ()=>{
+            const name = projects.value.page.name;
+            const file = projects.value.contextMenu.row.name;
+            fetchProjectBuild(name,`${file}`);
+        }
+
         const handleSource = ()=>{
             projects.value.editor.path = `${projects.value.page.path}/${projects.value.contextMenu.row.name}`;
             projects.value.editor.remark = projects.value.contextMenu.row.remark;
@@ -181,8 +201,9 @@ export default {
             });
         });
 
-        return {projects,canSource,hasInProject,canRename,
-            handleRefresh,handleCreate,handleBack,handleHome,handleUpload,handleDownload,handleCreateFile,handleDel,handleSource,handleRename}
+        return {projects,canSource,hasInProject,canRename,canRun,
+            handleRefresh,handleCreate,handleBack,handleHome,handleUpload,handleDownload,
+            handleCreateFile,handleDel,handleSource,handleRename,handleRun}
     }
 }
 </script>

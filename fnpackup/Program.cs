@@ -32,7 +32,6 @@ namespace fnpackup
 
             var app = builder.Build();
 
-
             app.UseCors("AllowAll");
             app.UseRouting();
 
@@ -42,6 +41,7 @@ namespace fnpackup
             app.Run();
         }
     }
+
 
     public static class StaticFileExtends
     {

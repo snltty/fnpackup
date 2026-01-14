@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { fetchFileList, fetchFileRead, fetchFileWrite, fetchProjectBuild } from '@/api/api';
+import { fetchFileList, fetchFileRead, fetchFileWrite, fetchProjectPack } from '@/api/api';
 import { useLogger } from '../../logger';
 import { useProjects } from '../list';
 import { ElMessage, ElNotification } from 'element-plus';
@@ -121,7 +121,7 @@ export default {
             }
             state.loading = true;
             logger.value.debug('开始打包...');
-            fetchProjectBuild(name,state.platform ? state.platforms.join(','):'',state.server)
+            fetchProjectPack(name,state.platform ? state.platforms.join(','):'',state.server)
             .then(async (res)=>{
                 res.forEach(c=>{
                     if(c.msg.indexOf('Packing successfully')>=0){

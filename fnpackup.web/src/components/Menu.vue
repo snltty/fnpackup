@@ -13,11 +13,11 @@
             </template>
         </ul>
         <div class="foot-wrap">
-            <a href="javascript:;" @click="changeMode('light')" v-if="state.mode == 'dark'"><el-icon size="20"><Moon /></el-icon></a>
-            <a href="javascript:;" @click="changeMode('dark')" v-else><el-icon size="20"><Sunny /></el-icon></a>
+            <a href="javascript:;" @click="changeTheme('light')" v-if="state.theme == 'dark'"><el-icon size="20"><Moon /></el-icon></a>
+            <a href="javascript:;" @click="changeTheme('dark')" v-else><el-icon size="20"><Sunny /></el-icon></a>
             <a href="https://github.com/snltty/fnpackup" target="_blank">
-                <img v-if="state.mode == 'light'" src="../assets/github-light.svg" height="24" style="vertical-align: text-bottom;">
-                <img v-else-if="state.mode == 'dark'" src="../assets/github-dark.svg" height="24" style="vertical-align: text-bottom;">
+                <img v-if="state.theme == 'light'" src="../assets/github-light.svg" height="24" style="vertical-align: text-bottom;">
+                <img v-else-if="state.theme == 'dark'" src="../assets/github-dark.svg" height="24" style="vertical-align: text-bottom;">
                 <span>{{ state.version }}</span>
             </a>
             <a href="javascript:;">Snltty ©2026</a>
@@ -36,31 +36,29 @@ export default {
     setup () {
         const router = useRouter();
         const options = computed(()=>router.options.routes);
-
-        const isSystemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const isSystemLightMode = window.matchMedia('(prefers-color-scheme: light)').matches;
-        const cacheMode = localStorage.getItem('theme-mode') || (isSystemDarkMode?'dark':'light');
+  
         const state = reactive({
-            mode: cacheMode,
+            theme: '',
             version: 'v0.0.0'
         });
-        const changeMode = (mode)=>{
-            state.mode = mode;
-            localStorage.setItem('theme-mode', mode);
-            setMode();
+        const changeTheme = (theme)=>{
+            state.theme = theme;
+            localStorage.setItem('fnos-theme', theme);
+            setTheme();
         }
-        const setMode = ()=>{
-            document.querySelector('html').setAttribute('class', state.mode);
+        const setTheme = ()=>{
+            state.theme = localStorage.getItem('fnos-theme') || (isSystemDarkMode?'dark':'light')
+            document.querySelector('html').setAttribute('class', state.theme);
         }
 
         onMounted(()=>{
-            setMode();
             fetchSystemVersion().then(res=>{
                 state.version = res;
-            })
+            });
+            setTheme();
         })
 
-        return {options,state,changeMode}
+        return {options,state,changeTheme}
     }
 }
 </script>

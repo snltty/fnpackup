@@ -96,7 +96,8 @@ export const provideProjects = () => {
             create:false,
             upload:false,
             mime:'*/*',
-            paint:false
+            paint:false,
+            fnpacking:false
         },
 
 
