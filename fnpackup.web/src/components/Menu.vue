@@ -47,6 +47,7 @@ export default {
             setTheme();
         }
         const setTheme = ()=>{
+             const isSystemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
             state.theme = localStorage.getItem('fnos-theme') || (isSystemDarkMode?'dark':'light')
             document.querySelector('html').setAttribute('class', state.theme);
         }
