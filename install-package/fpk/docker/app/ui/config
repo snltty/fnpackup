@@ -1,13 +1,23 @@
 {
     ".url": {
-        "fnpackup.docker.Application": {
+        "fnpackup.cgi.Application": {
             "title": "在线fpk",
             "icon": "images/icon_{0}.png",
             "type": "iframe",
             "protocol": "http",
             "port": "",
             "url": "/cgi/ThirdParty/fnpackup/index.cgi/",
-            "allUsers": false
+            "allUsers": true
+        },
+        "fnpackup.docker.Application": {
+            "title": "在线fpk",
+            "icon": "images/icon_{0}.png",
+            "type": "iframe",
+            "protocol": "http",
+            "port": "1069",
+            "url": "/",
+            "allUsers": true,
+            "noDisplay":true
         }
     }
 }
