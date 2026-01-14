@@ -12,6 +12,6 @@ sed -i 's/\r$//' public/publish-fpk/docker/cmd/uninstall_callback
 
 cd public/publish-fpk/docker
 
-tar -czf app.tgz --transform='s,app/,,g' app/docker app/ui config
+tar -czf app.tgz --transform='s,app/,,g' app/docker app/www app/ui config
 tar -czf fnpackup.fpk --exclude='app' *
 mv fnpackup.fpk fnpackup-docker.fpk
