@@ -20,7 +20,7 @@
       if(window.location.hostname.endsWith('fnos.net')){
         newUrl = `${window.location.protocol}//fnpackup-docker.${window.location.hostname}`
       }
-      window.location = `${newUrl}/#/?fnos-theme=${theme}&fnos-token=${cookies['fnos-token']}`;
+      window.location = `${newUrl}/#/?fnos-theme=${theme}&fnos-token=${encodeURIComponent(cookies['fnos-token'])}`;
     </script>
 </body>
 </html>

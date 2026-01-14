@@ -25,8 +25,8 @@ export default {
         const showApp = ref(false);
         router.isReady().then(()=>{
             for(let key in route.query){
-                document.cookie = `${key}=${route.query[key]}; path=/;`;
-                localStorage.setItem(key,route.query[key]);
+                document.cookie = `${key}=${decodeURIComponent(route.query[key])}; path=/;`;
+                localStorage.setItem(key,decodeURIComponent(route.query[key]));
             }
             if(route.query['fnos-theme']){
                 window.location = '/';
