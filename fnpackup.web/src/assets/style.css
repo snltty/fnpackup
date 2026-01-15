@@ -182,11 +182,15 @@ html .el-overlay {
 }
 html.dark{
     background-color:#14171a;
-    --main-border-color:#39434c;
+    --main-border-color:#293037;
+    --el-fill-color-lighter:#fff;
+}
+html.dark .el-table{
+    background-color:transparent;
 }
 html.dark .el-switch__core .el-switch__action{background-color: #ccc; }
 html.dark .el-dialog{border: 1px solid #575c61;}
-html.dark .el-table tr{ --el-table-header-bg-color:#14171a;}
+html.dark .el-table tr{ --el-table-header-bg-color:#14171a;background-color: transparent;}
 html.dark .el-tabs--left.el-tabs--border-card .el-tabs__item.is-left.is-active{
      border-color:var(--main-border-color) transparent
 }

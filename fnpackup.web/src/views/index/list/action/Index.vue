@@ -62,7 +62,7 @@ export default {
 
 <style lang="stylus" scoped>
 html.dark .actions-wrap{
-    border-color:#39434c;
+    border-color:var(--main-border-color);
 }
 .actions-wrap{
     border-bottom:1px solid #e2e8f0e6;

@@ -37,11 +37,11 @@ export default {
 <style lang="stylus" scoped>
 html.dark .list-wrap{
     .inner{
-        border-color:#39434c;
+        border-color:var(--main-border-color);
     }
 }
 .list-wrap{
-    padding:1rem 1rem .5rem 1rem;
+    padding:2rem 2rem .5rem 2rem;
     box-sizing: border-box;
 
     .inner{

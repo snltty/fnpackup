@@ -2,7 +2,7 @@
     <div class="table-wrap flex-1 flex flex-column flex-nowrap" @contextmenu="handleContextMenu1">
         <div class="flex-1 relative">
             <div class="absolute">
-                <el-table :data="projects.page.list" stripe size="small" height="100%" v-loading="projects.page.loading"
+                <el-table :data="projects.page.list" size="small" height="100%" v-loading="projects.page.loading"
                 @cell-dblclick="handleOpen" @row-contextmenu="handleContextMenu" ref="table">
                     <el-table-column prop="if" width="35">
                         <template #default="scope">

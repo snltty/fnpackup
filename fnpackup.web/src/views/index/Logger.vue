@@ -46,7 +46,7 @@ export default {
 <style lang="stylus" scoped>
 html.dark .logger-wrap{
     .inner{
-        border-color:#39434c;
+        border-color:var(--main-border-color);
     }
 }
 .split{
@@ -57,7 +57,7 @@ html.dark .logger-wrap{
 }
 .logger-wrap{
     font-size:1.2rem;
-    padding:.5rem 1rem 1rem 1rem;
+    padding:.5rem 2rem 2rem 2rem;
     box-sizing: border-box;
     position:relative;
 

@@ -51,7 +51,7 @@ export default {
 
 <style lang="stylus" scoped>
 html.dark .path-wrap{
-    border-color:#39434c;
+    border-color:var(--main-border-color);
 }
 .path-wrap{
     padding:1rem;

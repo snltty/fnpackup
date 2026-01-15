@@ -7,7 +7,7 @@
             </div>
             <div class="flex-1 relative">
                 <div class="absolute">
-                    <el-table :data="state.list" stripe size="small" height="98%" v-loading="state.loading">
+                    <el-table :data="state.list" size="small" height="98%" v-loading="state.loading">
                         <el-table-column prop="name" label="名称">
                             <template #default="scope">
                                 <div class="flex">
@@ -83,16 +83,16 @@ export default {
 <style lang="stylus" scoped>
 html.dark .table-wrap{
     .inner{
-        border-color:#39434c;
+        border-color:var(--main-border-color);
         .head{
-            border-color:#39434c;
+            border-color:var(--main-border-color);
         }
     }
 }
 .table-wrap{
     
     overflow hidden;
-    padding:1rem;
+    padding:2rem;
     box-sizing: border-box;
     
     .inner{
