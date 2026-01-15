@@ -258,7 +258,7 @@ export default {
         onMounted(()=>{
             readUiEndpoint();
             
-            fetchAppCenter(state.ruleForm.install_dep_apps)
+            fetchAppCenter('',state.ruleForm.install_dep_apps.join(':'))
             .then(res => {
                 if(res.code == 0){
                     fieldsArray.value[fieldsArray.value.findIndex(c=>c.name == 'install_dep_apps')].options = res.data.list.map(c=>{

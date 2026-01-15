@@ -585,7 +585,7 @@ namespace fnpackup.Controllers
 
         [HttpGet]
         [Route("/app/list")]
-        public async Task<AppCenterRespInfo> AppCenter(string name)
+        public async Task<AppCenterRespInfo> AppCenter(string name,string names)
         {
             try
             {
@@ -601,10 +601,10 @@ namespace fnpackup.Controllers
                     };
                 }
 
-                string[] names = (name ?? string.Empty).Split(':');
-                if (names.Length > 1)
+                string[] _names = (names ?? string.Empty).Split(':');
+                if (_names.Length > 1)
                 {
-                    return await Search(host, token, names);
+                    return await Search(host, token, _names);
                 }
                 return await Search(host, token, name);
             }

@@ -156,9 +156,9 @@ export const fetchPlatform = (name,platform) => {
 }
 
 
-export const fetchAppCenter = (name) => { 
+export const fetchAppCenter = (name,names) => { 
     return fetchApi('/app/list',{
-        params:{name:name || ''},
+        params:{name:name || '',names:names || ''},
         method:'GET',
         headers:{'Content-Type':'application/json'},
     }).then(res => res.json());
