@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace fnpackup.Controllers
 {
@@ -15,8 +16,10 @@ namespace fnpackup.Controllers
         private TaskCompletionSource tcs;
         private ConcurrentQueue<string> queue = new();
 
-        public ProjectController()
+        private readonly IHttpClientFactory httpClientFactory;
+        public ProjectController(IHttpClientFactory httpClientFactory)
         {
+            this.httpClientFactory = httpClientFactory;
             if (Directory.Exists(root) == false)
             {
                 Directory.CreateDirectory(root);
@@ -610,28 +613,13 @@ namespace fnpackup.Controllers
         }
         private async Task<AppCenterRespInfo> Search(string host, string token, string[] names)
         {
-            AppCenterRespInfo finalResp = new AppCenterRespInfo
-            {
-                Code = 0,
-                Data = new AppCenterDataInfo
-                {
-                    List = []
-                },
-                Msg = "ok"
-            };
-            foreach (var name in names)
-            {
-                var resp = await Search(host, token,  name);
-                if (resp.Code != 0)
-                {
-                    finalResp.Data.List.AddRange(resp.Data.List);
-                }
-            }
+            AppCenterRespInfo finalResp = await Search(host, token, string.Empty);
+            finalResp.Data.List = finalResp.Data.List.Where(c => names.Contains(c.AppName)).ToList();
             return finalResp;
         }
         private async Task<AppCenterRespInfo> Search(string host, string token, string name)
         {
-            using HttpClient client = new HttpClient();
+            using HttpClient client = httpClientFactory.CreateClient();
 
             string url = $"{host}app-center/v1/app/list?language=zh";
             if (string.IsNullOrWhiteSpace(name) == false)

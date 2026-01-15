@@ -15,11 +15,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         with:
-          tag_name: v0.0.9
-          release_name: v0.0.9.${{ steps.date.outputs.today }}
+          tag_name: v1.0.0
+          release_name: v1.0.0.${{ steps.date.outputs.today }}
           draft: false
           prerelease: false
-          body: "1. 一些累计更新，写了一些bug\r\n2. ui优化，错位什么的\r\n3. 展示可用环境变量\r\n4. 重构组件，增加修改未保存提醒"
+          body: "1. 一些累计更新，写了一些新bug\r\n2. 一些bug优化\r\n3. 颜色主题适应\r\n4. 依赖选择，查询应用中心应用列表"
       - name: setup node.js
         uses: actions/setup-node@v2
         with:
@@ -46,5 +46,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./public/publish-fpk/docker/fnpackup-docker.fpk
-          asset_name: fnpackup-docker-v0.0.9.fpk
+          asset_name: fnpackup-docker-v1.0.0.fpk
           asset_content_type: application/fpk
