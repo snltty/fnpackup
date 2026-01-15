@@ -495,6 +495,12 @@ namespace fnpackup.Controllers
                 CommandHelper.Execute($"tar", $" -xvf {Path.GetFileName(file.FileName)}", [], dir, out string error);
                 Directory.CreateDirectory(Path.Join(dir, "app"));
                 CommandHelper.Execute($"tar", $" -xzvf app.tgz -C app", [], dir, out error);
+
+
+                if (Directory.Exists(Path.Join(dir, "building")) == false)
+                    System.IO.Directory.CreateDirectory(Path.Join(dir, "building"));
+                if (Directory.Exists(Path.Join(dir, "building", "platform")) == false)
+                    System.IO.Directory.CreateDirectory(Path.Join(dir, "building", "platform"));
             }
             catch (Exception)
             {
