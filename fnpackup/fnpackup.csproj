@@ -8,13 +8,12 @@
 		<Authors>snltty</Authors>
 		<Company>snltty</Company>
 		<PackageReleaseNotes>fnpackup</PackageReleaseNotes>
-		<Version>1.0.0</Version>
-		<AssemblyVersion>1.0.0</AssemblyVersion>
-		<FileVersion>1.0.0</FileVersion>
+		<Version>1.0.1</Version>
+		<AssemblyVersion>1.0.1</AssemblyVersion>
+		<FileVersion>1.0.1</FileVersion>
 		<Description>1. 一些累计更新，写了一些新bug
 2. 一些bug优化
-3. 颜色主题适应
-4. 依赖选择，查询应用中心应用列表</Description>
+3. ssl证书</Description>
 		<Copyright>snltty</Copyright>
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 		<ApplicationIcon>ico.ico</ApplicationIcon>
