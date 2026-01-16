@@ -16,7 +16,7 @@
           return json;
       },{});
 
-      const port = window.location.protocol = 'http:' ? '1069' : '10699'
+      const port = window.location.protocol == 'http:' ? '1069' : '10699'
       let newUrl = `${window.location.protocol}//${window.location.hostname}:${port}`;
       if(window.location.hostname.endsWith('fnos.net')){
         newUrl = `${window.location.protocol}//fnpackup-docker.${window.location.hostname}`
