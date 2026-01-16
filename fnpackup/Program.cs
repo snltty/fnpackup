@@ -3,6 +3,9 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using System.Collections.Frozen;
 using System.Net;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Serialization;
 
 namespace fnpackup
@@ -28,20 +31,59 @@ namespace fnpackup
                           .AllowAnyHeader();
                 });
             });
+            builder.WebHost.ConfigureKestrel(serverOptions =>
+            {
+                serverOptions.ConfigureHttpsDefaults(httpsOptions =>
+                {
+
+                    using Stream streamPublic = Assembly.GetExecutingAssembly().GetManifestResourceStream($"fnpackup.publickey.pem");
+                    using Stream streamPrivate = Assembly.GetExecutingAssembly().GetManifestResourceStream($"fnpackup.privatekey.pem");
+
+                    using StreamReader readerPublic = new StreamReader(streamPublic);
+                    using StreamReader readerPrivate = new StreamReader(streamPrivate);
+
+                    RSA rsaPrivateKey = RSA.Create();
+                    rsaPrivateKey.ImportFromPem(readerPrivate.ReadToEnd());
+
+                    using X509Certificate2 publicCert = X509Certificate2.CreateFromPem(readerPublic.ReadToEnd());
+                    X509Certificate2 certificate = publicCert.CopyWithPrivateKey(rsaPrivateKey);
+
+                    //不导出不支持windows什么的
+                    byte[] pfxBytes = certificate.Export(X509ContentType.Pfx, "snltty");
+                    certificate.Dispose();
+                    certificate = new X509Certificate2(pfxBytes, "snltty");
+                    httpsOptions.ServerCertificate = certificate;
+                });
+            });
+
             builder.Services.AddDynamicStaticFile();
+            builder.Services.AddLogger();
 
             var app = builder.Build();
-
             app.UseCors("AllowAll");
             app.UseRouting();
-
-            app.UseDynamicStaticFile();
             app.MapControllers();
 
+            app.UseDynamicStaticFile();
+            app.UseLogger();
+            
             app.Run();
         }
     }
 
+
+    public static class LoggerExtends
+    {
+        public static IServiceCollection AddLogger(this IServiceCollection services)
+        {
+            return services;
+        }
+        public static WebApplication UseLogger(this WebApplication app)
+        {
+            
+            return app;
+        }
+    }
 
     public static class StaticFileExtends
     {
@@ -77,7 +119,6 @@ namespace fnpackup
             return app;
         }
     }
-
     public class DynamicFileProvider : IFileProvider
     {
         private FrozenDictionary<string, FileProviderInfo> host2path = new Dictionary<string, FileProviderInfo>().ToFrozenDictionary();

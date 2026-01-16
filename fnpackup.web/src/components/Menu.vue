@@ -13,15 +13,24 @@
             </template>
         </ul>
         <div class="foot-wrap">
-            <a href="javascript:;" @click="changeTheme('light')" v-if="state.theme == 'dark'"><el-icon size="20"><Moon /></el-icon></a>
-            <a href="javascript:;" @click="changeTheme('dark')" v-else><el-icon size="20"><Sunny /></el-icon></a>
+            <a href="javascript:;" @click="changeTheme('light')" v-if="state.theme == 'dark'"><el-icon size="18"><Moon /></el-icon></a>
+            <a href="javascript:;" @click="changeTheme('dark')" v-else><el-icon size="18"><Sunny /></el-icon></a>
             <a href="https://github.com/snltty/fnpackup" target="_blank">
-                <img v-if="state.theme == 'light'" src="../assets/github-light.svg" height="24" style="vertical-align: text-bottom;">
-                <img v-else-if="state.theme == 'dark'" src="../assets/github-dark.svg" height="24" style="vertical-align: text-bottom;">
-                <span>{{ state.version }}</span>
+                <img v-if="state.theme == 'light'" src="../assets/github-light.svg" class="img">
+                <img v-else-if="state.theme == 'dark'" src="../assets/github-dark.svg" class="img">
+                <span>在线fpk {{ state.version }}</span>
             </a>
-            <a href="javascript:;">Snltty ©2026</a>
-            <a href="https://linker.snltty.com" target="_blank">Linker</a>
+            <a href="https://linker.snltty.com" target="_blank">
+                <img v-if="state.theme == 'light'" src="../assets/github-light.svg" class="img">
+                <img v-else-if="state.theme == 'dark'" src="../assets/github-dark.svg" class="img">
+                <span>linker(开源组网)</span>
+            </a>
+            <a href="https://tun324.snltty.com/" target="_blank">
+                <img v-if="state.theme == 'light'" src="../assets/github-light.svg" class="img">
+                <img v-else-if="state.theme == 'dark'" src="../assets/github-dark.svg" class="img">
+                <span>tun324(tun转代理)</span>
+            </a>
+            <a href="javascript:;" class="pdl">snltty ©2026</a>
         </div>
     </div>
 </template>
@@ -76,7 +85,7 @@ html.dark{
     }
 }
 .menu-wrap{
-    width: 140px;
+    width: 15rem;
 }
 ul{
     padding:.8rem;
@@ -92,27 +101,34 @@ ul{
                 color:#2173df;
                 font-weight:500;
             }
+            
+
             .el-icon,span{
                 vertical-align: middle;
-                font-size:1.4rem;
+                font-size:1.3rem;
             }
             .el-icon{
                 margin-right:.6rem;
             }
-
         }
     }
 }
 
 .foot-wrap{
     padding:1rem .6rem;
-    font-size:1.3rem;
+    font-size:1.2rem;
     a{
         display:block;padding:.6rem;
         border-radius:4px;
         &:hover{
             background-color:#fff;
             color:#2568ed
+        }
+        &.pdl{padding-left:1rem;}
+        .img{
+            width:1.8rem;
+            height:1.8rem;
+            vertical-align: bottom;
         }
     }
 }

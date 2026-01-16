@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using System.Xml.Linq;
 
 namespace fnpackup.Controllers
 {
@@ -12,9 +10,6 @@ namespace fnpackup.Controllers
     public class ProjectController : BaseController
     {
         private readonly string root = "./projects";
-
-        private TaskCompletionSource tcs;
-        private ConcurrentQueue<string> queue = new();
 
         private readonly IHttpClientFactory httpClientFactory;
         public ProjectController(IHttpClientFactory httpClientFactory)
@@ -37,15 +32,6 @@ namespace fnpackup.Controllers
         [Route("/project/build")]
         public async Task<string> Build(string name, string shell)
         {
-            if (tcs != null && tcs.Task.IsCompleted == false)
-            {
-                return queue.TryDequeue(out string msg) ? msg : "已有构建任务在执行中，请稍后再试";
-            }
-            tcs = CommandHelper.ExecuteAsync(shell, Path.Join(root, name, "building"), (msg) =>
-            {
-                Console.WriteLine(msg);
-                //queue.Enqueue(msg);
-            });
             return string.Empty;
         }
         [HttpPost]
@@ -585,7 +571,7 @@ namespace fnpackup.Controllers
 
         [HttpGet]
         [Route("/app/list")]
-        public async Task<AppCenterRespInfo> AppCenter(string name,string names)
+        public async Task<AppCenterRespInfo> AppCenter(string name, string names)
         {
             try
             {

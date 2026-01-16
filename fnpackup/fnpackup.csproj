@@ -57,6 +57,14 @@
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="privatekey.pem" />
+	  <None Remove="publickey.pem" />
+	</ItemGroup>
+	<ItemGroup>
 	  <Content Include="ico.ico" />
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="privatekey.pem" />
+	  <EmbeddedResource Include="publickey.pem" />
 	</ItemGroup>
 </Project>

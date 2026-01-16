@@ -3,6 +3,7 @@ FROM debian:latest
 RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
 
 EXPOSE 1069/tcp
+EXPOSE 10699/tcp
 
 WORKDIR /app
 COPY . .
