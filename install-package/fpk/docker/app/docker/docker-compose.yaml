@@ -10,7 +10,7 @@ services:
     volumes:
       - "/${TRIM_APPDEST_VOL}/@appshare/fnpackup-docker/projects:/app/projects"
       - "/${TRIM_APPDEST_VOL}/@appshare/fnpackup-docker/statics:/app/statics"
-      - "/usr/local/bin/appcenter-cli:/app/appcenter-cli:ro"
-      - "/usr/local/bin/fnpack:/app/fnpack:ro"
-      - "/var/apps:/app/apps:ro"
-      - "/${TRIM_APPDEST_VOL}:/${TRIM_APPDEST_VOL}:ro"
+      - "/usr/local/bin/appcenter-cli:/app/appcenter-cli"
+      - "/usr/local/bin/fnpack:/app/fnpack"
+      - "/var/apps:/app/apps"
+      - "/${TRIM_APPDEST_VOL}:/${TRIM_APPDEST_VOL}"

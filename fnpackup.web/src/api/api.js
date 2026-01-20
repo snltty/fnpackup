@@ -177,3 +177,13 @@ export const fetchStaticSearch = () => {
         headers:{'Content-Type':'application/json'},
     });
 }
+
+
+
+export const fetchLoggerList = (text,p = 1,ps = 10,type = 0) => { 
+    return fetchApi('/logger/list',{
+        params:{text:text || '',p:p,ps:ps,type:type},
+        method:'GET',
+        headers:{'Content-Type':'application/json'},
+    }).then(res => res.json());
+}

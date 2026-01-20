@@ -1,4 +1,4 @@
-import { Pointer, Service } from '@element-plus/icons-vue'
+import { FirstAidKit, Pointer, Service } from '@element-plus/icons-vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 const routes = [
     {
@@ -17,6 +17,12 @@ const routes = [
         path: '/static-view',
         name: 'StaticView',
         component: () => import('@/views/static/View.vue'),
+    },
+    {
+        path: '/logger',
+        name: 'Logger',
+        meta: { title: '日志收集',icon:FirstAidKit },
+        component: () => import('@/views/logger/Index.vue'),
     }
 ]
 
