@@ -1,7 +1,7 @@
 appname=fnpackup
 version={version}
 display_name=在线fpk
-desc="""fnpack二次包装UI，在线编辑和打包fpk，和帮助fpk自动托管静态资源"""
+desc="""fnpack二次包装UI，在线编辑和打包fpk，和帮助fpk自动托管静态资源，<a href="https://jq.qq.com/?_wv=1027&k=ucoIVfz4" target="_blank">群聊：1121552990</a>，<a href="https://github.com/snltty/fnpackup" target="_blank">开源</a>"""
 platform=all
 source=thirdparty
 maintainer=snltty
