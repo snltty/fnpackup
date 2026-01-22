@@ -64,8 +64,9 @@ export const fetchProjectCreate = (data) => {
         body:JSON.stringify(data)
     }).then(res => res.text());
 }
-export const fetchProjectExists = () => { 
+export const fetchProjectExists = (name) => { 
     return fetchApi(`/project/exists`,{
+        params:{name:name},
         method:'GET',
         headers:{'Content-Type':'application/json'},
     }).then(res => res.json());

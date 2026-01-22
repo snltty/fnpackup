@@ -15,24 +15,37 @@
         <div class="foot-wrap">
             <a href="javascript:;" @click="changeTheme('light')" v-if="state.theme == 'dark'"><el-icon size="18"><Moon /></el-icon></a>
             <a href="javascript:;" @click="changeTheme('dark')" v-else><el-icon size="18"><Sunny /></el-icon></a>
-            <a href="https://github.com/snltty/fnpackup" target="_blank">
-                <img v-if="state.theme == 'light'" src="../assets/github-light.svg" class="img">
-                <img v-else-if="state.theme == 'dark'" src="../assets/github-dark.svg" class="img">
-                <span>在线fpk {{ state.version }}</span>
+            <a href="javascript:;" @click="handlePay">
+                <img src="../assets/money.svg" class="img-big">
+                <span>慷慨赞助</span>
             </a>
             <a href="https://linker.snltty.com" target="_blank">
-                <img v-if="state.theme == 'light'" src="../assets/github-light.svg" class="img">
-                <img v-else-if="state.theme == 'dark'" src="../assets/github-dark.svg" class="img">
-                <span>linker(开源组网)</span>
+                <img src="../assets/github.svg" class="img">
+                <span>开源组网</span>
             </a>
             <a href="https://tun324.snltty.com/" target="_blank">
-                <img v-if="state.theme == 'light'" src="../assets/github-light.svg" class="img">
-                <img v-else-if="state.theme == 'dark'" src="../assets/github-dark.svg" class="img">
-                <span>tun324(tun转代理)</span>
+                <img src="../assets/github.svg" class="img">
+                <span>tun转代理</span>
             </a>
-            <a href="javascript:;" class="pdl">snltty ©2026</a>
+            <a href="https://github.com/snltty/fnpackup" target="_blank">
+                <img src="../assets/github.svg" class="img">
+                <span>在线fpk {{ state.version }}</span>
+            </a>
         </div>
     </div>
+    <el-dialog v-model="state.showPay" title="慷慨赞助" width="350">
+        <div class="pay">
+            <p class="t-c mgb-1">
+                程序本身完全开源免费
+            </p>
+            <p class="t-c mgb-1">
+                但也可以作者帮忙打包，￥30/次，OR，纯慷慨赞助
+            </p>
+            <p>
+                <img src="pay.png" alt="pay" width="100%"/>
+            </p>
+        </div>
+    </el-dialog>
 </template>
 
 <script>
@@ -48,7 +61,8 @@ export default {
   
         const state = reactive({
             theme: '',
-            version: 'v0.0.0'
+            version: 'v0.0.0',
+            showPay:false
         });
         const changeTheme = (theme)=>{
             state.theme = theme;
@@ -60,6 +74,9 @@ export default {
             state.theme = localStorage.getItem('fnos-theme') || (isSystemDarkMode?'dark':'light')
             document.querySelector('html').setAttribute('class', state.theme);
         }
+        const handlePay = ()=>{
+            state.showPay = true;
+        }
 
         onMounted(()=>{
             fetchSystemVersion().then(res=>{
@@ -68,7 +85,7 @@ export default {
             setTheme();
         })
 
-        return {options,state,changeTheme}
+        return {options,state,changeTheme,handlePay}
     }
 }
 </script>
@@ -80,6 +97,9 @@ html.dark{
             color:#cbd5e0;
             &.router-link-active,&:hover{
                 background-color:#1a1e23;
+            }
+            .img-big{
+                &+span{color:#03ff03;}
             }
         }
     }
@@ -116,19 +136,26 @@ ul{
 
 .foot-wrap{
     padding:1rem .6rem;
-    font-size:1.2rem;
+    font-size:1.3rem;
     a{
         display:block;padding:.6rem;
         border-radius:4px;
+        display:flex;
+        align-items: center;
         &:hover{
             background-color:#fff;
             color:#2568ed
         }
-        &.pdl{padding-left:1rem;}
         .img{
             width:1.8rem;
             height:1.8rem;
-            vertical-align: bottom;
+        }
+        span{margin-left:.5rem;}
+        .img-big{
+            width:2.6rem;
+            height:2.6rem;
+
+            &+span{font-size:1.5rem;color:green;}
         }
     }
 }

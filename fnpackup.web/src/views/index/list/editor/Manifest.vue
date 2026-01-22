@@ -89,6 +89,7 @@ export default {
 
         const logger = useLogger();
         const projects = useProjects();
+        const root = projects.value.page.root.slice();
         const contentJson = props.content.split('\n').reduce((json,item)=>{
             const index = item.indexOf('=');
             if(index>0){
@@ -269,7 +270,7 @@ export default {
                 logger.value.error(res.msg);
             });
             
-            fetchProjectExists().then(res=>{
+            fetchProjectExists(root[1]).then(res=>{
                 if(res.ui == false){
                     state.ruleForm.desktop_uidir = contentJson.desktop_uidir || '';
                     state.ruleForm.desktop_applaunchname = contentJson.desktop_applaunchname || '';
