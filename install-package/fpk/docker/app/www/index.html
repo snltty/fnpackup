@@ -46,9 +46,14 @@
         }
         newUrl = `${newUrl}/#/?fnos-theme=${theme}&fnos-token=${encodeURIComponent(cookies['fnos-token'])}`;
         document.querySelector('.be-danger').href = newUrl;
-        fetch(newUrl).then(res=>{
+        if(newUrl.indexOf('fnos.net')>-1){
             window.location = newUrl;
-        })
+        }else{
+            fetch(newUrl).then(res=>{
+                window.location = newUrl;
+            })
+        }
+        
     </script>
 </body>
 </html>
