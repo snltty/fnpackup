@@ -41,12 +41,14 @@
 
         const port = window.location.protocol == 'http:' ? '1069' : '10699'
         let newUrl = `${window.location.protocol}//${window.location.hostname}:${port}`;
-        if(window.location.hostname.endsWith('fnos.net')){
-            newUrl = `${window.location.protocol}//fnpackup-docker.${window.location.hostname}`
-        }
+
+        const hasFn = window.location.hostname.indexOf('fnos.net')>=0 || window.location.hostname.indexOf('5ddd.com')>=0;
+
+        if(hasFn) newUrl = `${window.location.protocol}//fnpackup-docker.${window.location.hostname}`
         newUrl = `${newUrl}/#/?fnos-theme=${theme}&fnos-token=${encodeURIComponent(cookies['fnos-token'])}`;
         document.querySelector('.be-danger').href = newUrl;
-        if(newUrl.indexOf('fnos.net')>-1){
+        
+        if(hasFn){
             window.location = newUrl;
         }else{
             fetch(newUrl).then(res=>{
