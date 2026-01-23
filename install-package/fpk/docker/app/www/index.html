@@ -40,20 +40,19 @@
         },{});
 
         const port = window.location.protocol == 'http:' ? '1069' : '10699'
-        let newUrl = `${window.location.protocol}//${window.location.hostname}:${port}`;
-
         const hasFn = window.location.hostname.indexOf('fnos.net')>=0 || window.location.hostname.indexOf('5ddd.com')>=0;
 
+        let newUrl = `${window.location.protocol}//${window.location.hostname}:${port}`;
         if(hasFn) newUrl = `${window.location.protocol}//fnpackup-docker.${window.location.hostname}`
         newUrl = `${newUrl}/#/?fnos-theme=${theme}&fnos-token=${encodeURIComponent(cookies['fnos-token'])}`;
         document.querySelector('.be-danger').href = newUrl;
-        
+
         if(hasFn){
             window.location = newUrl;
         }else{
             fetch(newUrl).then(res=>{
                 window.location = newUrl;
-            })
+            });
         }
         
     </script>
