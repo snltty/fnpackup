@@ -119,7 +119,8 @@ export default {
                     state.steps.push({
                         '_id':_id,
                         'stepTitle':value,
-                        'items':[]
+                        'items':[],
+                        '_plus_field':[]
                     });
                     state.step = _id;
                 }).catch((e) => {
@@ -178,9 +179,12 @@ export default {
                 let arr = JSON.parse(JSON.stringify(state.steps));
                 arr.forEach(step=>{
 
-                    step._plus_field.forEach(item=>{
-                        step[item.field] = item.value;
-                    });
+                    if(step._plus_field){
+                        step._plus_field.forEach(item=>{
+                            step[item.field] = item.value;
+                        });
+                    }
+                    
                     //删除步骤的辅助字段
                     deleteField(step);
 
