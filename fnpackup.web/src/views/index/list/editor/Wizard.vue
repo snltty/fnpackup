@@ -120,7 +120,7 @@ export default {
                         '_id':_id,
                         'stepTitle':value,
                         'items':[],
-                        '_plus_field':[]
+                        '_plus_field':[],
                     });
                     state.step = _id;
                 }).catch((e) => {
