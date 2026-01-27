@@ -97,8 +97,11 @@ namespace fnpackup.Controllers
                 }
                 try
                 {
-                    Process.Start("mkfifo", path).WaitForExit();
-                    Process.Start("chmod", $"666 {path}").WaitForExit();
+                    CommandHelper.Execute("/bin/bash", string.Empty, [
+                        $"mkfifo \"{path}\"",
+                        $"chmod 666 \"{path}\"",
+                        ], $"/{vol}", out string error);
+
                     _ = ReadLoggerAsync(path, file.Type).ConfigureAwait(false);
                     Console.WriteLine($"create {path}");
                 }
