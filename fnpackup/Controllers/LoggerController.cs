@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace fnpackup.Controllers
 {
@@ -92,8 +93,9 @@ namespace fnpackup.Controllers
                     System.IO.File.Delete(path);
                     Console.WriteLine($"delete {path}");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex);
                 }
                 try
                 {
@@ -101,12 +103,14 @@ namespace fnpackup.Controllers
                         $"mkfifo \"{path}\"",
                         $"chmod 666 \"{path}\"",
                         ], $"/{vol}", out string error);
+                    Console.WriteLine($"create error {error}");
 
                     _ = ReadLoggerAsync(path, file.Type).ConfigureAwait(false);
                     Console.WriteLine($"create {path}");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex);
                 }
             }
         }
