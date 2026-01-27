@@ -1,3 +1,4 @@
+using fnpackup.Controllers;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
@@ -80,7 +81,7 @@ namespace fnpackup
         }
         public static WebApplication UseLogger(this WebApplication app)
         {
-            
+            app.Services.GetService<LoggerController>();
             return app;
         }
     }
