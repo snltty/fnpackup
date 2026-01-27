@@ -44,7 +44,7 @@
 
         let newUrl = `${window.location.protocol}//${window.location.hostname}:${port}`;
         if(hasFn) newUrl = `${window.location.protocol}//fnpackup-docker.${window.location.hostname}`
-        newUrl = `${newUrl}/#/?fnos-theme=${theme}&fnos-token=${encodeURIComponent(cookies['fnos-token'])}`;
+        newUrl = `${newUrl}/?t=${Date.now()}#/?fnos-theme=${theme}&fnos-token=${encodeURIComponent(cookies['fnos-token'])}`;
         document.querySelector('.be-danger').href = newUrl;
 
         if(hasFn){
