@@ -67,7 +67,7 @@ namespace fnpackup
 
             app.UseDynamicStaticFile();
             app.UseLogger();
-            
+
             app.Run();
         }
     }
@@ -77,11 +77,12 @@ namespace fnpackup
     {
         public static IServiceCollection AddLogger(this IServiceCollection services)
         {
+            services.AddSingleton<LoggerTransfer>();
             return services;
         }
         public static WebApplication UseLogger(this WebApplication app)
         {
-            app.Services.GetService<LoggerController>();
+            LoggerTransfer loggerTransfer = app.Services.GetService<LoggerTransfer>();
             return app;
         }
     }

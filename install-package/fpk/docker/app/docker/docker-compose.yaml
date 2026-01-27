@@ -14,3 +14,5 @@ services:
       - "/usr/local/bin/fnpack:/app/fnpack"
       - "/var/apps:/app/apps"
       - "/${TRIM_APPDEST_VOL}:/${TRIM_APPDEST_VOL}"
+    environment:
+      - FNOS_HTTP_PORT=${wizard_fnos_http_port}

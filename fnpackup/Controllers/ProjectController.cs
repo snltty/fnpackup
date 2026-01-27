@@ -575,7 +575,9 @@ namespace fnpackup.Controllers
         {
             try
             {
-                string host = "http://localhost:5666/";
+                string port = Environment.GetEnvironmentVariable("FNOS_HTTP_PORT") ?? "5666";
+
+                string host = $"http://localhost:{port}/";
                 string token = Request.Cookies["fnos-token"];
 
                 if (string.IsNullOrWhiteSpace(token))

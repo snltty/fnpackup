@@ -4,6 +4,22 @@ namespace fnpackup.Controllers
 {
     public class LoggerController : BaseController
     {
+
+        private readonly LoggerTransfer loggerTransfer;
+        public LoggerController(LoggerTransfer loggerTransfer)
+        {
+            this.loggerTransfer = loggerTransfer;
+        }
+
+        [HttpGet]
+        public LoggerPageInfo List(string text = "", int p = 1, int ps = 10, LoggerType type = LoggerType.None)
+        {
+            return loggerTransfer.List(text, p, ps, type);
+        }
+    }
+
+    public sealed class LoggerTransfer
+    {
         private readonly List<LoggerFileInfo> files = [
             new LoggerFileInfo { Name = "fnpackup.debug", Type = LoggerType.Debug },
             new LoggerFileInfo { Name = "fnpackup.info", Type = LoggerType.Info },
@@ -14,7 +30,8 @@ namespace fnpackup.Controllers
         private readonly List<LoggerInfo> list = [];
         private string vol = string.Empty;
 
-        public LoggerController()
+
+        public LoggerTransfer()
         {
             InitLogger();
             CreateLogger();
@@ -22,7 +39,6 @@ namespace fnpackup.Controllers
             Console.CancelKeyPress += (sender, e) => DeleteLogger();
         }
 
-        [HttpGet]
         public LoggerPageInfo List(string text = "", int p = 1, int ps = 10, LoggerType type = LoggerType.None)
         {
             IEnumerable<LoggerInfo> _list = list;
@@ -88,7 +104,6 @@ namespace fnpackup.Controllers
                 try
                 {
                     System.IO.File.Delete(path);
-                    Console.WriteLine($"delete {path}");
                 }
                 catch (Exception ex)
                 {
@@ -96,11 +111,8 @@ namespace fnpackup.Controllers
                 }
                 try
                 {
-                    CommandHelper.Execute("/bin/bash", $"-c \"mkfifo '{path}' ; chmod 666 '{path}'\"", [], $"/{vol}", out string error);
-                    Console.WriteLine($"create error {error}");
-
-                    _ = ReadLoggerAsync(path, file.Type).ConfigureAwait(false);
-                    Console.WriteLine($"create {path}");
+                    CommandHelper.Execute("/bin/bash", $"-c \"mkfifo '{path}' ; chmod 666 '{path}'\"", [], $"/{vol}", out string error, false);
+                    ReadLoggerAsync(path, file.Type);
                 }
                 catch (Exception ex)
                 {
@@ -108,22 +120,25 @@ namespace fnpackup.Controllers
                 }
             }
         }
-        private async Task ReadLoggerAsync(string path, LoggerType type)
+        private void ReadLoggerAsync(string path, LoggerType type)
         {
-            while (true)
+            Task.Run(async () =>
             {
-                using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                using var reader = new StreamReader(fs, Encoding.UTF8);
-                string message = await reader.ReadToEndAsync();
-                if (string.IsNullOrWhiteSpace(message) == false)
+                while (true)
                 {
-                    list.Add(new LoggerInfo { Type = type, Msg = message });
-                    if (list.Count > 10000)
+                    using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var reader = new StreamReader(fs, Encoding.UTF8);
+                    string message = await reader.ReadToEndAsync();
+                    if (string.IsNullOrWhiteSpace(message) == false)
                     {
-                        list.RemoveAt(0);
+                        list.Add(new LoggerInfo { Type = type, Msg = message });
+                        if (list.Count > 10000)
+                        {
+                            list.RemoveAt(0);
+                        }
                     }
                 }
-            }
+            });
         }
     }
 

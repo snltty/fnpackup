@@ -5,6 +5,22 @@
             {
                 "type": "tips",
                 "helpText": "如果需要动态托管应用的静态资源，请将需要托管的应用与在线fpk安装在同一空间"
+            },
+            {
+                "type": "tips",
+                "helpText": "如果自定义了飞牛端口，填写一下"
+            },
+            {
+                "type": "text",
+                "field": "wizard_fnos_http_port",
+                "label": "飞牛端口",
+                "initValue": "5666",
+                "rules": [
+                    {
+                        "required": true,
+                        "message": "请输入飞牛端口"
+                    }
+                ]
             }
         ]
     }

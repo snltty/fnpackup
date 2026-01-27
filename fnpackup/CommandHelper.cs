@@ -27,7 +27,7 @@ namespace fnpackup
             {
                 Console.WriteLine(args.Data);
             };
-           
+
             proc.Start();
             proc.BeginOutputReadLine();
             proc.BeginErrorReadLine();
@@ -49,7 +49,7 @@ namespace fnpackup
 
         }
 
-        public static string Execute(string fileName, string arg, string[] commands, string root, out string error)
+        public static string Execute(string fileName, string arg, string[] commands, string root, out string error, bool exit = true)
         {
             using Process proc = new Process();
             proc.StartInfo.WorkingDirectory = Path.GetFullPath(root);
@@ -73,12 +73,12 @@ namespace fnpackup
                     proc.StandardInput.WriteLine(commands[i]);
                 }
             }
-
-            proc.StandardInput.AutoFlush = true;
-            proc.StandardInput.WriteLine("exit");
-            proc.StandardInput.Close();
-
-
+            if (exit)
+            {
+                proc.StandardInput.AutoFlush = true;
+                proc.StandardInput.WriteLine("exit");
+                proc.StandardInput.Close();
+            }
             string output = proc.StandardOutput.ReadToEnd();
             error = proc.StandardError.ReadToEnd();
 
