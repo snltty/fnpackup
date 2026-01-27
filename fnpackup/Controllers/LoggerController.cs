@@ -51,7 +51,9 @@ namespace fnpackup.Controllers
         {
             try
             {
+                Console.WriteLine(Directory.ResolveLinkTarget("/app/apps/fnpackup/target", true).FullName);
                 vol = Directory.ResolveLinkTarget("/app/apps/fnpackup/target", true).FullName.Split('/')[1];
+                Console.WriteLine($"logger根目录: /{vol}/fnpackup.*" );
             }
             catch (Exception)
             {
