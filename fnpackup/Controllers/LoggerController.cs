@@ -51,7 +51,7 @@ namespace fnpackup.Controllers
         {
             try
             {
-                vol = Directory.ResolveLinkTarget("/var/apps/fnpackup/target", true).FullName.Split('/')[1];
+                vol = Directory.ResolveLinkTarget("/app/apps/fnpackup/target", true).FullName.Split('/')[1];
             }
             catch (Exception)
             {
