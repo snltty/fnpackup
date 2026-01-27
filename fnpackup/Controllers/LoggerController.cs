@@ -55,8 +55,9 @@ namespace fnpackup.Controllers
                 vol = Directory.ResolveLinkTarget("/app/apps/fnpackup/target", true).FullName.Split('/')[1];
                 Console.WriteLine($"logger根目录: /{vol}/fnpackup.*" );
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex);
             }
             if (string.IsNullOrWhiteSpace(vol))
             {
