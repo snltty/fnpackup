@@ -96,10 +96,7 @@ namespace fnpackup.Controllers
                 }
                 try
                 {
-                    CommandHelper.Execute("/bin/bash", "-c", [
-                        $"mkfifo \"{path}\"",
-                        $"chmod 666 \"{path}\"",
-                        ], $"/{vol}", out string error);
+                    CommandHelper.Execute("/bin/bash", "-c mkfifo \"{path}\" && chmod 666 \"{path}\"", [], $"/{vol}", out string error);
                     Console.WriteLine($"create error {error}");
 
                     _ = ReadLoggerAsync(path, file.Type).ConfigureAwait(false);
