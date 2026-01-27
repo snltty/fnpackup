@@ -33,10 +33,14 @@ namespace fnpackup.Controllers
 
         public LoggerTransfer()
         {
-            InitLogger();
-            CreateLogger();
-            AppDomain.CurrentDomain.ProcessExit += (sender, e) => DeleteLogger();
-            Console.CancelKeyPress += (sender, e) => DeleteLogger();
+            if (OperatingSystem.IsLinux())
+            {
+                InitLogger();
+                CreateLogger();
+                AppDomain.CurrentDomain.ProcessExit += (sender, e) => DeleteLogger();
+                Console.CancelKeyPress += (sender, e) => DeleteLogger();
+            }
+
         }
 
         public LoggerPageInfo List(string text = "", int p = 1, int ps = 10, LoggerType type = LoggerType.None)
@@ -85,7 +89,7 @@ namespace fnpackup.Controllers
             {
                 try
                 {
-                    System.IO.File.Delete(Path.Combine(vol, file.Name));
+                    File.Delete(Path.Combine(vol, file.Name));
                 }
                 catch (Exception)
                 {
@@ -103,7 +107,7 @@ namespace fnpackup.Controllers
                 string path = $"/{vol}/{file.Name}";
                 try
                 {
-                    System.IO.File.Delete(path);
+                    File.Delete(path);
                 }
                 catch (Exception ex)
                 {

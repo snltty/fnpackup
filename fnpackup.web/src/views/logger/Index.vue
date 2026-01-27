@@ -7,6 +7,7 @@
                 </el-select>
                 <el-input v-model="state.page.text" @change="getList" placeholder="文本" size="small" class="w-10 mgl-1"></el-input>
                 <el-button plain type="primary" size="small" :loading="state.loading" @click="getList" class="mgl-1"><el-icon><Refresh></Refresh></el-icon></el-button>
+                <el-button plain size="small" @click="handleInfo" class="mgl-1"><el-icon><InfoFilled></InfoFilled></el-icon>相关说明</el-button>
             </div>
             <div class="flex-1 relative">
                 <div class="absolute flex flex-column flex-nowrap">
@@ -35,14 +36,34 @@
             <textarea class="logger-msg">{{ state.msg }}</textarea>
         </div>
     </el-dialog>
+    <el-dialog class="options-center" title="相关说明" destroy-on-close v-model="state.showInfo" top="2vh" width="560">
+        <div>
+            <h3>日志管道</h3>
+            <p>在安装空间下</p>
+            <ul>
+                <li>调试: /${TRIM_APPDEST_VOL}/fnpackup.debug</li>
+                <li>信息: /${TRIM_APPDEST_VOL}/fnpackup.info</li>
+                <li>警告: /${TRIM_APPDEST_VOL}/fnpackup.warning</li>
+                <li>错误: /${TRIM_APPDEST_VOL}/fnpackup.error</li>
+                <li>致命: /${TRIM_APPDEST_VOL}/fnpackup.fatal</li>
+            </ul>
+            <h3>写入示例</h3>
+            <ul>
+                <li>标准: command > /${TRIM_APPDEST_VOL}/fnpackup.debug</li>
+                <li>标准: command 1> /${TRIM_APPDEST_VOL}/fnpackup.debug</li>
+                <li>错误: command 2> /${TRIM_APPDEST_VOL}/fnpackup.error</li>
+                <li>标准+错误: command > /${TRIM_APPDEST_VOL}/fnpackup.error 2>&1</li>
+            </ul>
+        </div>
+    </el-dialog>
 </template>
 
 <script>
 import { fetchLoggerList } from '@/api/api';
-import { Refresh } from '@element-plus/icons-vue';
+import { InfoFilled, Refresh } from '@element-plus/icons-vue';
 import { onMounted, reactive} from 'vue';
 export default {
-    components:{Refresh},
+    components:{Refresh,InfoFilled},
     setup () {
 
         const types = ['全部','debug','info','warning','error','fatal'];
@@ -60,13 +81,14 @@ export default {
            
             loading:false,
             show:false,
-            msg:''
+            msg:'',
+            showInfo:false
         });
 
         const getList = () => { 
             return new Promise((resolve,reject)=>{ 
                 state.loading = true;
-                fetchLoggerList()
+                fetchLoggerList(state.page.text,state.page.p,state.page.ps,state.page.type)
                 .then(res=>{
                     state.page.count = res.count;
                     state.page.p = res.p;
@@ -89,12 +111,16 @@ export default {
             state.show = true;
             state.msg = row.msg;
         }
+
+        const handleInfo = ()=>{
+            state.showInfo = true;
+        }
         
         onMounted(()=>{
             getList();
         });
 
-        return {state,getList,handlePageChange,tableRowClassName,handleRowClick}
+        return {state,getList,handlePageChange,tableRowClassName,handleRowClick,handleInfo}
     }
 }
 </script>

@@ -15,11 +15,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         with:
-          tag_name: v1.0.3
-          release_name: v1.0.3.${{ steps.date.outputs.today }}
+          tag_name: v1.0.4
+          release_name: v1.0.4.${{ steps.date.outputs.today }}
           draft: false
           prerelease: false
-          body: "1. 一些累计更新，写了一些新bug\r\n2. 一些bug优化\r\n3. ssl证书"
+          body: "1. 一些累计更新，写了一些新bug\r\n2. 日志收集，重定向到管道，可在在线fpk查看输出\r\n3. 向导新增飞牛端口填写，以适应自定义端口"
       - name: setup node.js
         uses: actions/setup-node@v2
         with:
@@ -46,5 +46,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./public/publish-fpk/docker/fnpackup-docker.fpk
-          asset_name: fnpackup-docker-v1.0.3.fpk
+          asset_name: fnpackup-docker-v1.0.4.fpk
           asset_content_type: application/fpk
