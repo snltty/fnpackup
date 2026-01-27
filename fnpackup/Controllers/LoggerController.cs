@@ -51,13 +51,10 @@ namespace fnpackup.Controllers
         {
             try
             {
-                Console.WriteLine(Directory.ResolveLinkTarget("/app/apps/fnpackup/target", true).FullName);
                 vol = Directory.ResolveLinkTarget("/app/apps/fnpackup/target", true).FullName.Split('/')[1];
-                Console.WriteLine($"logger根目录: /{vol}/fnpackup.*" );
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex);
             }
             if (string.IsNullOrWhiteSpace(vol))
             {
@@ -89,7 +86,7 @@ namespace fnpackup.Controllers
             }
             foreach (var file in files)
             {
-                string path = Path.Combine(vol, file.Name);
+                string path = $"/{vol}/{file.Name}";
                 try
                 {
                     System.IO.File.Delete(path);
