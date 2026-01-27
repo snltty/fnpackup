@@ -25,7 +25,7 @@ namespace fnpackup.Controllers
         }
 
         [HttpGet]
-        public LoggerPageInfo List(string text, int p = 1, int ps = 10, LoggerType type = LoggerType.None)
+        public LoggerPageInfo List(string text = "", int p = 1, int ps = 10, LoggerType type = LoggerType.None)
         {
             IEnumerable<LoggerInfo> _list = list;
 
@@ -90,6 +90,7 @@ namespace fnpackup.Controllers
                 try
                 {
                     System.IO.File.Delete(path);
+                    Console.WriteLine($"delete {path}");
                 }
                 catch (Exception)
                 {
@@ -99,6 +100,7 @@ namespace fnpackup.Controllers
                     Process.Start("mkfifo", path).WaitForExit();
                     Process.Start("chmod", $"666 {path}").WaitForExit();
                     _ = ReadLoggerAsync(path, file.Type).ConfigureAwait(false);
+                    Console.WriteLine($"create {path}");
                 }
                 catch (Exception)
                 {
