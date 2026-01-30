@@ -97,7 +97,7 @@ export default {
         const getContent = ()=>{
             return new Promise((resolve,reject)=>{ 
                 if(!dom.value || !dom.value.getContent) resolve();
-                else dom.value.getContent().then(resolve);
+                else dom.value.getContent().then(resolve).catch((e)=>{ console.log(e); });
             });
         }
 

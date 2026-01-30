@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fnpackup(在线fpk) - fnpack二次包装UI，在线编辑打包飞牛fpk</title>
+  <!-- 引入外部资源 -->
+  <script src="js/tailwindcss.js"></script>
+  <link href="css/font-awesome.min.css" rel="stylesheet">
+  <link rel="icon" href="img/logo.png" />
+
+  <!-- 自定义样式 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .section-full {
+        min-height: 100vh;
+      }
+      .scroll-smooth {
+        scroll-behavior: smooth;
+      }
+      #hero{
+        background-image: url(img/bg.png);
+        background-repeat: no-repeat;
+        background-position: bottom;
+        background-size: cover;
+      }
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3f37c9',
+            dark: '#2b2d42',
+            light: '#f8f9fa',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+</head>
+<body class="font-sans text-dark bg-light scroll-smooth">
+  <!-- 导航栏（仅保留Logo，移除所有导航菜单） -->
+  <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-sm shadow-sm z-50 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex justify-start items-center">
+      <!-- 仅保留Logo锚点，居中显示更美观（也可改为justify-start左对齐） -->
+      <a href="#hero" class="flex items-center gap-2 text-primary font-bold text-xl">
+        <img src="img/logo.png" alt="fnpackup" width="40">
+        <span>Fnpackup</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- 英雄区（首屏，完整保留视觉和核心功能） -->
+  <section id="hero" class="section-full flex items-center pt-20 bg-gradient-to-br from-primary/5 to-secondary/5">
+    <div class="container mx-auto px-4 py-16 flex flex-col md:flex-row items-center gap-10">
+      <div class="md:w-1/2">
+        <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-primary mb-6 leading-tight text-shadow">
+          在线fpk<br>
+          <span class="text-dark">fnpack二次包装UI</span>
+        </h1>
+        <p class="text-lg text-gray-700 mb-8">
+          在线编辑和打包fpk，帮助fpk自动托管静态资源，简化飞牛系统应用开发流程
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="https://github.com/snltty/fnpackup/releases" target="_blank" class="bg-primary text-white px-8 py-3 rounded-lg shadow-lg hover:bg-primary/90 transition-all">
+            <i class="fa fa-download mr-2"></i>立即安装
+          </a>
+          <a href="https://github.com/snltty/fnpackup" target="_blank" class="bg-white text-primary border border-primary px-8 py-3 rounded-lg shadow hover:shadow-md transition-all">
+            <i class="fa fa-github mr-2"></i>GitHub
+          </a>
+        </div>
+        <div class="mt-8 flex gap-4 text-sm text-gray-600">
+          <div><img src="https://img.shields.io/github/stars/snltty/fnpackup" alt="stars"></div>
+          <div><img src="https://img.shields.io/github/forks/snltty/fnpackup" alt="forks"></div>
+          <div><img src="https://img.shields.io/docker/pulls/snltty/fnpackup" alt="docker pulls"></div>
+          <div><img src="https://img.shields.io/github/v/release/snltty/fnpackup?sort=semver" alt="release"></div>
+          <div><img src="https://img.shields.io/github/license/snltty/fnpackup" alt="license"></div>
+        </div>
+      </div>
+      <div class="md:w-1/2">
+        <img src="img/fnpackup.png" alt="Fnpackup 预览" class="rounded-lg shadow-2xl w-full hover:scale-105 transition-transform duration-500">
+      </div>
+    </div>
+  </section>
+
+  <!-- 脚本（仅保留导航栏滚动效果，剔除所有菜单相关逻辑） -->
+  <script>
+    // 导航栏滚动效果（保留，提升体验）
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        nav.classList.add('py-2', 'shadow');
+        nav.classList.remove('py-3');
+      } else {
+        nav.classList.add('py-3');
+        nav.classList.remove('py-2', 'shadow');
+      }
+    });
+
+    // 仅保留Logo锚点的平滑滚动（简化版）
+    document.querySelector('a[href="#hero"]').addEventListener('click', function (e) {
+      e.preventDefault();
+      const targetElement = document.querySelector('#hero');
+      if (targetElement) {
+        window.scrollTo({
+          top: targetElement.offsetTop - 80,
+          behavior: 'smooth'
+        });
+      }
+    });
+  </script>
+</body>
+</html>
