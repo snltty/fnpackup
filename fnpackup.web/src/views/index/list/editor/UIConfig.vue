@@ -28,14 +28,15 @@ export default {
 
         const resetForm = (item) => { 
             const json = JSON.parse(JSON.stringify(item));
-            return Object.assign(Object.assign({
+            return Object.assign({
                 "noDisplay":false,
                 "allUsers":true,
                 "fileTypes":[],
                 "control": {
                     "accessPerm": "readonly"
-                }
-            },json),{protocol:'http'});
+                },
+                "protocol":'http'
+            },json);
         }
 
         const configJson = JSON.parse(props.content);

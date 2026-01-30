@@ -75,7 +75,7 @@ export default {
         
         _default.forEach((step,index)=>{
             step._id = index;
-            for(let i =0; i < step.items.length; i++){
+            for(let i = 0; i < step.items.length; i++){
                 step.items[i] = Object.assign(JSON.parse(JSON.stringify(defaultItem)),step.items[i]);
                 const type = types.filter(c=>c.value == step.items[i].type)[0];
                 if(type){
@@ -92,6 +92,7 @@ export default {
                 }
             });
         });
+
         const state = reactive({
             step:_default.length > 0 ? _default[0]._id : '',
             steps:_default,
