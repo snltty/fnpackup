@@ -24,9 +24,9 @@ fnpack二次包装UI，在线编辑和打包fpk，和帮助fpk自动托管静态
 
 ## [😂]安装方法
 
-1. 在飞牛系统`应用中心`找到应用安装
-2. 下载`fnpackup-docker-x64.fpk`到飞牛系统安装
-3. 或使用`snltty/fnpackup`Dcker镜像运行，依赖fnpack，监听1069/tcp端口
+1. 在飞牛系统`应用中心`找到`在线fpk`应用安装
+2. 在Github的Releases中下载`fpk`到飞牛系统安装
+3. 或使用`snltty/fnpackup`Docker镜像运行，依赖fnpack，http 1069 端口，https 10699 端口
 ```
 docker run -it -d --name fnpackup \
 --network host \
@@ -34,7 +34,6 @@ docker run -it -d --name fnpackup \
 -v /usr/local/fnpackup-docker/statics:/app/statics \
 -v /usr/local/bin/appcenter-cli:/app/appcenter-cli:ro \
 -v /usr/local/bin/fnpack:/app/fnpack:ro \
--v /var/apps:/app/apps:ro \
 --restart=always \
 --privileged=true \
 snltty/fnpackup
@@ -65,7 +64,17 @@ snltty/fnpackup
     2. 在里面下新建一个文件夹，上传你的静态资源
     3. 文件夹名称就是`{appname}`
 
-然后
+### [💾]日志收集
+在`在线fpk`安装的空间(比如vol1)下，有 fnpackup.debug、fnpackup.info、fnpackup.warning、fnpackup.error、fnpackup.fatal 管道文件，往管道内写入信息，就可以在在线fpk的`日志收集`页面查看到。
+
+当然，在应用生命周期脚本中也可以使用`${TRIM_APPDEST_VOL}`变量获取安装空间，比如
+
+```
+
+echo "debug msg" > /${TRIM_APPDEST_VOL}/fnpackup.debug
+echo "debug and error msg" > /${TRIM_APPDEST_VOL}/fnpackup.debug 2>&1
+
+```
 
 
 ## [🖼️]预览效果
@@ -78,7 +87,7 @@ snltty/fnpackup
 
 若此项目对您有用，可以考虑对作者稍加支持，让作者更有动力，在项目上投入更多时间和精力。
 
-**或者需要帮忙打包fpk的，￥30/次**
+**或花费￥30/次让作者帮忙打包fpk，可获得打包过程录屏**
 
 ![pay](./fnpackup.web/public/pay.png)
 
