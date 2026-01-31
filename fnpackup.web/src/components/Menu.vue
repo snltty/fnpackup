@@ -33,7 +33,7 @@
             </a>
         </div>
     </div>
-    <el-dialog v-model="state.showPay" title="慷慨赞助" width="350">
+    <el-dialog v-model="state.showPay" title="慷慨赞助" width="356">
         <div class="pay">
             <p class="t-c mgb-1">
                 程序本身完全开源免费
