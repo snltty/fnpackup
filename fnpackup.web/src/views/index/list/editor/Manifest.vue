@@ -31,7 +31,7 @@
                         <template v-else-if="item.type == 'select'">
                             <template v-if="item.to">
                                 <el-row class="w-100">
-                                    <el-col :span="12">
+                                    <el-col :span="24">
                                         <template v-if="item.create">
                                             <el-select v-model="state.ruleForm[item.name]" :remote="item.remote" :filter-method="item.remoteFn || remoteFn"
                                             filterable clearable allow-create 
@@ -44,9 +44,6 @@
                                                 <el-option v-for="(option,index) in item.options" :key="index" :label="option.label" :value="option.value"></el-option>
                                             </el-select>
                                         </template>
-                                    </el-col>
-                                    <el-col :span="12" class="t-r"> 
-                                        <el-button plain @click="handleTransform(index)">转为{{item.to.label}}</el-button>
                                     </el-col>
                                 </el-row>
                             </template>
@@ -104,24 +101,8 @@ export default {
             }
             return json;
         },{});
+        delete contentJson['arch'];
 
-        const archJson = {
-            arch:{
-                name: 'arch', label: '架构类型', type: 'select', options: [{label: 'x86_64', value: 'x86_64'}],default:'x86_64',
-                to:{label:'platform',value:'platform'}
-            },
-            platform:{
-                name: 'platform', label: '架构类型', type: 'select', 
-                options: [
-                    {label: '任意', value: 'all'},
-                    {label: '仅x86', value: 'x86'},
-                    {label: '仅arm', value: 'arm'},
-                    {label: '仅loongarch', value: 'loongarch'},
-                    {label: '仅risc-v', value: 'risc-v'},
-                ],
-                default:'x86', to:{label:'arch',value:'arch'}
-            }
-        }
 
         const staticHelp = [
             '可以填写app下的文件夹<br/>比如填写www则可通过<br/>',
@@ -135,7 +116,15 @@ export default {
             {name: 'version', label: '应用版本号', type: 'input',default:'0.0.1',rules:[{required: true, message: '请填写版本号', trigger: 'blur'}]},
             {name: 'display_name', label: '应用显示名', type: 'input',default:'',rules:[{required: true, message: '请填写显示名', trigger: 'blur'}]},
             {name: 'desc', label: '详细介绍支持HTML', type: 'textarea',default:'',rules:[{required: true, message: '请填写描述', trigger: 'blur'}]},
-            contentJson['arch'] !== undefined ? archJson['arch'] : archJson['platform'],
+            { name: 'platform', label: '架构类型', type: 'select',  default:'x86',
+                options: [
+                    {label: '任意', value: 'all'},
+                    {label: '仅x86', value: 'x86'},
+                    {label: '仅arm', value: 'arm'},
+                    {label: '仅loongarch', value: 'loongarch'},
+                    {label: '仅risc-v', value: 'risc-v'},
+                ]
+            },
             {name: 'source', label: '应用来源', type: 'select', options: [{label: '第三方应用', value: 'thirdparty'}],default:'thirdparty'},
             {name: 'maintainer', label: '开发者名', type: 'input',default:'',rules:[{required: true, message: '请填写开发者名', trigger: 'blur'}]},
             {name: 'maintainer_url', label: '开发者网站/联系方式', type: 'input',default:''},
@@ -214,15 +203,6 @@ export default {
         const remoteFn = ()=>{ 
         }
 
-        const handleTransform = (index)=>{
-            const from = fieldsArray.value[index];
-            const to = archJson[from.to.value];
-
-            fieldsArray.value[index] = to;
-            delete state.ruleForm[from.name];
-            state.ruleForm[to.name] = to.default;
-        }
-
         const ruleFormRef = ref(null);
         const getContent = ()=>{
             return new Promise((resolve,reject)=>{ 
@@ -278,7 +258,7 @@ export default {
             });
         })
     
-        return {state,fieldsArray,ruleFormRef,handleChange,handleTransform,remoteFn,getContent}
+        return {state,fieldsArray,ruleFormRef,handleChange,remoteFn,getContent}
     }
 }
 </script>
