@@ -82,6 +82,12 @@ echo "debug and error msg" > /${TRIM_APPDEST_VOL}/fnpackup.debug 2>&1
 ![pay](./fnpackup.web/public/fnpackup1.png)
 ![pay](./fnpackup.web/public/fnpackup2.png)
 ![pay](./fnpackup.web/public/fnpackup3.png)
+![pay](./fnpackup.web/public/fnpackup4.png)
+![pay](./fnpackup.web/public/fnpackup5.png)
+![pay](./fnpackup.web/public/fnpackup6.png)
+![pay](./fnpackup.web/public/fnpackup7.png)
+![pay](./fnpackup.web/public/fnpackup8.png)
+![pay](./fnpackup.web/public/fnpackup9.png)
 
 ## [🎁]为爱发电
 
