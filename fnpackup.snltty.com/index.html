@@ -27,6 +27,92 @@
         background-position: bottom;
         background-size: cover;
       }
+      /* 轮播相关样式 */
+      .carousel {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.9rem;
+        border: 3px solid #4361ee;
+      }
+      .carousel-inner {
+        display: flex;
+        transition: transform 0.5s ease;
+      }
+      .carousel-item {
+        flex: 0 0 100%;
+        /* 为标题预留空间，采用弹性布局垂直排列 */
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      /* 轮播项标题样式 */
+      .carousel-item-title {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 1rem 2rem;
+        background-color: rgba(0,0,0, 0.5);
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        z-index: 5;
+      }
+      .carousel-control {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255,255,255,0.8);
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+      }
+      .carousel-control:hover {
+        background-color: rgba(255,255,255,1);
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      }
+      .carousel-control-prev {
+        left: 1rem;
+      }
+      .carousel-control-next {
+        right: 1rem;
+      }
+      .carousel-indicators {
+        position: absolute;
+        bottom: 0.85rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 0.5rem;
+        z-index: 10;
+        max-width: 90%;
+        overflow-x: auto;
+        padding: 0.5rem 0;
+        scrollbar-width: none; /* 隐藏火狐滚动条 */
+      }
+      .carousel-indicators::-webkit-scrollbar {
+        display: none; /* 隐藏chrome滚动条 */
+      }
+      .carousel-indicator {
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 50%;
+        background-color: rgba(255,255,255,0.6);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex-shrink: 0; /* 防止指示器被压缩 */
+      }
+      .carousel-indicator.active {
+        background-color: #4361ee;
+        width: 2rem;
+        border-radius: 0.5rem;
+      }
     }
   </style>
   <script>
@@ -87,12 +173,76 @@
         </div>
       </div>
       <div class="md:w-1/2">
-        <img src="img/fnpackup.png" alt="Fnpackup 预览" class="rounded-lg shadow-2xl w-full hover:scale-105 transition-transform duration-500">
+        <!-- 多图轮播容器 -->
+        <div class="carousel shadow-2xl hover:shadow-3xl transition-all duration-500">
+          <div class="carousel-inner">
+            <!-- 轮播项1 - 对应fnpackup1.png -->
+            <div class="carousel-item">
+              <div class="carousel-item-title">暗色主题</div>
+              <img src="img/fnpackup1.png" alt="暗色主题" class="w-full h-auto">
+            </div>
+            <!-- 轮播项2 - 对应fnpackup2.png -->
+            <div class="carousel-item">
+              <div class="carousel-item-title">亮色主题</div>
+              <img src="img/fnpackup2.png" alt="亮色主题" class="w-full h-auto">
+            </div>
+            <!-- 轮播项3 - 对应fnpackup3.png -->
+            <div class="carousel-item">
+              <div class="carousel-item-title">静态资源托管</div>
+              <img src="img/fnpackup3.png" alt="静态资源托管" class="w-full h-auto">
+            </div>
+            <!-- 轮播项4 - 对应fnpackup4.png -->
+            <div class="carousel-item">
+              <div class="carousel-item-title">日志收集</div>
+              <img src="img/fnpackup4.png" alt="日志收集4" class="w-full h-auto">
+            </div>
+            <!-- 轮播项5 - 对应fnpackup5.png -->
+            <div class="carousel-item">
+              <div class="carousel-item-title">图标设计</div>
+              <img src="img/fnpackup5.png" alt="图标设计" class="w-full h-auto">
+            </div>
+            <!-- 轮播项6 - 对应fnpackup6.png -->
+            <div class="carousel-item">
+              <div class="carousel-item-title">图标上传处理</div>
+              <img src="img/fnpackup6.png" alt="图标上传处理" class="w-full h-auto">
+            </div>
+            <!-- 轮播项7 - 对应fnpackup7.png -->
+            <div class="carousel-item">
+              <div class="carousel-item-title">选择依赖应用</div>
+              <img src="img/fnpackup7.png" alt="选择依赖应用" class="w-full h-auto">
+            </div>
+            <!-- 轮播项8 - 对应fnpackup8.png -->
+            <div class="carousel-item">
+              <div class="carousel-item-title">打包多平台fpk</div>
+              <img src="img/fnpackup8.png" alt="打包多平台fpk" class="w-full h-auto">
+            </div>
+          </div>
+          
+          <!-- 轮播控制按钮 -->
+          <div class="carousel-control carousel-control-prev">
+            <i class="fa fa-chevron-left text-primary"></i>
+          </div>
+          <div class="carousel-control carousel-control-next">
+            <i class="fa fa-chevron-right text-primary"></i>
+          </div>
+          
+          <!-- 轮播指示器（8个，与轮播项一一对应） -->
+          <div class="carousel-indicators">
+            <div class="carousel-indicator active" data-index="0"></div>
+            <div class="carousel-indicator" data-index="1"></div>
+            <div class="carousel-indicator" data-index="2"></div>
+            <div class="carousel-indicator" data-index="3"></div>
+            <div class="carousel-indicator" data-index="4"></div>
+            <div class="carousel-indicator" data-index="5"></div>
+            <div class="carousel-indicator" data-index="6"></div>
+            <div class="carousel-indicator" data-index="7"></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 脚本（仅保留导航栏滚动效果，剔除所有菜单相关逻辑） -->
+  <!-- 脚本 -->
   <script>
     // 导航栏滚动效果（保留，提升体验）
     const nav = document.querySelector('nav');
@@ -116,6 +266,84 @@
           behavior: 'smooth'
         });
       }
+    });
+
+    // 轮播功能实现
+    document.addEventListener('DOMContentLoaded', function() {
+      const carousel = document.querySelector('.carousel');
+      const carouselInner = carousel.querySelector('.carousel-inner');
+      const carouselItems = carousel.querySelectorAll('.carousel-item');
+      const prevBtn = carousel.querySelector('.carousel-control-prev');
+      const nextBtn = carousel.querySelector('.carousel-control-next');
+      const indicators = carousel.querySelectorAll('.carousel-indicator');
+      
+      // 轮播基础配置（自动适配8个轮播项，无需修改数量）
+      const itemCount = carouselItems.length;
+      let currentIndex = 0;
+      const autoPlayInterval = 5000; // 自动轮播间隔（毫秒）
+      let autoPlayTimer;
+
+      // 更新轮播视图
+      function updateCarousel() {
+        // 移动轮播容器
+        carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`;
+        
+        // 更新指示器状态
+        indicators.forEach((indicator, index) => {
+          if (index === currentIndex) {
+            indicator.classList.add('active');
+          } else {
+            indicator.classList.remove('active');
+          }
+        });
+      }
+
+      // 上一张
+      function prevSlide() {
+        currentIndex = (currentIndex - 1 + itemCount) % itemCount;
+        updateCarousel();
+        resetAutoPlay();
+      }
+
+      // 下一张
+      function nextSlide() {
+        currentIndex = (currentIndex + 1) % itemCount;
+        updateCarousel();
+        resetAutoPlay();
+      }
+
+      // 跳转到指定索引
+      function goToSlide(index) {
+        currentIndex = index;
+        updateCarousel();
+        resetAutoPlay();
+      }
+
+      // 重置自动轮播定时器
+      function resetAutoPlay() {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = setInterval(nextSlide, autoPlayInterval);
+      }
+
+      // 绑定事件
+      prevBtn.addEventListener('click', prevSlide);
+      nextBtn.addEventListener('click', nextSlide);
+      indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => goToSlide(index));
+      });
+
+      // 鼠标悬停暂停自动轮播
+      carousel.addEventListener('mouseenter', () => {
+        clearInterval(autoPlayTimer);
+      });
+
+      // 鼠标离开恢复自动轮播
+      carousel.addEventListener('mouseleave', () => {
+        resetAutoPlay();
+      });
+
+      // 初始化自动轮播
+      resetAutoPlay();
     });
   </script>
 </body>
